@@ -35,6 +35,7 @@
 **Databases**  
 - Kasandra
     - Store Equipment and Weapons
+    ![](images/Cassandra.png)
 - Neo4j
     - For build generation and skill querying
     ![](images/neo4j_datastructure.png)
