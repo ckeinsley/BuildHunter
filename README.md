@@ -37,6 +37,7 @@
     - Store Equipment and Weapons
 - Neo4j
     - For build generation and skill querying
+    ![](images/neo4j_datastructure.png)
 - Redis
     - Crafting and Consumable items
     - User made builds
