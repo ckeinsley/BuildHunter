@@ -43,6 +43,6 @@
     - Crafting and Consumable items
     - User made builds
     - Query builds
-
+    ![](images/redis_diagram.png)
 ## Reach Goals
 - Generate builds per skills desired
