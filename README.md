@@ -1,4 +1,10 @@
 # BuildHunter
+
+## Team
+- Christopher Keinsley
+- Collin Moore
+- Rahul Yarlagadda
+
 ## Features
 - Query for Individual Items
     - Includes information about
