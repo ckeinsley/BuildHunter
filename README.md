@@ -52,3 +52,7 @@
     ![](images/redis_diagram.png)
 ## Reach Goals
 - Generate builds per skills desired
+
+## Notes on Running
+- How to start neo4j
+    - sudo service neo4j {start|stop|restart}
