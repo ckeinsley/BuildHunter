@@ -56,3 +56,10 @@
 ## Notes on Running
 - How to start neo4j
     - sudo service neo4j {start|stop|restart}
+- Install cqlsh
+    - Make sure to use pip, not pip3; python 2.7 not python 3.x.
+    - pip install cqlsh
+    - pip install cassandra-driver
+    - export CQLSH_NO_BUNDLED=true
+    - echo ‘export CQLSH_NO_BUNDLED=true’ >> ~/.bashrc
+    - cqlsh –cqlversion=3.4.4
