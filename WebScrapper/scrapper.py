@@ -5,6 +5,26 @@ import pandas as pd
 import numpy as np
 import re
 
+'''
+{
+    Name : 'Leather Trousers',
+    Type : 'All',
+    Part : 'Head',
+    Gender : 'Both',
+    Rarity : '1',
+    Defense : '1 — 71',
+    Slot : 'o--',
+    Fire : '-1',
+    Water : '0',
+    Ice : '0',
+    Thunder : '0',
+    Dragon : '+1',
+    Skills : [
+        ('Gathering', '+1'),
+        ('Whim', '+3')
+    ]
+}
+'''
 def get_armor_links(url):
     r = requests.get(url)
     data = r.text
@@ -57,18 +77,25 @@ def get_armor_item_data(url):
 
     return (name, armor_dict)
 
+def get_armor_item_skills(bsoup):
+    table_rows = bsoup.find('h3', string='Skills').next_sibling.next_sibling.contents[1].contents
+    print(table_rows)
+
 def build_armor_list_dataframe(url_list):
    pass
 
-array = get_all_armor_links()
-(name, details_dict) = get_armor_item_data(array[0])
-for k in details_dict.items():
-    print(k)
+#array = get_all_armor_links()
+#(name, details_dict) = get_armor_item_data(array[0])
+#print(details_dict)
+#for k in details_dict.items():
+#    print(k)
 
-#session = dryscrape.Session()
-#session.visit('http://kiranico.com/en/mh4u/armor/legs/leather-trousers')
-#response = session.body()
-#soup = BeautifulSoup(response, 'lxml')
+session = dryscrape.Session()
+session.visit('http://kiranico.com/en/mh4u/armor/legs/leather-trousers')
+response = session.body()
+soup = BeautifulSoup(response, 'lxml')
 
-#typ = soup.find('td', string='Fire').next_sibling.string
+get_armor_item_skills(soup)
+
+#typ = soup.find('a', string='Gathering').parent.next_sibling.next_sibling.contents[0].string
 #print(typ)
