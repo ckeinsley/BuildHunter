@@ -79,7 +79,16 @@ def get_armor_item_data(url):
 
 def get_armor_item_skills(bsoup):
     table_rows = bsoup.find('h3', string='Skills').next_sibling.next_sibling.contents[1].contents
-    print(table_rows)
+    skills = []
+    k = 0
+    while k < len(table_rows):
+        tds = table_rows[k].contents
+        name = tds[1].a.string
+        value = tds[3].string
+        skills.append((name, value))
+        k += 2
+    return skills
+        
 
 def build_armor_list_dataframe(url_list):
    pass
@@ -91,11 +100,11 @@ def build_armor_list_dataframe(url_list):
 #    print(k)
 
 session = dryscrape.Session()
-session.visit('http://kiranico.com/en/mh4u/armor/legs/leather-trousers')
+session.visit('http://kiranico.com/en/mh4u/armor/legs/derring-trousers')
 response = session.body()
 soup = BeautifulSoup(response, 'lxml')
 
-get_armor_item_skills(soup)
+print(get_armor_item_skills(soup))
 
 #typ = soup.find('a', string='Gathering').parent.next_sibling.next_sibling.contents[0].string
 #print(typ)
