@@ -30,40 +30,45 @@ def get_all_armor_links():
 # TODO make a function to interpret slots into integers
 # TODO use dryscrape to get data from javascript rendered html
 def get_armor_item_data(url):
-    r = requests.get(url)
-    data = r.text
-    soup = BeautifulSoup(data, 'lxml')
+    # r = requests.get(url)
+    # data = r.text
+    session = dryscrape.Session()
+    session.visit(url)
+    response = session.body()
+    soup = BeautifulSoup(response, 'lxml')
 
-    details_general_keys = ['Type', 'Part', 'Gender', 'Rarity', 'Slot', 'Defense']
+    details_general_keys = ['Type', 'Part', 'Gender', 'Rarity', 'Defense']
+    special_slot = ['Slot']
     details_resist_keys = ['Fire', 'Water', 'Ice', 'Thunder', 'Dragon']
     details_values = []
     
     for key in details_general_keys:
         details_values.append(soup.find('td', string=key).next_sibling.next_sibling.string)
 
+    # Slot is special
+    details_values.append(soup.find('td', string='Slot').next_sibling.next_sibling.contents[0].string)
+
     for key in details_resist_keys:
         details_values.append(soup.find('td', string=key).next_sibling.string)
 
-    details_dict = dict(zip(details_general_keys+details_resist_keys, details_values))
+    armor_dict = dict(zip(details_general_keys + special_slot + details_resist_keys, details_values))
 
     name = soup.h1.string
 
-    return (name, details_dict)
+    return (name, armor_dict)
 
 def build_armor_list_dataframe(url_list):
    pass
 
-#array = get_all_armor_links()
-#for w in array:
-#    print(w)
-#(name, details_dict) = get_armor_item_data(array[0])
-#for k in details_dict.items():
-#    print(k)
+array = get_all_armor_links()
+(name, details_dict) = get_armor_item_data(array[0])
+for k in details_dict.items():
+    print(k)
 
-r = requests.get('http://kiranico.com/en/mh4u/armor/legs/leather-trousers')
-data = r.text
-print(data)
-soup = BeautifulSoup(data, 'lxml')
+#session = dryscrape.Session()
+#session.visit('http://kiranico.com/en/mh4u/armor/legs/leather-trousers')
+#response = session.body()
+#soup = BeautifulSoup(response, 'lxml')
 
-typ = soup.find('td', string='Slot').next_sibling.next_sibling
-print(type(typ))
+#typ = soup.find('td', string='Fire').next_sibling.string
+#print(typ)
