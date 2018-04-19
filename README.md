@@ -56,6 +56,12 @@
 ## Notes on Running
 - How to start neo4j
     - sudo service neo4j {start|stop|restart}
+    - sudo cypher-shell
+        username=neo4j
+        password=neo4j
+    Install py2neo
+        -sudo pip install py2neo
+        -in python 'from py2neo import *'
 - Install cqlsh
     - Make sure to use pip, not pip3; python 2.7 not python 3.x.
     - pip install cqlsh
