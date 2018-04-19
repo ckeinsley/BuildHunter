@@ -4,6 +4,7 @@
 - Christopher Keinsley
 - Collin Moore
 - Rahul Yarlagadda
+- Jack Peterson
 
 ## Features
 - Query for Individual Items
@@ -54,7 +55,7 @@
 - Generate builds per skills desired
 
 ## Notes on Running
-- How to start neo4j
+- How to start neo4j (Note: Only works on node 6 at the moment)
     - sudo service neo4j {start|stop|restart}
     - sudo cypher-shell
         username=neo4j
