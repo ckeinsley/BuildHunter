@@ -4,9 +4,15 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import pandas as pd
 import numpy as np
+import pickle
 import re
 import webkit_server
 import time
+
+# TODO: Encode slot to a number
+# TODO: Maybe strip plusses
+# TODO: Store range for defense
+# TODO: Add item ids, constantly increasing, keep track of max, make skills and crafting items 
 
 '''
 {
@@ -25,6 +31,10 @@ import time
     Skills : [
         ('Gathering', '+1'),
         ('Whim', '+3')
+    ],
+    'Crafting Items' : [
+        ('Warm Pelt', '1'),
+        ('Iron Ore', '1')
     ]
 }
 '''
@@ -126,11 +136,15 @@ def populate_armor_items():
         temp = get_armor_item_data(url, driver)
         print(temp)
         armor_list.append(temp)
-    print(armor_list)
+    #print(armor_list)
     return armor_list
 
    
-populate_armor_items()
+armor_dict = populate_armor_items()
+for item in armor_dict:    
+    with open('obj/armor_items/' + item['id'] + '.pkl', 'wb') as f:
+        pickle.dump(item, f)
+
 
 #array = get_all_armor_links()
 #(name, details_dict) = get_armor_item_data(array[0])
