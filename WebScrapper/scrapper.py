@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
-import dryscrape
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import pandas as pd
 import numpy as np
 import re
@@ -44,32 +45,19 @@ def get_all_armor_links():
     legs = 'http://kiranico.com/en/mh4u/armor/legs'
 
     master_list = []
-    urls = [heads, chest, arms, waist, legs]
+    #urls = [heads, chest, arms, waist, legs]
+    urls = [heads]
     for u in urls:
         master_list += get_armor_links(u)
     return master_list
 
 # TODO make a function to interpret slots into integers
 # TODO use dryscrape to get data from javascript rendered html
-def get_armor_item_data(url, session):
-    # r = requests.get(url)
-    # data = r.text
-    retry_count = 25
-    while True:
-        try:
-            session.visit(url)
-        except (webkit_server.InvalidResponseError, webkit_server.EndOfStreamError, BrokenPipeError, ConnectionRefusedError, ConnectionResetError) as e:
-            time.sleep(5)
-            if retry_count == 0:
-                break
-            print('URL: ', url)
-            print("ERROR: {}".format(e.args[-1]))
-            session.reset()
-            retry_count -= 1
-            continue
-        break
-    response = session.body()
-    soup = BeautifulSoup(response, 'lxml')
+def get_armor_item_data(url, driver):
+    driver.get(url)
+    time.sleep(1)
+    data = driver.page_source
+    soup = BeautifulSoup(data, 'lxml')
 
     details_general_keys = ['Type', 'Part', 'Gender', 'Rarity', 'Defense']
     special_slot = ['Slot']
@@ -101,8 +89,12 @@ def get_armor_item_data(url, session):
     return armor_item_dict
 
 def get_armor_item_skills(bsoup):
-    table_rows = bsoup.find('h3', string='Skills').next_sibling.next_sibling.contents[1].contents
+    table_rows = bsoup.find('h3', string='Skills').next_sibling.next_sibling.contents
     skills = []
+    if len(table_rows) >= 2:
+        table_rows = table_rows[1].contents
+    else :
+        return skills
     k = 0
     while k < len(table_rows):
         tds = table_rows[k].contents
@@ -125,12 +117,15 @@ def get_armor_crafting_items(bsoup):
         
 
 def populate_armor_items():
+    chrome_options = Options()
+    #chrome_options.add_argument('--headless')
+    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
     url_list = get_all_armor_links()
-    session = dryscrape.Session()
     armor_list = []
     for url in url_list:
-        time.sleep(3)
-        armor_list.append(get_armor_item_data(url, session))
+        temp = get_armor_item_data(url, driver)
+        print(temp)
+        armor_list.append(temp)
     print(armor_list)
     return armor_list
 
