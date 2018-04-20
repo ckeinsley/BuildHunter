@@ -4,6 +4,8 @@ import dryscrape
 import pandas as pd
 import numpy as np
 import re
+import webkit_server
+import time
 
 '''
 {
@@ -49,11 +51,23 @@ def get_all_armor_links():
 
 # TODO make a function to interpret slots into integers
 # TODO use dryscrape to get data from javascript rendered html
-def get_armor_item_data(url):
+def get_armor_item_data(url, session):
     # r = requests.get(url)
     # data = r.text
-    session = dryscrape.Session()
-    session.visit(url)
+    retry_count = 25
+    while True:
+        try:
+            session.visit(url)
+        except (webkit_server.InvalidResponseError, webkit_server.EndOfStreamError, BrokenPipeError, ConnectionRefusedError, ConnectionResetError) as e:
+            time.sleep(5)
+            if retry_count == 0:
+                break
+            print('URL: ', url)
+            print("ERROR: {}".format(e.args[-1]))
+            session.reset()
+            retry_count -= 1
+            continue
+        break
     response = session.body()
     soup = BeautifulSoup(response, 'lxml')
 
@@ -71,11 +85,20 @@ def get_armor_item_data(url):
     for key in details_resist_keys:
         details_values.append(soup.find('td', string=key).next_sibling.string)
 
-    armor_dict = dict(zip(details_general_keys + special_slot + details_resist_keys, details_values))
+    armor_item_dict = dict(zip(details_general_keys + special_slot + details_resist_keys, details_values))
 
     name = soup.h1.string
+    price = soup.find('h3', string='Crafting Materials').next_sibling.next_sibling.contents[1].contents[0].contents[1].string
+    price = re.sub('Price: ', '', price)
+    skills = get_armor_item_skills(soup)
+    crafting_items = get_armor_crafting_items(soup)
 
-    return (name, armor_dict)
+    armor_item_dict['Name'] = name
+    armor_item_dict['Price'] = price
+    armor_item_dict['Skills'] = skills
+    armor_item_dict['Crafting Items'] = crafting_items
+
+    return armor_item_dict
 
 def get_armor_item_skills(bsoup):
     table_rows = bsoup.find('h3', string='Skills').next_sibling.next_sibling.contents[1].contents
@@ -88,10 +111,31 @@ def get_armor_item_skills(bsoup):
         skills.append((name, value))
         k += 2
     return skills
+
+def get_armor_crafting_items(bsoup):
+    trs = bsoup.find('h3', string='Crafting Materials').next_sibling.next_sibling.contents[1].contents
+    crafting_items = []
+    k = 2
+    while k < len(trs):
+        name = trs[k].td.a.string
+        quantity = trs[k].td.next_sibling.next_sibling.string
+        crafting_items.append((name, quantity))
+        k += 2
+    return crafting_items
         
 
-def build_armor_list_dataframe(url_list):
-   pass
+def populate_armor_items():
+    url_list = get_all_armor_links()
+    session = dryscrape.Session()
+    armor_list = []
+    for url in url_list:
+        time.sleep(3)
+        armor_list.append(get_armor_item_data(url, session))
+    print(armor_list)
+    return armor_list
+
+   
+populate_armor_items()
 
 #array = get_all_armor_links()
 #(name, details_dict) = get_armor_item_data(array[0])
@@ -99,12 +143,18 @@ def build_armor_list_dataframe(url_list):
 #for k in details_dict.items():
 #    print(k)
 
-session = dryscrape.Session()
-session.visit('http://kiranico.com/en/mh4u/armor/legs/derring-trousers')
-response = session.body()
-soup = BeautifulSoup(response, 'lxml')
+#session = dryscrape.Session()
+#while True:
+#    try:
+#        session.visit('http://kiranico.com/en/mh4u/armor/head/derring-headgear')
+#    except (webkit_server.InvalidResponseError, webkit_server.EndOfStreamError):
+#        continue
+#    break
+#response = session.body()
+#soup = BeautifulSoup(response, 'lxml')
 
-print(get_armor_item_skills(soup))
+#print(get_armor_crafting_items(soup))
+#print(get_armor_item_data('http://kiranico.com/en/mh4u/armor/legs/derring-trousers'))
 
 #typ = soup.find('a', string='Gathering').parent.next_sibling.next_sibling.contents[0].string
 #print(typ)
