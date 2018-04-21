@@ -2,17 +2,20 @@ from bs4 import BeautifulSoup
 import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import TimeoutException
 import pandas as pd
 import numpy as np
 import pickle
 import re
 import webkit_server
 import time
+import sys
 
-# TODO: Encode slot to a number
-# TODO: Maybe strip plusses
-# TODO: Store range for defense
+sys.setrecursionlimit(10000)
+
 # TODO: Add item ids, constantly increasing, keep track of max, make skills and crafting items 
+# TODO: Will need to add id's to skills and crafting items so I can put those with the armors
+# TODO: Consider closing files as they are no longer necessary
 
 '''
 {
@@ -21,16 +24,19 @@ import time
     Part : 'Head',
     Gender : 'Both',
     Rarity : '1',
-    Defense : '1 — 71',
-    Slot : 'o--',
+    Defense : {
+        'initial' : '1',
+        'max' : '71'
+    }
+    Slot : '1',
     Fire : '-1',
     Water : '0',
     Ice : '0',
     Thunder : '0',
-    Dragon : '+1',
+    Dragon : '1',
     Skills : [
-        ('Gathering', '+1'),
-        ('Whim', '+3')
+        ('Gathering', '1'),
+        ('Whim', '3')
     ],
     'Crafting Items' : [
         ('Warm Pelt', '1'),
@@ -55,22 +61,46 @@ def get_all_armor_links():
     legs = 'http://kiranico.com/en/mh4u/armor/legs'
 
     master_list = []
-    #urls = [heads, chest, arms, waist, legs]
+    #urls = [heads, chest, arms, waist, legs] DON'T FORGET TO REVERT THIS
     urls = [heads]
     for u in urls:
         master_list += get_armor_links(u)
     return master_list
 
 # TODO make a function to interpret slots into integers
-# TODO use dryscrape to get data from javascript rendered html
+
+def slot_encoder(slot_string):
+    switcher = {
+        '---' : 0,
+        'o--' : 1,
+        'oo-' : 2,
+        'ooo' : 3
+    }
+    return switcher.get(slot_string)
+
+def defense_range_encoder(range_string):
+    vals = re.findall(r'[\d]+', range_string)
+    if len(vals) != 2:
+        print('You done fucked up!!!!!')
+        return {
+            'initial' : 'ERROR',
+            'max' : 'ERROR'
+        }
+    else:
+        return {
+            'initial' : vals[0],
+            'max' : vals[1]
+        }
+
 def get_armor_item_data(url, driver):
+   
     driver.get(url)
-    time.sleep(1)
+    # time.sleep(0.25)
     data = driver.page_source
     soup = BeautifulSoup(data, 'lxml')
 
-    details_general_keys = ['Type', 'Part', 'Gender', 'Rarity', 'Defense']
-    special_slot = ['Slot']
+    details_general_keys = ['Type', 'Part', 'Gender', 'Rarity']
+    special_slot = ['Slot', 'Defense']
     details_resist_keys = ['Fire', 'Water', 'Ice', 'Thunder', 'Dragon']
     details_values = []
     
@@ -78,10 +108,11 @@ def get_armor_item_data(url, driver):
         details_values.append(soup.find('td', string=key).next_sibling.next_sibling.string)
 
     # Slot is special
-    details_values.append(soup.find('td', string='Slot').next_sibling.next_sibling.contents[0].string)
+    details_values.append(slot_encoder(soup.find('td', string='Slot').next_sibling.next_sibling.contents[0].string))
+    details_values.append(defense_range_encoder(soup.find('td', string='Defense').next_sibling.next_sibling.string))
 
     for key in details_resist_keys:
-        details_values.append(soup.find('td', string=key).next_sibling.string)
+        details_values.append(soup.find('td', string=key).next_sibling.string.replace('+', ''))
 
     armor_item_dict = dict(zip(details_general_keys + special_slot + details_resist_keys, details_values))
 
@@ -109,7 +140,7 @@ def get_armor_item_skills(bsoup):
     while k < len(table_rows):
         tds = table_rows[k].contents
         name = tds[1].a.string
-        value = tds[3].string
+        value = tds[3].string.replace('+', '')
         skills.append((name, value))
         k += 2
     return skills
@@ -128,22 +159,46 @@ def get_armor_crafting_items(bsoup):
 
 def populate_armor_items():
     chrome_options = Options()
-    #chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--headless')
     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
+    driver.set_page_load_timeout(10)
     url_list = get_all_armor_links()
     armor_list = []
+    id_list = []
+    count = 0
     for url in url_list:
-        temp = get_armor_item_data(url, driver)
+        attempts = 0
+        while True:
+            try:
+                temp = get_armor_item_data(url, driver)
+            except TimeoutException:
+                print('TimeoutException: ', attempts)
+                attempts += 1
+                continue
+            break
         print(temp)
         armor_list.append(temp)
-    #print(armor_list)
-    return armor_list
+        id_list.append(temp['Name'].replace(' ','')) # TODO replace with id attributes
+        count += 1
+        if count == 10:
+            break
+    return (armor_list, id_list)
 
-   
-armor_dict = populate_armor_items()
-for item in armor_dict:    
-    with open('obj/armor_items/' + item['id'] + '.pkl', 'wb') as f:
-        pickle.dump(item, f)
+def create_armor_files():
+    (armor_item_list, id_list) = populate_armor_items()
+    pickle.dump(id_list, open('./obj/armor_items/id_list.p', 'wb'))
+    for item in armor_item_list:
+        # TODO: replace name with id for filenames
+        pickle.dump(item, open('./obj/armor_items/' + item['Name'].replace(' ', '') + '.p', 'wb'))
+
+def read_armor_files():
+    id_list = pickle.load(open('./obj/armor_items/id_list.p', 'rb'))
+    armor_item_list = []
+    for item in id_list:
+        armor_item_list.append(pickle.load(open('./obj/armor_items/' + item + '.p', 'rb')))
+    for i in armor_item_list:
+        print(i)
+    return (armor_item_list, id_list)
 
 
 #array = get_all_armor_links()
