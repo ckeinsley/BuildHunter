@@ -11,11 +11,11 @@ import webkit_server
 import time
 import sys
 
+# pickle likes to yell if this isn't high
 sys.setrecursionlimit(10000)
 
 # TODO: Add item ids, constantly increasing, keep track of max, make skills and crafting items 
 # TODO: Will need to add id's to skills and crafting items so I can put those with the armors
-# TODO: Consider closing files as they are no longer necessary
 
 '''
 {
@@ -44,6 +44,17 @@ sys.setrecursionlimit(10000)
     ]
 }
 '''
+
+# CONSTANTS:
+WEBDRIVER_REQUEST_TIMEOUT = 5
+HEAD = 'http://kiranico.com/en/mh4u/armor/head'
+CHEST = 'http://kiranico.com/en/mh4u/armor/chest'
+ARMS = 'http://kiranico.com/en/mh4u/armor/arms'
+WAIST = 'http://kiranico.com/en/mh4u/armor/waist'
+LEGS = 'http://kiranico.com/en/mh4u/armor/legs'
+ARMOR_ITEMS_PATH = './obj/armor_items/'
+
+
 def get_armor_links(url):
     r = requests.get(url)
     data = r.text
@@ -54,15 +65,9 @@ def get_armor_links(url):
 
 def get_all_armor_links():
     # Armor list urls by body piece
-    heads = 'http://kiranico.com/en/mh4u/armor/head'
-    chest = 'http://kiranico.com/en/mh4u/armor/chest'
-    arms = 'http://kiranico.com/en/mh4u/armor/arms'
-    waist = 'http://kiranico.com/en/mh4u/armor/waist'
-    legs = 'http://kiranico.com/en/mh4u/armor/legs'
-
     master_list = []
-    #urls = [heads, chest, arms, waist, legs] DON'T FORGET TO REVERT THIS
-    urls = [heads]
+    #urls = [head, chest, arms, waist, legs] DON'T FORGET TO REVERT THIS
+    urls = [HEAD]
     for u in urls:
         master_list += get_armor_links(u)
     return master_list
@@ -161,11 +166,11 @@ def populate_armor_items():
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
-    driver.set_page_load_timeout(10)
+    driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
     url_list = get_all_armor_links()
     armor_list = []
     id_list = []
-    count = 0
+    count = 0 # TODO: Get rid of
     for url in url_list:
         attempts = 0
         while True:
@@ -179,28 +184,37 @@ def populate_armor_items():
         print(temp)
         armor_list.append(temp)
         id_list.append(temp['Name'].replace(' ','')) # TODO replace with id attributes
-        count += 1
-        if count == 10:
-            break
+        count += 1 # TODO: Get rid of
+        if count == 10: # TODO: Get rid of
+            break # TODO: Get rid of
     return (armor_list, id_list)
 
-def create_armor_files():
+def write_armor_files():
     (armor_item_list, id_list) = populate_armor_items()
-    pickle.dump(id_list, open('./obj/armor_items/id_list.p', 'wb'))
+    id_file = open(ARMOR_ITEMS_PATH + 'id_list.p', 'wb')
+    pickle.dump(id_list, id_file)
+    id_file.close()
     for item in armor_item_list:
         # TODO: replace name with id for filenames
-        pickle.dump(item, open('./obj/armor_items/' + item['Name'].replace(' ', '') + '.p', 'wb'))
+        item_file = open(ARMOR_ITEMS_PATH + item['Name'].replace(' ', '') + '.p', 'wb')
+        pickle.dump(item, item_file)
+        item_file.close()
 
 def read_armor_files():
-    id_list = pickle.load(open('./obj/armor_items/id_list.p', 'rb'))
+    id_file = open(ARMOR_ITEMS_PATH + 'id_list.p', 'rb')
+    id_list = pickle.load(id_file)
+    id_file.close()
     armor_item_list = []
     for item in id_list:
-        armor_item_list.append(pickle.load(open('./obj/armor_items/' + item + '.p', 'rb')))
+        item_file = open(ARMOR_ITEMS_PATH + item + '.p', 'rb')
+        armor_item_list.append(pickle.load(item_file))
+        item_file.close()
     for i in armor_item_list:
         print(i)
     return (armor_item_list, id_list)
 
-
+write_armor_files()
+read_armor_files()
 #array = get_all_armor_links()
 #(name, details_dict) = get_armor_item_data(array[0])
 #print(details_dict)
