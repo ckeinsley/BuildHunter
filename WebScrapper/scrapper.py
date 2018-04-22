@@ -52,7 +52,9 @@ CHEST = 'http://kiranico.com/en/mh4u/armor/chest'
 ARMS = 'http://kiranico.com/en/mh4u/armor/arms'
 WAIST = 'http://kiranico.com/en/mh4u/armor/waist'
 LEGS = 'http://kiranico.com/en/mh4u/armor/legs'
+ITEMS = 'http://kiranico.com/en/mh4u/item'
 ARMOR_ITEMS_PATH = './obj/armor_items/'
+
 
 
 def get_armor_links(url):
@@ -97,7 +99,7 @@ def defense_range_encoder(range_string):
             'max' : vals[1]
         }
 
-def get_armor_item_data(url, driver):
+def process_armor_item_data(url, driver):
    
     driver.get(url)
     # time.sleep(0.25)
@@ -161,8 +163,7 @@ def get_armor_crafting_items(bsoup):
         k += 2
     return crafting_items
         
-
-def populate_armor_items():
+def populate_armor_items_list():
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
@@ -175,7 +176,7 @@ def populate_armor_items():
         attempts = 0
         while True:
             try:
-                temp = get_armor_item_data(url, driver)
+                temp = process_armor_item_data(url, driver)
             except TimeoutException:
                 print('TimeoutException: ', attempts)
                 attempts += 1
@@ -190,7 +191,7 @@ def populate_armor_items():
     return (armor_list, id_list)
 
 def write_armor_files():
-    (armor_item_list, id_list) = populate_armor_items()
+    (armor_item_list, id_list) = populate_armor_items_list()
     id_file = open(ARMOR_ITEMS_PATH + 'id_list.p', 'wb')
     pickle.dump(id_list, id_file)
     id_file.close()
@@ -213,8 +214,23 @@ def read_armor_files():
         print(i)
     return (armor_item_list, id_list)
 
-write_armor_files()
-read_armor_files()
+def get_all_item_links():
+    r = requests.get(ITEMS)
+    data = r.text
+    soup = BeautifulSoup(data, 'lxml')
+    a_tags = soup.find_all(href=lambda x : x and re.compile(ITEMS).search(x))
+    links = list(map(lambda x : x['href'], a_tags))
+    return links
+
+def process_item_data(url, driver):
+    # need to determine whether an item is a 'crafting/consumable/misc' item, a 'decoration', or 'monster shit'
+    driver.get(url)
+    data = driver.page_source
+    soup = BeautifulSoup(data, 'lxml')
+
+    
+
+
 #array = get_all_armor_links()
 #(name, details_dict) = get_armor_item_data(array[0])
 #print(details_dict)
