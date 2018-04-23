@@ -22,6 +22,101 @@ sys.setrecursionlimit(10000)
 # TODO: Make difference btwn upgrade and create, make generic blademaster, then make couple specials
 
 '''
+Generic_Blademaster:
+    {
+        'id' : '',
+        'Name' : '',
+        'Weapon_Family' : '',
+        'Rarity' : '',
+        'Attack' : '',
+        'True_Attack' : '',
+        'Defense' : '',
+        'Affinity' : '',
+        'Slot' : '',
+        'Price' : '',
+        'Element' : {
+            'Name' : '',
+            'Value' : ''
+        }
+        'Upgrades_To' : [
+            {
+                'id' : '',
+                'Name' : ''
+            }
+        ],
+        'Crafting_Items' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ]
+    }
+
+Insect_Glaive:
+    {
+        'id' : '',
+        'Name' : '',
+        'Weapon_Family' : '',
+        'Rarity' : '',
+        'Attack' : '',
+        'True_Attack' : '',
+        'Defense' : '',
+        'Affinity' : '',
+        'Slot' : '',
+        'Price' : '',
+        'Element' : {
+            'Name' : '',
+            'Value' : ''
+        }
+        'Upgrades_To' : [
+            {
+                'id' : '',
+                'Name' : ''
+            }
+        ],
+        'Crafting_Items' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ],
+        'Type' : ''
+    }
+
+Charge_Blade_or_Switch_Axe:
+    {
+        'id' : '',
+        'Name' : '',
+        'Weapon_Family' : '',
+        'Rarity' : '',
+        'Attack' : '',
+        'True_Attack' : '',
+        'Defense' : '',
+        'Affinity' : '',
+        'Slot' : '',
+        'Price' : '',
+        'Element' : {
+            'Name' : '',
+            'Value' : ''
+        }
+        'Upgrades_To' : [
+            {
+                'id' : '',
+                'Name' : ''
+            }
+        ],
+        'Crafting_Items' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ],
+        'Phial' : ''
+    }
+
 Bowgun :
     {
         'id' : '',
