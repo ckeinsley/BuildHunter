@@ -16,33 +16,265 @@ sys.setrecursionlimit(10000)
 
 # TODO: Add item ids, constantly increasing, keep track of max, make skills and crafting items 
 # TODO: Will need to add id's to skills and crafting items so I can put those with the armors
+# TODO: Generate all item id's in a giant map first then start making objects
+# TODO: Store item drops with monsters, just list id's and rates and such
+
+# TODO: Make difference btwn upgrade and create, make generic blademaster, then make couple specials
 
 '''
-{
-    Name : 'Leather Trousers',
-    Type : 'All',
-    Part : 'Head',
-    Gender : 'Both',
-    Rarity : '1',
-    Defense : {
-        'initial' : '1',
-        'max' : '71'
+Bowgun :
+    {
+        'id' : '',
+        'Name' : '',
+        'Weapon_Family' : '',
+        'Rarity' : '',
+        'Attack' : '',
+        'True_Attack' : '',
+        'Defense' : '',
+        'Affinity' : '',
+        'Slot' : '',
+        'Price' : '',
+        'Element' : {
+            'Name' : '',
+            'Value' : ''
+        }
+        'Upgrades_To' : [
+            {
+                'id' : '',
+                'Name' : ''
+            }
+        ],
+        'Crafting_Items' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ],
+        'Ammo' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Carry' : '',
+                'isZoom' : ''
+            }
+        ]
     }
-    Slot : '1',
-    Fire : '-1',
-    Water : '0',
-    Ice : '0',
-    Thunder : '0',
-    Dragon : '1',
-    Skills : [
-        ('Gathering', '1'),
-        ('Whim', '3')
-    ],
-    'Crafting Items' : [
-        ('Warm Pelt', '1'),
-        ('Iron Ore', '1')
-    ]
-}
+
+Bow :
+    {
+        'id' : '',
+        'Name' : '',
+        'Weapon_Family' : '',
+        'Rarity' : '',
+        'Attack' : '',
+        'True_Attack' : '',
+        'Defense' : '',
+        'Affinity' : '',
+        'Slot' : '',
+        'Price' : '',
+        'Element' : {
+            'Name' : '',
+            'Value' : ''
+        }
+        'Upgrades_To' : [
+            {
+                'id' : '',
+                'Name' : ''
+            }
+        ],
+        'Crafting_Items' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ],
+        'Arc_Shot' : '',
+        'Charge_Lvls' : ['', '', '', '']
+        'Coatings' : [
+            {
+                'id' : '',
+                'Name' : ''
+            }
+        ]
+    }
+
+Gunlance :
+    {
+        'id' : '',
+        'Name' : '',
+        'Weapon_Family' : '',
+        'Rarity' : '',
+        'Attack' : '',
+        'True_Attack' : '',
+        'Defense' : '',
+        'Affinity' : '',
+        'Slot' : '',
+        'Price' : '',
+         'Element' : {
+            'Name' : '',
+            'Value' : ''
+        }
+        'Upgrades_To' : [
+            {
+                'id' : '',
+                'Name' : ''
+            }
+        ],
+        'Crafting_Items' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ],
+        'Shelling' : [
+            {'id' : '', 'Name' : ''}
+        ]
+    }
+
+Armor_Item:
+    {
+        'id' : '1248329814',
+        Name : 'Leather Trousers',
+        Type : 'All',
+        Part : 'Head',
+        Gender : 'Both',
+        Rarity : '1',
+        Defense : {
+            'initial' : '1',
+            'max' : '71'
+        }
+        Slot : '1',
+        Fire : '-1',
+        Water : '0',
+        Ice : '0',
+        Thunder : '0',
+        Dragon : '1',
+        Skills : [
+            {
+                'id' : '1234125',
+                'Name' : 'Gathering',
+                'Value' : '1'
+            },
+            {
+                'id' : '12314850',
+                'Name' : 'Whim',
+                'Value' : '3'
+            }
+        ],
+        'Crafting Items' : [
+            {
+                'id' : '11235143',
+                'Name' : 'Warm Pelt' 
+                'Quantity': '1'
+            },
+            {
+                'id' : '12341542323',
+                'Name' : 'Iron Ore',
+                'Quanity' : '1'
+            }
+        ]
+    }
+
+Decoration :
+    {
+        'id' : '19323214',
+        'Name' : 'Leader Jewel 1',
+        'Rarity' : '',
+        'Carry' : '',
+        'Buy' : '',
+        'Sell' : '',
+        'Craft_Price' : '',
+        'Slot' : '',
+        'Skills' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Value' : ''
+            }
+        ],
+        'Crafting_Items' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            },
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ]
+    }
+
+Item :
+    {
+        'id' : '19323214',
+        'Name' : 'Potion',
+        'Rarity' : '',
+        'Carry' : '',
+        'Buy' : '',
+        'Sell' : '',
+        'Combo_List' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            },
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ],
+        'Gather_Locations' : [
+            {
+                'Rank' : '',
+                'Map' : '',
+                'Area' : '',
+                'Gather_Method' : '',
+                'Drop_Rate' : ''
+            }
+        ]
+    }
+
+Monster :
+    {
+        'id' : '',
+        'Name' : '',
+        'Item_Drops' : {
+            'Low_Rank' : [
+                {
+                    'Item_Id' : '',
+                    'Drop_Type' : '',
+                    'Quantity' : '',
+                    'Drop_Rate' : ''
+                }
+            ],
+            'High_Rank' : [
+
+            ],
+            'G' : [
+                
+            ]
+        },
+        'Damage_Chart' : [
+            {
+                'Region' : '',
+                'Cut' : '',
+                'Impact' : '',
+                'Shot' : '',
+                'Fire' : '',
+                'Water' : '',
+                'Ice' : '',
+                'Thunder' : '',
+                'Dragon' : '',
+                'Dizzy' : ''
+            }
+        ]
+    }
 '''
 
 # CONSTANTS:
@@ -53,8 +285,12 @@ ARMS = 'http://kiranico.com/en/mh4u/armor/arms'
 WAIST = 'http://kiranico.com/en/mh4u/armor/waist'
 LEGS = 'http://kiranico.com/en/mh4u/armor/legs'
 ITEMS = 'http://kiranico.com/en/mh4u/item'
-ARMOR_ITEMS_PATH = './obj/armor_items/'
-
+ARMORS_PATH = './obj/armors/'
+WEAPONS_PATH = './obj/weapons/'
+MONSTERS_PATH = './obj/monsters/'
+DECORATIONS_PATH = './obj/decorations/'
+SKILLS_PATH = './obj/skills/'
+ITEMS_PATH = './obj/items/'
 
 
 def get_armor_links(url):
@@ -73,8 +309,6 @@ def get_all_armor_links():
     for u in urls:
         master_list += get_armor_links(u)
     return master_list
-
-# TODO make a function to interpret slots into integers
 
 def slot_encoder(slot_string):
     switcher = {
@@ -192,22 +426,22 @@ def populate_armor_items_list():
 
 def write_armor_files():
     (armor_item_list, id_list) = populate_armor_items_list()
-    id_file = open(ARMOR_ITEMS_PATH + 'id_list.p', 'wb')
+    id_file = open(ARMORS_PATH + 'id_list.p', 'wb')
     pickle.dump(id_list, id_file)
     id_file.close()
     for item in armor_item_list:
         # TODO: replace name with id for filenames
-        item_file = open(ARMOR_ITEMS_PATH + item['Name'].replace(' ', '') + '.p', 'wb')
+        item_file = open(ARMORS_PATH + item['Name'].replace(' ', '') + '.p', 'wb')
         pickle.dump(item, item_file)
         item_file.close()
 
 def read_armor_files():
-    id_file = open(ARMOR_ITEMS_PATH + 'id_list.p', 'rb')
+    id_file = open(ARMORS_PATH + 'id_list.p', 'rb')
     id_list = pickle.load(id_file)
     id_file.close()
     armor_item_list = []
     for item in id_list:
-        item_file = open(ARMOR_ITEMS_PATH + item + '.p', 'rb')
+        item_file = open(ARMORS_PATH + item + '.p', 'rb')
         armor_item_list.append(pickle.load(item_file))
         item_file.close()
     for i in armor_item_list:
@@ -222,14 +456,44 @@ def get_all_item_links():
     links = list(map(lambda x : x['href'], a_tags))
     return links
 
+def is_jewel(soup):
+    header = soup.find('h1').string
+    print(header)
+    return bool(header) and bool(re.compile('(Jewel)|(Jwl)').search(header))
+
 def process_item_data(url, driver):
     # need to determine whether an item is a 'crafting/consumable/misc' item, a 'decoration', or 'monster shit'
     driver.get(url)
     data = driver.page_source
     soup = BeautifulSoup(data, 'lxml')
 
+    jewel_skills_obj = {}
+    craft_obj = {}
     
 
+    if is_jewel(soup):
+        print('Its a jewel')
+
+def populate_items_list():
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
+    driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
+    links = get_all_item_links()
+    k = len(links)-100
+    while k < len(links):
+        attempts = 0
+        while True:
+            try:
+                temp = process_item_data(links[k], driver)
+            except TimeoutException:
+                print('TimeoutException: ', attempts)
+                attempts += 1
+                continue
+            break
+        k += 1
+
+populate_items_list()
 
 #array = get_all_armor_links()
 #(name, details_dict) = get_armor_item_data(array[0])
