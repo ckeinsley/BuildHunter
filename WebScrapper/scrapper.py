@@ -381,6 +381,7 @@ WAIST = 'http://kiranico.com/en/mh4u/armor/waist'
 LEGS = 'http://kiranico.com/en/mh4u/armor/legs'
 ITEMS = 'http://kiranico.com/en/mh4u/item'
 WEAPONS = 'http://kiranico.com/en/mh4u/weapon'
+MONSTERS = 'http://kiranico.com/en/mh4u/monster'
 ARMORS_PATH = './obj/armors/'
 WEAPONS_PATH = './obj/weapons/'
 MONSTERS_PATH = './obj/monsters/'
@@ -388,6 +389,14 @@ DECORATIONS_PATH = './obj/decorations/'
 SKILLS_PATH = './obj/skills/'
 ITEMS_PATH = './obj/items/'
 
+def get_all_monster_links():
+    r = requests.get(MONSTERS)
+    data = r.text
+    soup = BeautifulSoup(data, 'lxml')
+    a_tags = soup.find_all(href=lambda x : x and re.compile(MONSTERS).search(x))
+    links = list(map(lambda x : x['href'], a_tags))
+    links.pop(0)
+    return links
 
 def get_all_item_links():
     r = requests.get(ITEMS)
@@ -395,6 +404,7 @@ def get_all_item_links():
     soup = BeautifulSoup(data, 'lxml')
     a_tags = soup.find_all(href=lambda x : x and re.compile(ITEMS).search(x))
     links = list(map(lambda x : x['href'], a_tags))
+    links.pop(0)
     return links
 
 def get_weapon_links(url, driver):
@@ -456,6 +466,11 @@ def get_name_id_mapping():
     master_id = 0
     item_links = get_all_item_links()
     armor_links = get_all_armor_links()
+    weapon_temp = get_all_weapon_links()
+    weapon_links = []
+    for w in weapon_temp.values():
+        weapon_links += w
+    
 
 def slot_encoder(slot_string):
     switcher = {
@@ -627,6 +642,7 @@ def populate_items_list():
             break
         k += 1
 
+print(get_all_armor_links())
 
 #array = get_all_armor_links()
 #(name, details_dict) = get_armor_item_data(array[0])
