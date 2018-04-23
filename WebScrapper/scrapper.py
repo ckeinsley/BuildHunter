@@ -44,7 +44,14 @@ Generic_Blademaster:
                 'Name' : ''
             }
         ],
-        'Crafting_Items' : [
+        'Upgrade_Items' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ],
+        'From_Scratch_Items' : [
             {
                 'id' : '',
                 'Name' : '',
@@ -75,7 +82,14 @@ Insect_Glaive:
                 'Name' : ''
             }
         ],
-        'Crafting_Items' : [
+        'Upgrade_Items' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ],
+        'From_Scratch_Items' : [
             {
                 'id' : '',
                 'Name' : '',
@@ -107,7 +121,14 @@ Charge_Blade_or_Switch_Axe:
                 'Name' : ''
             }
         ],
-        'Crafting_Items' : [
+        'Upgrade_Items' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ],
+        'From_Scratch_Items' : [
             {
                 'id' : '',
                 'Name' : '',
@@ -139,7 +160,14 @@ Bowgun :
                 'Name' : ''
             }
         ],
-        'Crafting_Items' : [
+        'Upgrade_Items' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ],
+        'From_Scratch_Items' : [
             {
                 'id' : '',
                 'Name' : '',
@@ -178,7 +206,14 @@ Bow :
                 'Name' : ''
             }
         ],
-        'Crafting_Items' : [
+        'Upgrade_Items' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ],
+        'From_Scratch_Items' : [
             {
                 'id' : '',
                 'Name' : '',
@@ -217,7 +252,14 @@ Gunlance :
                 'Name' : ''
             }
         ],
-        'Crafting_Items' : [
+        'Upgrade_Items' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Quantity' : ''
+            }
+        ],
+        'From_Scratch_Items' : [
             {
                 'id' : '',
                 'Name' : '',
@@ -382,12 +424,22 @@ LEGS = 'http://kiranico.com/en/mh4u/armor/legs'
 ITEMS = 'http://kiranico.com/en/mh4u/item'
 WEAPONS = 'http://kiranico.com/en/mh4u/weapon'
 MONSTERS = 'http://kiranico.com/en/mh4u/monster'
+SKILLS = 'http://kiranico.com/en/mh4u/armor/skill'
 ARMORS_PATH = './obj/armors/'
 WEAPONS_PATH = './obj/weapons/'
 MONSTERS_PATH = './obj/monsters/'
 DECORATIONS_PATH = './obj/decorations/'
 SKILLS_PATH = './obj/skills/'
 ITEMS_PATH = './obj/items/'
+
+def get_all_skill_links():
+    r = requests.get(SKILLS)
+    data = r.text
+    soup = BeautifulSoup(data, 'lxml')
+    a_tags = soup.find_all(href=lambda x : x and re.compile(SKILLS).search(x))
+    links = list(map(lambda x : x['href'], a_tags))
+    links.pop(0)
+    return links
 
 def get_all_monster_links():
     r = requests.get(MONSTERS)
@@ -470,7 +522,8 @@ def get_name_id_mapping():
     weapon_links = []
     for w in weapon_temp.values():
         weapon_links += w
-    
+    monster_links = get_all_monster_links()
+
 
 def slot_encoder(slot_string):
     switcher = {
@@ -642,7 +695,7 @@ def populate_items_list():
             break
         k += 1
 
-print(get_all_armor_links())
+print(get_all_skill_links())
 
 #array = get_all_armor_links()
 #(name, details_dict) = get_armor_item_data(array[0])
