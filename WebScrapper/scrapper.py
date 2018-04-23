@@ -380,6 +380,7 @@ ARMS = 'http://kiranico.com/en/mh4u/armor/arms'
 WAIST = 'http://kiranico.com/en/mh4u/armor/waist'
 LEGS = 'http://kiranico.com/en/mh4u/armor/legs'
 ITEMS = 'http://kiranico.com/en/mh4u/item'
+WEAPONS = 'http://kiranico.com/en/mh4u/weapon'
 ARMORS_PATH = './obj/armors/'
 WEAPONS_PATH = './obj/weapons/'
 MONSTERS_PATH = './obj/monsters/'
@@ -387,6 +388,53 @@ DECORATIONS_PATH = './obj/decorations/'
 SKILLS_PATH = './obj/skills/'
 ITEMS_PATH = './obj/items/'
 
+
+def get_all_item_links():
+    r = requests.get(ITEMS)
+    data = r.text
+    soup = BeautifulSoup(data, 'lxml')
+    a_tags = soup.find_all(href=lambda x : x and re.compile(ITEMS).search(x))
+    links = list(map(lambda x : x['href'], a_tags))
+    return links
+
+def get_weapon_links(url, driver):
+    driver.get(url)
+    data = driver.page_source
+    soup = BeautifulSoup(data, 'lxml')
+    a_tags = soup.findAll('a', href=lambda x : x and re.compile(url).search(x))
+    category = a_tags.pop(0).string
+    links = list(map(lambda x : x['href'], a_tags))
+    return (category,links)
+
+def get_all_weapon_links():
+    r = requests.get(WEAPONS)
+    data = r.text
+    soup = BeautifulSoup(data, 'lxml')
+    a_tags = soup.find_all(href=lambda x: x and re.compile(WEAPONS).search(x))
+    weapon_tree_links = list(map(lambda x : x['href'], a_tags))
+    weapon_tree_links = weapon_tree_links[:14]
+    weapon_categories = []
+    link_arrays = []
+
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
+    driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
+    
+
+    for link in weapon_tree_links:
+        attempts = 0
+        while True:
+            try:
+                (category, links) = get_weapon_links(link, driver)
+                link_arrays.append(links)
+                weapon_categories.append(category)
+            except TimeoutException:
+                print('TimeoutException: Attempt ', attempts)
+                attempts += 1
+                continue
+            break
+    return dict(zip(weapon_categories, link_arrays))
 
 def get_armor_links(url):
     r = requests.get(url)
@@ -399,11 +447,15 @@ def get_armor_links(url):
 def get_all_armor_links():
     # Armor list urls by body piece
     master_list = []
-    #urls = [head, chest, arms, waist, legs] DON'T FORGET TO REVERT THIS
-    urls = [HEAD]
+    urls = [HEAD, CHEST, ARMS, WAIST, LEGS]
     for u in urls:
         master_list += get_armor_links(u)
     return master_list
+
+def get_name_id_mapping():
+    master_id = 0
+    item_links = get_all_item_links()
+    armor_links = get_all_armor_links()
 
 def slot_encoder(slot_string):
     switcher = {
@@ -543,14 +595,6 @@ def read_armor_files():
         print(i)
     return (armor_item_list, id_list)
 
-def get_all_item_links():
-    r = requests.get(ITEMS)
-    data = r.text
-    soup = BeautifulSoup(data, 'lxml')
-    a_tags = soup.find_all(href=lambda x : x and re.compile(ITEMS).search(x))
-    links = list(map(lambda x : x['href'], a_tags))
-    return links
-
 def is_jewel(soup):
     header = soup.find('h1').string
     print(header)
@@ -561,11 +605,6 @@ def process_item_data(url, driver):
     driver.get(url)
     data = driver.page_source
     soup = BeautifulSoup(data, 'lxml')
-
-    jewel_skills_obj = {}
-    craft_obj = {}
-    
-
     if is_jewel(soup):
         print('Its a jewel')
 
@@ -588,7 +627,6 @@ def populate_items_list():
             break
         k += 1
 
-populate_items_list()
 
 #array = get_all_armor_links()
 #(name, details_dict) = get_armor_item_data(array[0])
