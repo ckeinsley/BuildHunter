@@ -14,9 +14,6 @@ import sys
 # pickle likes to yell if this isn't high
 sys.setrecursionlimit(10000000)
 
-# TODO: Add item ids, constantly increasing, keep track of max, make skills and crafting items 
-# TODO: Will need to add id's to skills and crafting items so I can put those with the armors
-# TODO: Generate all item id's in a giant map first then start making objects
 # TODO: Store item drops with monsters, just list id's and rates and such
 
 '''
@@ -410,6 +407,19 @@ Monster :
             }
         ]
     }
+
+Skill :
+    {
+        'id' : '',
+        'Name' : '',
+        'Skills' : [
+            {
+                'Name' : '',
+                'Skill_Req' : 10,
+                'Description' : ''
+            }
+        ]
+    }
 '''
 
 # CONSTANTS:
@@ -580,7 +590,7 @@ def defense_range_encoder(range_string):
             'max' : vals[1]
         }
 
-def process_armor_item_data(url, driver):
+def process_armor_item_data(url, driver, name_id_map):
    
     driver.get(url)
     # time.sleep(0.25)
@@ -605,11 +615,13 @@ def process_armor_item_data(url, driver):
     armor_item_dict = dict(zip(details_general_keys + special_slot + details_resist_keys, details_values))
 
     name = soup.h1.string
+    uid = name_id_map.get('ARMOR:' + name)
     price = soup.find('h3', string='Crafting Materials').next_sibling.next_sibling.contents[1].contents[0].contents[1].string
     price = re.sub('Price: ', '', price)
-    skills = get_armor_item_skills(soup)
-    crafting_items = get_armor_crafting_items(soup)
+    skills = get_armor_item_skills(soup, name_id_map)
+    crafting_items = get_armor_crafting_items(soup, name_id_map)
 
+    armor_item_dict['id'] = uid
     armor_item_dict['Name'] = name
     armor_item_dict['Price'] = price
     armor_item_dict['Skills'] = skills
@@ -617,7 +629,7 @@ def process_armor_item_data(url, driver):
 
     return armor_item_dict
 
-def get_armor_item_skills(bsoup):
+def get_armor_item_skills(bsoup, nam_id_map):
     table_rows = bsoup.find('h3', string='Skills').next_sibling.next_sibling.contents
     skills = []
     if len(table_rows) >= 2:
@@ -628,23 +640,37 @@ def get_armor_item_skills(bsoup):
     while k < len(table_rows):
         tds = table_rows[k].contents
         name = tds[1].a.string
+        uid = nam_id_map.get('SKILL:' + name)
         value = tds[3].string.replace('+', '')
-        skills.append((name, value))
+        skills.append(
+            {
+                'id':uid,
+                'Name':name,
+                'Value':value
+            }
+        )
         k += 2
     return skills
 
-def get_armor_crafting_items(bsoup):
+def get_armor_crafting_items(bsoup, name_id_map):
     trs = bsoup.find('h3', string='Crafting Materials').next_sibling.next_sibling.contents[1].contents
     crafting_items = []
     k = 2
     while k < len(trs):
         name = trs[k].td.a.string
+        uid = name_id_map.get('ITEM:' + name)
         quantity = trs[k].td.next_sibling.next_sibling.string
-        crafting_items.append((name, quantity))
+        crafting_items.append(
+            {
+                'id' : uid,
+                'Name': name,
+                'Quantity': quantity
+            })
         k += 2
     return crafting_items
         
 def populate_armor_items_list():
+    name_id_map = read_name_id_mapping()
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
@@ -652,23 +678,21 @@ def populate_armor_items_list():
     url_list = get_all_armor_links()
     armor_list = []
     id_list = []
-    count = 0 # TODO: Get rid of
     for url in url_list:
         attempts = 0
         while True:
             try:
-                temp = process_armor_item_data(url, driver)
+                temp = process_armor_item_data(url, driver, name_id_map)
             except TimeoutException:
                 print('TimeoutException: ', attempts)
-                attempts += 1
+                attempts += 1# TODO: Add item ids, constantly increasing, keep track of max, make skills and crafting items 
+# TODO: Will need to add id's to skills and crafting items so I can put those with the armors
+# TODO: Generate all item id's in a giant map first then start making objects
                 continue
             break
         print(temp)
         armor_list.append(temp)
         id_list.append(temp['Name'].replace(' ','')) # TODO replace with id attributes
-        count += 1 # TODO: Get rid of
-        if count == 10: # TODO: Get rid of
-            break # TODO: Get rid of
     return (armor_list, id_list)
 
 def write_armor_files():
@@ -727,7 +751,7 @@ def populate_items_list():
             break
         k += 1
 
-print(read_name_id_mapping())
+write_armor_files()
 
 #array = get_all_armor_links()
 #(name, details_dict) = get_armor_item_data(array[0])
