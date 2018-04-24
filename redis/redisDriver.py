@@ -50,17 +50,19 @@ class RedisDriver:
 
     ####----Users----####
     
-    def add_user(self, user):
+    def add_user(self, user, setActive=False):
         #TODO: Input verification
         self._r.sadd('users', user)
+        if setActive:
+            self.active_user = user
 
     def delete_user(self, user):
-        #TODO:
+        #TODO
         pass
 
     ####----Builds----####
     
-    def add_build(self, build):
+    def add_build(self, build, setActive=False):
         #TODO
         pass
     
@@ -68,17 +70,19 @@ class RedisDriver:
         #TODO
         pass
 
-    def get_all_builds_for_user(self, user):
+    def get_all_builds(self):
         #TODO
         pass
     
-    def get_build_details(self, build):
+    def get_build_details(self):
         #TODO
         pass
 
     ####----Build Components (e.g. armor pieces, weapons)----####
 
-    def add_build_component(self, part, itemID):
+    BUILD_PARTS = ['head', 'chest', 'arms', 'waist', 'legs', 'weapon']
+
+    def add_build_component(self, part, itemId):
         #TODO
         pass
 
@@ -88,17 +92,35 @@ class RedisDriver:
     
     ####----Decorations----####
 
-    def add_decoration(self, part, itemID):
+    def add_decoration(self, part, itemId):
         #TODO
         pass
     
-    def remove_decoration(self, part, itemID):
+    def remove_decoration(self, part, itemId):
         #TODO
         pass
 
     def remove_all_decorations(self, part):
         #TODO
         pass
+
+    ####----Items----####
+
+    ITEM_TYPES = ['armor', 'weapon', 'skill', 'item']
+
+    def get_object_name(self, id, type_):
+        #TODO: Input verification
+        return self._r.hget(type_+ '_ids', id).decode('utf-8')
+    
+    def get_object_type(self, id):
+        #TODO
+        pass
+    
+    def get_object_id(self, name, type_):
+        #TODO
+        pass
+    
+
 
 
 
