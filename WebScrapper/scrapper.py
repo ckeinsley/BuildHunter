@@ -12,14 +12,12 @@ import time
 import sys
 
 # pickle likes to yell if this isn't high
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(10000000)
 
 # TODO: Add item ids, constantly increasing, keep track of max, make skills and crafting items 
 # TODO: Will need to add id's to skills and crafting items so I can put those with the armors
 # TODO: Generate all item id's in a giant map first then start making objects
 # TODO: Store item drops with monsters, just list id's and rates and such
-
-# TODO: Make difference btwn upgrade and create, make generic blademaster, then make couple specials
 
 '''
 Generic_Blademaster:
@@ -456,7 +454,7 @@ def get_all_item_links():
     soup = BeautifulSoup(data, 'lxml')
     a_tags = soup.find_all(href=lambda x : x and re.compile(ITEMS).search(x))
     links = list(map(lambda x : x['href'], a_tags))
-    links.pop(0)
+    del links[0:4]
     return links
 
 def get_weapon_links(url, driver):
@@ -514,7 +512,16 @@ def get_all_armor_links():
         master_list += get_armor_links(u)
     return master_list
 
-def get_name_id_mapping():
+def get_name_from_url(url):
+    r = requests.get(url)
+    data = r.text
+    soup = BeautifulSoup(data, 'lxml')
+    name = soup.find('h1').string
+    if name == None:
+        name = soup.find('h1').contents[0].strip()
+    return name
+
+def write_name_id_mapping():
     master_id = 0
     item_links = get_all_item_links()
     armor_links = get_all_armor_links()
@@ -523,7 +530,32 @@ def get_name_id_mapping():
     for w in weapon_temp.values():
         weapon_links += w
     monster_links = get_all_monster_links()
+    skill_links = get_all_skill_links()
 
+    name_id_map = {}
+    link_array = [item_links, armor_links, weapon_links, monster_links, skill_links]
+    link_prefixes = ['ITEM', 'ARMOR', 'WEAPON', 'MONSTER', 'SKILL']
+
+    for k in range(len(link_array)):
+        for url in link_array[k]:
+            print(url)
+            name = get_name_from_url(url)
+            name = link_prefixes[k] + ':' + name
+            if name_id_map.get(name) != None:
+                print('AAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHH!!!!!!!!')
+                print('Name: ', name)
+            name_id_map[name] = master_id
+            master_id += 1
+    print('Next Available Id')
+    f = open('./obj/name_id_map.p', 'wb')
+    pickle.dump(name_id_map, f)
+    f.close()
+
+def read_name_id_mapping():
+    f = open('./obj/name_id_map.p', 'rb')
+    name_id_mapping = pickle.load(f)
+    f.close()
+    return name_id_mapping
 
 def slot_encoder(slot_string):
     switcher = {
@@ -695,7 +727,7 @@ def populate_items_list():
             break
         k += 1
 
-print(get_all_skill_links())
+print(read_name_id_mapping())
 
 #array = get_all_armor_links()
 #(name, details_dict) = get_armor_item_data(array[0])
