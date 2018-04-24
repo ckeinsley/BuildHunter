@@ -15,7 +15,7 @@ import sys
 sys.setrecursionlimit(10000000)
 
 # TODO: Store item drops with monsters, just list id's and rates and such
-
+# TODO: Separate out the loading functions from the scraping/writing functions
 '''
 Generic_Blademaster:
     {
@@ -563,7 +563,7 @@ def write_name_id_mapping():
 
 def read_name_id_mapping():
     f = open('./obj/name_id_map.p', 'rb')
-    name_id_mapping = pickle.load(f)
+    name_id_mapping = pickle.load(f, encoding='unicode')
     f.close()
     return name_id_mapping
 
@@ -685,14 +685,12 @@ def populate_armor_items_list():
                 temp = process_armor_item_data(url, driver, name_id_map)
             except TimeoutException:
                 print('TimeoutException: ', attempts)
-                attempts += 1# TODO: Add item ids, constantly increasing, keep track of max, make skills and crafting items 
-# TODO: Will need to add id's to skills and crafting items so I can put those with the armors
-# TODO: Generate all item id's in a giant map first then start making objects
+                attempts += 1
                 continue
             break
         print(temp)
         armor_list.append(temp)
-        id_list.append(temp['Name'].replace(' ','')) # TODO replace with id attributes
+        id_list.append(temp['id'].replace(' ','')) # TODO replace with id attributes
     return (armor_list, id_list)
 
 def write_armor_files():
@@ -702,18 +700,18 @@ def write_armor_files():
     id_file.close()
     for item in armor_item_list:
         # TODO: replace name with id for filenames
-        item_file = open(ARMORS_PATH + item['Name'].replace(' ', '') + '.p', 'wb')
+        item_file = open(ARMORS_PATH + item['id'].replace(' ', '') + '.p', 'wb')
         pickle.dump(item, item_file)
         item_file.close()
 
 def read_armor_files():
     id_file = open(ARMORS_PATH + 'id_list.p', 'rb')
-    id_list = pickle.load(id_file)
+    id_list = pickle.load(id_file, encoding='unicode')
     id_file.close()
     armor_item_list = []
     for item in id_list:
         item_file = open(ARMORS_PATH + item + '.p', 'rb')
-        armor_item_list.append(pickle.load(item_file))
+        armor_item_list.append(pickle.load(item_file, encoding='unicode'))
         item_file.close()
     for i in armor_item_list:
         print(i)
@@ -751,7 +749,60 @@ def populate_items_list():
             break
         k += 1
 
-write_armor_files()
+def process_skill_data(url, driver, name_id_map):
+    driver.get(url)
+    data = driver.page_source
+    soup = BeautifulSoup(data, 'lxml')
+    
+    name = soup.find('h1').string
+    uid = name_id_map.get('SKILL:' + name)
+    description = soup.find('h1').next_sibling.next_sibling.p.string
+    skills = []
+
+    skill_table = soup.find('tbody').contents
+    print(skill_table)
+    k = 0
+    while k < len(skill_table):
+        skill_name = skill_table[k].contents[1]
+        skill_req = skill_table[k].contents[3]
+        skill_description = skill_table[k].contents[5]
+        skills.append({
+            'Name' : skill_name,
+            'Skill_Req' : skill_req,
+            'Description' : skill_description
+        })
+        k += 2
+    return {
+        'id' : uid,
+        'Name' : name,
+        'Description' : description,
+        'Skills' : skills
+    }
+
+def populate_skills_list():
+    name_id_map = read_name_id_mapping()
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
+    driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
+    url_list = get_all_skill_links()
+    skill_list = []
+    id_list = []
+    for url in url_list:
+        attempts = 0
+        while True:
+            try:
+                temp = process_skill_data(url, driver, name_id_map)
+            except TimeoutException:
+                print('TimeoutException: ', attempts)
+                attempts += 1
+                continue
+            break
+        print(temp)
+        skill_list.append(temp)
+        id_list.append(temp['id'])
+    return (skill_list, id_list)
+print(populate_skills_list())
 
 #array = get_all_armor_links()
 #(name, details_dict) = get_armor_item_data(array[0])
