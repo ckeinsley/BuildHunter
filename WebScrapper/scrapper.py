@@ -700,7 +700,7 @@ def write_armor_files():
     id_file.close()
     for item in armor_item_list:
         # TODO: replace name with id for filenames
-        item_file = open(ARMORS_PATH + item['id'].replace(' ', '') + '.p', 'wb')
+        item_file = open(ARMORS_PATH + str(item['id']).replace(' ', '') + '.p', 'wb')
         pickle.dump(item, item_file)
         item_file.close()
 
@@ -710,7 +710,7 @@ def read_armor_files():
     id_file.close()
     armor_item_list = []
     for item in id_list:
-        item_file = open(ARMORS_PATH + item + '.p', 'rb')
+        item_file = open(ARMORS_PATH + str(item) + '.p', 'rb')
         armor_item_list.append(pickle.load(item_file, encoding='unicode'))
         item_file.close()
     for i in armor_item_list:
@@ -760,15 +760,14 @@ def process_skill_data(url, driver, name_id_map):
     skills = []
 
     skill_table = soup.find('tbody').contents
-    print(skill_table)
     k = 0
     while k < len(skill_table):
-        skill_name = skill_table[k].contents[1]
-        skill_req = skill_table[k].contents[3]
-        skill_description = skill_table[k].contents[5]
+        skill_name = skill_table[k].contents[1].string
+        skill_req = skill_table[k].contents[3].string
+        skill_description = skill_table[k].contents[5].string
         skills.append({
             'Name' : skill_name,
-            'Skill_Req' : skill_req,
+            'Skill_Req' : skill_req.strip().replace('+',''),
             'Description' : skill_description
         })
         k += 2
@@ -802,8 +801,32 @@ def populate_skills_list():
         skill_list.append(temp)
         id_list.append(temp['id'])
     return (skill_list, id_list)
-print(populate_skills_list())
 
+def write_skills_file():
+    (skill_list, id_list) = populate_skills_list()
+    id_file = open(SKILLS_PATH + 'id_list.p', 'wb')
+    pickle.dump(id_list, id_file)
+    id_file.close()
+    for skill in skill_list:
+        skill_file = open(SKILLS_PATH + str(skill['id']) + '.p', 'wb')
+        pickle.dump(skill, skill_file)
+        skill_file.close()
+
+def read_skills_file():
+    id_file = open(SKILLS_PATH + 'id_list.p', 'rb')
+    id_list = pickle.load(id_file, encoding='unicode')
+    id_file.close()
+    skill_list = []
+    for skill in id_list:
+        skill_file = open(SKILLS_PATH + str(skill) + '.p', 'rb')
+        skill_list.append(pickle.load(skill_file, encoding='unicode'))
+        skill_file.close()
+    for i in skill_list:
+        print(i)
+    return (skill_list, id_list)
+
+write_skills_file()
+read_skills_file()
 #array = get_all_armor_links()
 #(name, details_dict) = get_armor_item_data(array[0])
 #print(details_dict)
