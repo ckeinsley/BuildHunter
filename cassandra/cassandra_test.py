@@ -15,7 +15,7 @@ from cassandra.query import SimpleStatement
 KEYSPACE = "testkeyspace"
 
 def main():
-    cluster = Cluster(['127.0.0.1'])
+    cluster = Cluster(['137.112.89.78'])
     session = cluster.connect()
 
     rows = session.execute("SELECT keyspace_name FROM system_schema.keyspaces")
