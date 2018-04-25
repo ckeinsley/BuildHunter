@@ -3,19 +3,15 @@ import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException
-import pandas as pd
-import numpy as np
 import pickle
 import re
-import webkit_server
-import time
 import sys
 
 # pickle likes to yell if this isn't high
 sys.setrecursionlimit(10000000)
 
 # TODO: Store item drops with monsters, just list id's and rates and such
-
+# TODO: Separate out the loading functions from the scraping/writing functions
 '''
 Generic_Blademaster:
     {
@@ -345,6 +341,7 @@ Item :
     {
         'id' : '19323214',
         'Name' : 'Potion',
+        'Description' : '',
         'Rarity' : '',
         'Carry' : '',
         'Buy' : '',
@@ -353,12 +350,10 @@ Item :
             {
                 'id' : '',
                 'Name' : '',
-                'Quantity' : ''
             },
             {
                 'id' : '',
                 'Name' : '',
-                'Quantity' : ''
             }
         ],
         'Gather_Locations' : [
@@ -563,7 +558,7 @@ def write_name_id_mapping():
 
 def read_name_id_mapping():
     f = open('./obj/name_id_map.p', 'rb')
-    name_id_mapping = pickle.load(f)
+    name_id_mapping = pickle.load(f, encoding='unicode')
     f.close()
     return name_id_mapping
 
@@ -685,14 +680,12 @@ def populate_armor_items_list():
                 temp = process_armor_item_data(url, driver, name_id_map)
             except TimeoutException:
                 print('TimeoutException: ', attempts)
-                attempts += 1# TODO: Add item ids, constantly increasing, keep track of max, make skills and crafting items 
-# TODO: Will need to add id's to skills and crafting items so I can put those with the armors
-# TODO: Generate all item id's in a giant map first then start making objects
+                attempts += 1
                 continue
             break
         print(temp)
         armor_list.append(temp)
-        id_list.append(temp['Name'].replace(' ','')) # TODO replace with id attributes
+        id_list.append(temp['id'].replace(' ','')) # TODO replace with id attributes
     return (armor_list, id_list)
 
 def write_armor_files():
@@ -702,48 +695,58 @@ def write_armor_files():
     id_file.close()
     for item in armor_item_list:
         # TODO: replace name with id for filenames
-        item_file = open(ARMORS_PATH + item['Name'].replace(' ', '') + '.p', 'wb')
+        item_file = open(ARMORS_PATH + str(item['id']).replace(' ', '') + '.p', 'wb')
         pickle.dump(item, item_file)
         item_file.close()
 
-def read_armor_files():
-    id_file = open(ARMORS_PATH + 'id_list.p', 'rb')
-    id_list = pickle.load(id_file)
-    id_file.close()
-    armor_item_list = []
-    for item in id_list:
-        item_file = open(ARMORS_PATH + item + '.p', 'rb')
-        armor_item_list.append(pickle.load(item_file))
-        item_file.close()
-    for i in armor_item_list:
-        print(i)
-    return (armor_item_list, id_list)
-
 def is_jewel(soup):
     header = soup.find('h1').string
-    print(header)
     return bool(header) and bool(re.compile('(Jewel)|(Jwl)').search(header))
 
-def process_item_data(url, driver):
+def get_combo_list(soup):
+    combo_header = soup.find('h3', string='Combo List')
+    if combo_header == None:
+        return []
+    combo_list = []
+    table_rows = combo_header.next_sibling.next_sibling.contents[1].contents[0].find_next_siblings('tr')
+    for row in table_rows:
+        
+
+
+def process_item_data(url, driver, name_id_map):
     # need to determine whether an item is a 'crafting/consumable/misc' item, a 'decoration', or 'monster shit'
+    print(url)
     driver.get(url)
     data = driver.page_source
     soup = BeautifulSoup(data, 'lxml')
     if is_jewel(soup):
         print('Its a jewel')
+        return None
+    else:
+        name = soup.find('h1').string
+        uid = name_id_map.get('ITEM:' + name)
+        description = soup.find('h1').next_sibling.next_sibling.string
+        rarity = soup.find('td', string='Rarity').next_sibling.next_sibling.string
+        carry = soup.find('td', string='Carry').next_sibling.next_sibling.string
+        buy = soup.find('td', string='Buy').next_sibling.next_sibling.string
+        sell = soup.find('td', string='Sell').next_sibling.next_sibling.string
+        combo_list = get_combo_list(soup)
+
+        
 
 def populate_items_list():
+    name_id_map = read_name_id_mapping()
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
     driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
     links = get_all_item_links()
-    k = len(links)-100
-    while k < len(links):
+    k = 8
+    while k < 15:
         attempts = 0
         while True:
             try:
-                temp = process_item_data(links[k], driver)
+                temp = process_item_data(links[k], driver, name_id_map)
             except TimeoutException:
                 print('TimeoutException: ', attempts)
                 attempts += 1
@@ -751,26 +754,67 @@ def populate_items_list():
             break
         k += 1
 
-write_armor_files()
+def process_skill_data(url, driver, name_id_map):
+    driver.get(url)
+    data = driver.page_source
+    soup = BeautifulSoup(data, 'lxml')
+    
+    name = soup.find('h1').string
+    uid = name_id_map.get('SKILL:' + name)
+    description = soup.find('h1').next_sibling.next_sibling.p.string
+    skills = []
 
-#array = get_all_armor_links()
-#(name, details_dict) = get_armor_item_data(array[0])
-#print(details_dict)
-#for k in details_dict.items():
-#    print(k)
+    skill_table = soup.find('tbody').contents
+    k = 0
+    while k < len(skill_table):
+        skill_name = skill_table[k].contents[1].string
+        skill_req = skill_table[k].contents[3].string
+        skill_description = skill_table[k].contents[5].string
+        skills.append({
+            'Name' : skill_name,
+            'Skill_Req' : skill_req.strip().replace('+',''),
+            'Description' : skill_description
+        })
+        k += 2
+    return {
+        'id' : uid,
+        'Name' : name,
+        'Description' : description,
+        'Skills' : skills
+    }
 
-#session = dryscrape.Session()
-#while True:
-#    try:
-#        session.visit('http://kiranico.com/en/mh4u/armor/head/derring-headgear')
-#    except (webkit_server.InvalidResponseError, webkit_server.EndOfStreamError):
-#        continue
-#    break
-#response = session.body()
-#soup = BeautifulSoup(response, 'lxml')
+def populate_skills_list():
+    name_id_map = read_name_id_mapping()
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
+    driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
+    url_list = get_all_skill_links()
+    skill_list = []
+    id_list = []
+    for url in url_list:
+        attempts = 0
+        while True:
+            try:
+                temp = process_skill_data(url, driver, name_id_map)
+            except TimeoutException:
+                print('TimeoutException: ', attempts)
+                attempts += 1
+                continue
+            break
+        print(temp)
+        skill_list.append(temp)
+        id_list.append(temp['id'])
+    return (skill_list, id_list)
 
-#print(get_armor_crafting_items(soup))
-#print(get_armor_item_data('http://kiranico.com/en/mh4u/armor/legs/derring-trousers'))
+def write_skills_file():
+    (skill_list, id_list) = populate_skills_list()
+    id_file = open(SKILLS_PATH + 'id_list.p', 'wb')
+    pickle.dump(id_list, id_file)
+    id_file.close()
+    for skill in skill_list:
+        skill_file = open(SKILLS_PATH + str(skill['id']) + '.p', 'wb')
+        pickle.dump(skill, skill_file)
+        skill_file.close()
 
-#typ = soup.find('a', string='Gathering').parent.next_sibling.next_sibling.contents[0].string
-#print(typ)
+populate_items_list()
