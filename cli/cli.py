@@ -52,6 +52,10 @@ def add_part(part, id):
 def delete_part(part):
     r.remove_build_component(part)
 
+@c.option('--id', '-i', type=int)
+@cli.command('weapon-name')
+def get_weapon_name(id):
+    print(r.get_object_name(id, 'weapon').decode('utf-8'))
 
 
 

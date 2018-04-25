@@ -2,8 +2,8 @@ import redis
 
 class RedisDriver:
 
-    # _r = redis.StrictRedis(host='433-05.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
-    _r = redis.StrictRedis()
+    _r = redis.StrictRedis(host='433-05.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
+    #_r = redis.StrictRedis()
 
     def __init__(self):
         self._active_user = None
@@ -122,8 +122,8 @@ class RedisDriver:
 
     def get_object_name(self, id, type_):
         #TODO: Input verification
-        return self._r.hget(type_+ '_ids', id).decode('utf-8')
-    
+        return self._r.hget(type_+ '_ids', id)
+        
     def get_object_type(self, id):
         #TODO
         pass
