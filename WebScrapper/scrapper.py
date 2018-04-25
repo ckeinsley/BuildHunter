@@ -3,12 +3,8 @@ import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException
-import pandas as pd
-import numpy as np
 import pickle
 import re
-import webkit_server
-import time
 import sys
 
 # pickle likes to yell if this isn't high
@@ -345,6 +341,7 @@ Item :
     {
         'id' : '19323214',
         'Name' : 'Potion',
+        'Description' : '',
         'Rarity' : '',
         'Carry' : '',
         'Buy' : '',
@@ -353,12 +350,10 @@ Item :
             {
                 'id' : '',
                 'Name' : '',
-                'Quantity' : ''
             },
             {
                 'id' : '',
                 'Name' : '',
-                'Quantity' : ''
             }
         ],
         'Gather_Locations' : [
@@ -704,44 +699,54 @@ def write_armor_files():
         pickle.dump(item, item_file)
         item_file.close()
 
-def read_armor_files():
-    id_file = open(ARMORS_PATH + 'id_list.p', 'rb')
-    id_list = pickle.load(id_file, encoding='unicode')
-    id_file.close()
-    armor_item_list = []
-    for item in id_list:
-        item_file = open(ARMORS_PATH + str(item) + '.p', 'rb')
-        armor_item_list.append(pickle.load(item_file, encoding='unicode'))
-        item_file.close()
-    for i in armor_item_list:
-        print(i)
-    return (armor_item_list, id_list)
-
 def is_jewel(soup):
     header = soup.find('h1').string
-    print(header)
     return bool(header) and bool(re.compile('(Jewel)|(Jwl)').search(header))
 
-def process_item_data(url, driver):
+def get_combo_list(soup):
+    combo_header = soup.find('h3', string='Combo List')
+    if combo_header == None:
+        return []
+    combo_list = []
+    table_rows = combo_header.next_sibling.next_sibling.contents[1].contents[0].find_next_siblings('tr')
+    for row in table_rows:
+        
+
+
+def process_item_data(url, driver, name_id_map):
     # need to determine whether an item is a 'crafting/consumable/misc' item, a 'decoration', or 'monster shit'
+    print(url)
     driver.get(url)
     data = driver.page_source
     soup = BeautifulSoup(data, 'lxml')
     if is_jewel(soup):
         print('Its a jewel')
+        return None
+    else:
+        name = soup.find('h1').string
+        uid = name_id_map.get('ITEM:' + name)
+        description = soup.find('h1').next_sibling.next_sibling.string
+        rarity = soup.find('td', string='Rarity').next_sibling.next_sibling.string
+        carry = soup.find('td', string='Carry').next_sibling.next_sibling.string
+        buy = soup.find('td', string='Buy').next_sibling.next_sibling.string
+        sell = soup.find('td', string='Sell').next_sibling.next_sibling.string
+        combo_list = get_combo_list(soup)
+
+        
 
 def populate_items_list():
+    name_id_map = read_name_id_mapping()
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
     driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
     links = get_all_item_links()
-    k = len(links)-100
-    while k < len(links):
+    k = 8
+    while k < 15:
         attempts = 0
         while True:
             try:
-                temp = process_item_data(links[k], driver)
+                temp = process_item_data(links[k], driver, name_id_map)
             except TimeoutException:
                 print('TimeoutException: ', attempts)
                 attempts += 1
@@ -812,39 +817,4 @@ def write_skills_file():
         pickle.dump(skill, skill_file)
         skill_file.close()
 
-def read_skills_file():
-    id_file = open(SKILLS_PATH + 'id_list.p', 'rb')
-    id_list = pickle.load(id_file, encoding='unicode')
-    id_file.close()
-    skill_list = []
-    for skill in id_list:
-        skill_file = open(SKILLS_PATH + str(skill) + '.p', 'rb')
-        skill_list.append(pickle.load(skill_file, encoding='unicode'))
-        skill_file.close()
-    for i in skill_list:
-        print(i)
-    return (skill_list, id_list)
-
-write_skills_file()
-read_skills_file()
-#array = get_all_armor_links()
-#(name, details_dict) = get_armor_item_data(array[0])
-#print(details_dict)
-#for k in details_dict.items():
-#    print(k)
-
-#session = dryscrape.Session()
-#while True:
-#    try:
-#        session.visit('http://kiranico.com/en/mh4u/armor/head/derring-headgear')
-#    except (webkit_server.InvalidResponseError, webkit_server.EndOfStreamError):
-#        continue
-#    break
-#response = session.body()
-#soup = BeautifulSoup(response, 'lxml')
-
-#print(get_armor_crafting_items(soup))
-#print(get_armor_item_data('http://kiranico.com/en/mh4u/armor/legs/derring-trousers'))
-
-#typ = soup.find('a', string='Gathering').parent.next_sibling.next_sibling.contents[0].string
-#print(typ)
+populate_items_list()
