@@ -21,7 +21,7 @@ def main():
     (armor_item_list, id_list) = read_armor_files()
     print("Load Complete")
     # for armor in armor_item_list:
-    armor = armor_item_list[0];
+    armor = armor_item_list[0]
     main_armor = convertArmor(armor)
     skills = convertSkills(armor)
     crafting = convertCrafting(armor)
@@ -101,11 +101,11 @@ def extractDefense(armorMap, armor):
     armorMap['defense_max'] = armor.get('Defense').get('max')
 
 def extractResistances(armorMap, armor):
-    armorMap['fire'] = armor.get('Fire')
-    armorMap['dragon'] = armor.get('Dragon')
-    armorMap['water'] = armor.get('Water')
-    armorMap['thunder'] = armor.get('Thunder')
-    armorMap['ice'] = armor.get('Ice')
+    armorMap['fire'] = int(armor.get('Fire'))
+    armorMap['dragon'] = int(armor.get('Dragon'))
+    armorMap['water'] = int(armor.get('Water'))
+    armorMap['thunder'] = int(armor.get('Thunder'))
+    armorMap['ice'] = int(armor.get('Ice'))
 
 def convertSkills(armor):
     skillsList = []
