@@ -763,9 +763,18 @@ def process_item_data(url, driver, name_id_map):
         sell = soup.find('td', string='Sell').next_sibling.next_sibling.string
         combo_list = get_combo_list(soup, name_id_map)
         gather_locations = get_gather_locations(soup)
-
+        return {
+            'id' : uid,
+            'Name' : name,
+            'Description' : description,
+            'Rarity' : rarity,
+            'Carry' : carry,
+            'Buy' : buy,
+            'Sell' : sell,
+            'Combo_List' : combo_list,
+            'Gather_Locations' : gather_locations
+        }
         
-
 def populate_items_list():
     name_id_map = read_name_id_mapping()
     chrome_options = Options()
@@ -773,18 +782,33 @@ def populate_items_list():
     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
     driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
     links = get_all_item_links()
-    k = 30
-    while k < 45:
+    item_list = []
+    id_list = []
+    for k in links:
         attempts = 0
         while True:
             try:
-                temp = process_item_data(links[k], driver, name_id_map)
+                temp = process_item_data(k, driver, name_id_map)
             except TimeoutException:
                 print('TimeoutException: ', attempts)
                 attempts += 1
                 continue
             break
-        k += 1
+        print(temp)
+        id_list.append(temp['id'])
+        item_list.append(temp)
+    return (item_list, id_list)
+
+def write_item_files():
+    (item_list, id_list) = populate_items_list()
+    id_file = open(ITEMS_PATH + 'id_list.p', 'wb')
+    pickle.dump(id_list, id_file)
+    id_file.close()
+    for item in item_list:
+        item_file = open(ITEMS_PATH + str(item['id']) + '.p', 'wb')
+        pickle.dump(item, item_file)
+        item_file.close()
+
 
 def process_skill_data(url, driver, name_id_map):
     driver.get(url)
@@ -849,4 +873,4 @@ def write_skills_file():
         pickle.dump(skill, skill_file)
         skill_file.close()
 
-populate_items_list()
+write_item_files()
