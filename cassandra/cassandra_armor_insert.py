@@ -120,7 +120,7 @@ def convertSkills(armor):
 
 def convertCrafting(armor):
     craftingList = []
-    for item in armor.get('Crafting Items')
+    for item in armor.get('Crafting Items'):
         craftmap = {}
         craftmap['id'] = armor.get('id')
         craftmap['item_id'] = item.get('id')
