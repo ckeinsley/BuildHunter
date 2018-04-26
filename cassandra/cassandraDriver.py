@@ -14,7 +14,7 @@ from cassandra.query import SimpleStatement
 from cassandra.query import dict_factory
 
 IP_ADDRESSES = ['137.112.89.78', '137.112.89.77', '137.112.89.76', '137.112.89.75']
-KEYSPACE = 'buildHunter'
+KEYSPACE = 'buildhunter'
 ARMOR_TABLE = 'armor'
 
 def connect():
