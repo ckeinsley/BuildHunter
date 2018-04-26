@@ -3,12 +3,14 @@ import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException
+import time
 import pickle
+import bson
 import re
 import sys
 
 # pickle likes to yell if this isn't high
-sys.setrecursionlimit(10000000)
+sys.setrecursionlimit(100000000)
 
 # TODO: Store item drops with monsters, just list id's and rates and such
 # TODO: Separate out the loading functions from the scraping/writing functions
@@ -703,7 +705,8 @@ def is_jewel(soup):
     return bool(header) and bool(re.compile('(Jewel)|(Jwl)').search(header))
 
 def get_combo_list(soup, name_id_map):
-    combo_header = soup.find('h3', string='Combo List')
+    combo_header = soup.find('h2', string=lambda x : x and re.compile('Where to find.*').search(x)).next_sibling.next_sibling.next_sibling.next_sibling
+    combo_header = combo_header.find('h3', string='Combo List')
     if combo_header == None:
         return []
     combo_list = []
@@ -748,6 +751,7 @@ def process_item_data(url, driver, name_id_map):
     # need to determine whether an item is a 'crafting/consumable/misc' item, a 'decoration', or 'monster shit'
     print(url)
     driver.get(url)
+    time.sleep(0.3)
     data = driver.page_source
     soup = BeautifulSoup(data, 'lxml')
     if is_jewel(soup):
@@ -782,7 +786,7 @@ def populate_items_list():
     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
     driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
     links = get_all_item_links()
-    item_list = []
+
     id_list = []
     for k in links:
         attempts = 0
@@ -792,22 +796,43 @@ def populate_items_list():
             except TimeoutException:
                 print('TimeoutException: ', attempts)
                 attempts += 1
+                if attempts % 10 == 0:
+                    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
                 continue
             break
+        if temp == None:
+            continue
         print(temp)
+        print('Begin writing', temp['Name'])
+        item_file = open(ITEMS_PATH + str(temp['id']) + '.bson', 'wb')
+        item_file.write(bson.dumps(temp))
+        item_file.close()
+        print('Finished writing,', temp['Name'])
         id_list.append(temp['id'])
-        item_list.append(temp)
-    return (item_list, id_list)
+    print('Populated complete')
+    print('Beginning write')
+    id_dict = {'ids' : id_list}
+    id_file = open(ITEMS_PATH + 'id_dict.bson', 'wb')
+    id_file.write(bson.dumps(id_dict))
+    id_file.close()
+    print('ID file wirtten')
+    
 
 def write_item_files():
     (item_list, id_list) = populate_items_list()
+    print('Populated complete')
+    print('Beginning write')
     id_file = open(ITEMS_PATH + 'id_list.p', 'wb')
     pickle.dump(id_list, id_file)
     id_file.close()
+    print('ID file wirtten')
     for item in item_list:
+        print('Begin writing', item['Name'])
         item_file = open(ITEMS_PATH + str(item['id']) + '.p', 'wb')
         pickle.dump(item, item_file)
         item_file.close()
+        print('Finished writing,', item['Name'])
+    print('End writing')
 
 
 def process_skill_data(url, driver, name_id_map):
@@ -859,6 +884,8 @@ def populate_skills_list():
                 continue
             break
         print(temp)
+        if temp == None:
+            continue
         skill_list.append(temp)
         id_list.append(temp['id'])
     return (skill_list, id_list)
@@ -873,4 +900,4 @@ def write_skills_file():
         pickle.dump(skill, skill_file)
         skill_file.close()
 
-write_item_files()
+populate_items_list()
