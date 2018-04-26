@@ -42,17 +42,17 @@ def __createKeyspaceIfNotExists():
 def createArmorTable():
     session.execute("""
         create type if not exists skillmap (
+            id int,
             name text,
-            value int,
-            id int
+            value int
         )
     """)
 
     session.execute("""
         create type if not exists craftmap (
+            id int,
             name text,
-            quantity int,
-            id int
+            quantity int
         )
     """)
 
