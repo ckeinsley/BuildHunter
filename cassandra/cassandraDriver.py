@@ -41,7 +41,7 @@ def __createKeyspaceIfNotExists():
 
 def createArmorTable():
     session.execute("""
-        create table armor (
+        create table %s (
         id int,
         name text,
         part text,
