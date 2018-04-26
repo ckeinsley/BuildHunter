@@ -46,7 +46,7 @@ def createArmorTable():
         name text,
         part text,
         price text,
-        rarity text,
+        rarity int,
         slot int,
         type text,
         gender text,
