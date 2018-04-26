@@ -133,30 +133,15 @@ def convertDefense(defense):
     defenseDict['initial'] = initial
     return defenseDict
 
-# def replaceDefenseIdentifiers(defenseDict):
-#     value = str(defenseDict)
-#     value = value.replace("'max'", 'max')
-#     value = value.replace("'initial'", 'initial')
-#     return value
-
 def convertResistances(armor):
-    resist = []
-    resist.append({'fire':int(armor.get('Fire'))})
-    resist.append({'dragon':int(armor.get('Dragon'))})
-    resist.append({'water':int(armor.get('Water'))})
-    resist.append({'ice':int(armor.get('Ice'))})
-    resist.append({'thunder':int(armor.get('Thunder'))})
-    return replaceResistanceIdentifiers(resist)
+    resist = {}
+    resist['fire'] = int(armor.get('Fire'))
+    resist['dragon'] = int(armor.get('Dragon'))
+    resist['water'] = int(armor.get('Water'))
+    resist['ice'] = int(armor.get('Ice'))
+    resist['thunder'] =int(armor.get('Thunder'))
+    return resist
     
-def replaceResistanceIdentifiers(resist):
-    value = str(resist)
-    value = value.replace("'fire'",'fire')
-    value = value.replace("'dragon'",'dragon')
-    value = value.replace("'ice'",'ice')
-    value = value.replace("'water'",'water')
-    value = value.replace("'thunder'",'thunder')
-    return value
-
 
 if __name__ == "__main__":
     main()
