@@ -62,5 +62,5 @@ def createArmorTable():
 
 def insertArmor(armor):
     query = SimpleStatement("INSERT INTO " + ARMOR_TABLE + "(name, id, price, part, rarity, slot, type, gender, skill, crafting_item, defense, resist)" +
-    "VALUES ({name}, {id}, {price}, {part}, {rarity}, {slot}, {type}, {gender}, {skill}, {crafting_item}, {defense}, {resist})".format_map(armor))
+    "VALUES ('{name}', {id}, '{price}', '{part}', {rarity}, {slot}, '{type}', '{gender}', {skill}, {crafting_item}, {defense}, {resist})".format_map(armor))
     session.execute(query)
