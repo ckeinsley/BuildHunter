@@ -16,8 +16,8 @@ def read_armor_files():
         item_file = open(ARMORS_PATH + str(item) + '.p', 'rb')
         armor_item_list.append(pickle.load(item_file, encoding='unicode'))
         item_file.close()
-    for i in armor_item_list:
-        print(i)
+    # for i in armor_item_list:
+    #     print(i)
     return (armor_item_list, id_list)
 
 def read_skills_file():

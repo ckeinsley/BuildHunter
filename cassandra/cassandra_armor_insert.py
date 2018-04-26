@@ -47,6 +47,7 @@ Armor_Item:
 
 # Standard Imports
 import sys
+from pprint import pprint
 
 # Object Loader
 sys.path.insert(0,'../WebScrapper')
@@ -57,8 +58,8 @@ KEYSPACE = 'testkeyspace'
 
 def main():
     (armor_item_list, id_list) = read_armor_files()
-    for data in armor_item_list:
-        print(data)
+    pprint(armor_item_list[0])
+        
 
 
 
