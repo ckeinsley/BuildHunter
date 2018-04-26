@@ -54,10 +54,16 @@ sys.path.insert(0,'../WebScrapper')
 from obj_loader import read_armor_files
 
 # Cassandra Driver
+import cassandraDriver as db
 KEYSPACE = 'testkeyspace'
 
 def main():
+    print("Connecting to Cassandra")
+    result = db.connect()
+    print("Connected to " + result)
+    print("Begining Load")
     (armor_item_list, id_list) = read_armor_files()
+    print("Load Complete")
     pprint(armor_item_list[0])
         
 

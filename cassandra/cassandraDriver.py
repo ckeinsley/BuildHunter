@@ -22,7 +22,7 @@ def connect():
         try:
             cluster = Cluster(address)
             session = cluster.connect()
-            break
+            return address
         except:
             log.error('Unable to connect to %s', address)
 
