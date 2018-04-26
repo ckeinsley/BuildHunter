@@ -26,6 +26,10 @@ def main():
     skills = convertSkills(armor)
     crafting = convertCrafting(armor)
 
+    pprint(main_armor)
+    pprint(skills)
+    pprint(crafting)
+
     db.insertArmor(armor, skills, crafting)
     print("Processing armor piece " + armor.get('name'))
     # db.insertArmor(armor)
