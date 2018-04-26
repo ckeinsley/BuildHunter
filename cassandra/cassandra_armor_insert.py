@@ -126,6 +126,7 @@ def convertCrafting(armor):
         craftmap['item_id'] = item.get('id')
         craftmap['name'] = item.get('Name')
         craftmap['quantity'] = item.get('Quantity')
+        craftingList.append(craftmap)
     return craftingList
 
 if __name__ == "__main__":
