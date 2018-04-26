@@ -113,14 +113,17 @@ def convertCraftingItems(crafting):
     result = replaceBracketWithBrace(str(craftList))
     return removeSingleQuotesFromIdentifiers(result)
 
+# Convert list notation to set notation for cassandra
 def replaceBracketWithBrace(value):
     return value.replace('[','{').replace(']','}')
 
+# For UDTs cassandra disallows 'key' in the subobject for queries
 def removeSingleQuotesFromIdentifiers(value):
     value = value.replace("'name'",'name')
     value = value.replace("'quantity'", 'quantity')
     value = value.replace("'id'", 'id')
     value = value.replace("'value'", 'value')
+    return value
 
 def convertDefense(defense):
     initial = int(defense.get('initial'))
