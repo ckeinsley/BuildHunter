@@ -85,11 +85,35 @@ def convertArmor(armor):
     convertedArmor['slot'] = int(armor.get('Slot'))
     convertedArmor['type'] = armor.get('Type')
     convertedArmor['gender'] = armor.get('Gender')
-    convertedArmor['skill'] = armor.get('Skills')
-    convertedArmor['crafting_item'] = armor.get('Crafting Items')
+    convertedArmor['skill'] = convertSkillItems(armor.get('Skills'))
+    convertedArmor['crafting_item'] = convertCraftingItems(armor.get('Crafting Items'))
     convertedArmor['defense'] = convertDefense(armor.get('Defense'))
     convertedArmor['resist'] = convertResistances(armor)
     return convertedArmor
+
+def convertSkillItems(skillItems):
+    full_skill_set_map = {}
+    skillList = []
+    for skill in skillItems:
+        skillmap = {}
+        skillmap['name'] = skill.get('Name')
+        skillmap['quantity'] = int(skill.get('Quantity'))
+        skillmap['id'] = int(skill.get('id'))
+        skillList.append(skillmap)
+    full_skill_set_map['skill'] = skillList
+    return full_skill_set_map
+
+def convertCraftingItems(crafting):
+    full_crafting_map = {}
+    craftList = []
+    for item in crafting:
+        craftmap = {}
+        craftmap['name'] = item.get('Name')
+        craftmap['value'] = int(item.get('Value'))
+        craftmap['id'] = int(item.get('id'))
+        craftList.append(craftmap)
+    full_crafting_map['crafting_item'] = craftList
+    return full_crafting_map
 
 def convertDefense(defense):
     initial = int(defense.get('initial'))

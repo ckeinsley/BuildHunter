@@ -41,6 +41,22 @@ def __createKeyspaceIfNotExists():
 
 def createArmorTable():
     session.execute("""
+        create type if not exists skillmap (
+            name text,
+            quantity int,
+            id int
+        )
+    """)
+
+    session.execute("""
+        create type if not exists craftmap (
+            name text,
+            value int,
+            id int
+        )
+    """)
+    
+    session.execute("""
         create table if not exists %s (
         id int,
         name text,
@@ -50,8 +66,8 @@ def createArmorTable():
         slot int,
         type text,
         gender text,
-        skill list<frozen<map<text, text>>>,
-        crafting_item list<frozen<map<text,text>>>,
+        skill list<frozen<skillmap>>,
+        crafting_item list<frozen<craftmap>>,
         defense map<text,int>,
         resist map<text, int>,
         PRIMARY KEY (id, name)
