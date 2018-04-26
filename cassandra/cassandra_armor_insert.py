@@ -131,13 +131,13 @@ def convertDefense(defense):
     defenseDict = {}
     defenseDict['max'] = maximum
     defenseDict['initial'] = initial
-    return replaceDefenseIdentifiers(defenseDict)
+    return defenseDict
 
-def replaceDefenseIdentifiers(defenseDict):
-    value = str(defenseDict)
-    value = value.replace("'max'", 'max')
-    value = value.replace("'initial'", 'initial')
-    return value
+# def replaceDefenseIdentifiers(defenseDict):
+#     value = str(defenseDict)
+#     value = value.replace("'max'", 'max')
+#     value = value.replace("'initial'", 'initial')
+#     return value
 
 def convertResistances(armor):
     resist = []
