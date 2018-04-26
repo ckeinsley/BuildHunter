@@ -348,13 +348,11 @@ Item :
         'Sell' : '',
         'Combo_List' : [
             {
-                'id' : '',
-                'Name' : '',
+                'id_1' : '',
+                'Name_1' : '',
+                'id_2' : '',
+                'Name_2' : ''
             },
-            {
-                'id' : '',
-                'Name' : '',
-            }
         ],
         'Gather_Locations' : [
             {
@@ -703,14 +701,30 @@ def is_jewel(soup):
     header = soup.find('h1').string
     return bool(header) and bool(re.compile('(Jewel)|(Jwl)').search(header))
 
-def get_combo_list(soup):
+def get_combo_list(soup, name_id_map):
     combo_header = soup.find('h3', string='Combo List')
     if combo_header == None:
         return []
     combo_list = []
     table_rows = combo_header.next_sibling.next_sibling.contents[1].contents[0].find_next_siblings('tr')
     for row in table_rows:
-        
+        links = row.find_all('a')
+        if len(links) != 3:
+            print('ComboListError')
+            for l in links:
+                print(l)
+            return
+        name_1 = links[1].string
+        name_2 = links[2].string
+        uid_1 = name_id_map.get('ITEM:' + name_1)
+        uid_2 = name_id_map.get('ITEM:' + name_2)
+        combo_list.append({
+            'id_1' : uid_1,
+            'Name_1' : name_1,
+            'id_2' : uid_2,
+            'Name_2' : name_2
+        })
+    return combo_list
 
 
 def process_item_data(url, driver, name_id_map):
@@ -730,7 +744,8 @@ def process_item_data(url, driver, name_id_map):
         carry = soup.find('td', string='Carry').next_sibling.next_sibling.string
         buy = soup.find('td', string='Buy').next_sibling.next_sibling.string
         sell = soup.find('td', string='Sell').next_sibling.next_sibling.string
-        combo_list = get_combo_list(soup)
+        combo_list = get_combo_list(soup, name_id_map)
+        print(combo_list)
 
         
 
