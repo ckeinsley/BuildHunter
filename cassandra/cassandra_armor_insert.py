@@ -99,7 +99,8 @@ def convertSkillItems(skillItems):
         skillmap['value'] = int(skill.get('Value'))
         skillmap['id'] = int(skill.get('id'))
         skillList.append(skillmap)
-    return str(skillList).replace('[','{').replace(']','}')
+    result = replaceBracketWithBrace(str(skillList))
+    return removeSingleQuotesFromIdentifiers(result)
 
 def convertCraftingItems(crafting):
     craftList = []
@@ -109,7 +110,17 @@ def convertCraftingItems(crafting):
         craftmap['quantity'] = int(item.get('Quantity'))
         craftmap['id'] = int(item.get('id'))
         craftList.append(craftmap)
-    return str(craftList).replace('[','{').replace(']','}')
+    result = replaceBracketWithBrace(str(craftList))
+    return removeSingleQuotesFromIdentifiers(result)
+
+def replaceBracketWithBrace(value):
+    return value.replace('[','{').replace(']','}')
+
+def removeSingleQuotesFromIdentifiers(value):
+    value = value.replace("'name'",'name')
+    value = value.replace("'quantity'", 'quantity')
+    value = value.replace("'id'", 'id')
+    value = value.replace("'value'", 'value')
 
 def convertDefense(defense):
     initial = int(defense.get('initial'))
