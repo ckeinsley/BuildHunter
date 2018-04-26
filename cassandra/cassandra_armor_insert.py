@@ -22,6 +22,7 @@ def main():
     print("Load Complete")
     # for armor in armor_item_list:
     armor = convertArmor(armor_item_list[0])
+    db.insertArmor(armor)
     pprint(armor)
     print("Processing armor piece " + armor.get('name'))
     # db.insertArmor(armor)
