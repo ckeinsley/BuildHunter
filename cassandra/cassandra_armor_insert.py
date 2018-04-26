@@ -60,6 +60,9 @@ KEYSPACE = 'testkeyspace'
 def main():
     print("Connecting to Cassandra")
     result = db.connect()
+    if not result:
+        print('Unable to connect to any node')
+        return
     print("Connected to " + result)
     print("Begining Load")
     (armor_item_list, id_list) = read_armor_files()

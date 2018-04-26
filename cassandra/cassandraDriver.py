@@ -23,8 +23,11 @@ def connect():
             cluster = Cluster(address)
             session = cluster.connect()
             return address
-        except:
+        except Exception as e:
             log.error('Unable to connect to %s', address)
+            log.exception(e)
+            return None
+    
 
 
 def insertArmor(armor):
