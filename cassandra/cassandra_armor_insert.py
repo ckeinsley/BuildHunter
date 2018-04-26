@@ -1,5 +1,35 @@
 #!/usr/bin/env python
+# Standard Imports
+import sys
+from pprint import pprint
+
+# Object Loader
+sys.path.insert(0,'../WebScrapper')
+from obj_loader import read_armor_files
+
+# Cassandra Driver
+import cassandraDriver as db
+KEYSPACE = 'testkeyspace'
+
+def main():
+    print("Connecting to Cassandra")
+    db.connect()
+    print("Connected")
+    print("Attempting to create Armor Table")
+    db.createArmorTable()
+    print("Begining Load")
+    (armor_item_list, id_list) = read_armor_files()
+    print("Load Complete")
+    # for armor in armor_item_list:
+    armor = convertArmor(armor_item_list[0])
+    pprint(armor)
+    print("Processing armor piece " + armor.get('name'))
+    # db.insertArmor(armor)
+    print("Finished Dumping Files")
+
 '''
+Loaded Format
+----------------------------------
 Armor_Item:
     {
         'id' : '1248329814',
@@ -44,30 +74,38 @@ Armor_Item:
         ]
     }
 '''
+def convertArmor(armor):
+    convertedArmor = {}
+    convertedArmor['name'] = armor.get('Name')
+    convertedArmor['id'] = int(armor.get('id'))
+    convertedArmor['price'] = armor.get('Price')
+    convertedArmor['part'] = armor.get('Part')
+    convertedArmor['rarity']= int(armor.get('Rarity'))
+    convertedArmor['slot'] = int(armor.get('Slot'))
+    convertedArmor['type'] = armor.get('Type')
+    convertedArmor['gender'] = armor.get('Gender')
+    convertedArmor['skill'] = armor.get('Skills')
+    convertedArmor['crafting_item'] = armor.get('Crafting Items')
+    convertedArmor['defense'] = convertDefense(armor.get('Defense'))
+    convertedArmor['resist'] = convertResistances(armor)
+    return convertedArmor
 
-# Standard Imports
-import sys
-from pprint import pprint
+def convertDefense(defense):
+    initial = int(defense.get('initial'))
+    maximum = int(defense.get('max'))
+    defenseDict = {}
+    defenseDict['max'] = maximum
+    defenseDict['initial'] = initial
+    return defenseDict
 
-# Object Loader
-sys.path.insert(0,'../WebScrapper')
-from obj_loader import read_armor_files
-
-# Cassandra Driver
-import cassandraDriver as db
-KEYSPACE = 'testkeyspace'
-
-def main():
-    print("Connecting to Cassandra")
-    db.connect()
-    print("Connected")
-    print("Begining Load")
-    (armor_item_list, id_list) = read_armor_files()
-    print("Load Complete")
-    pprint(armor_item_list[0])
-        
-
-
+def convertResistances(armor):
+    resist = []
+    resist.append({'fire':int(armor.get('Fire'))})
+    resist.append({'dragon':int(armor.get('Dragon'))})
+    resist.append({'water':int(armor.get('Water'))})
+    resist.append({'ice':int(armor.get('Ice'))})
+    resist.append({'thunder':int(armor.get('Thunder'))})
+    return resist
 
 if __name__ == "__main__":
     main()
