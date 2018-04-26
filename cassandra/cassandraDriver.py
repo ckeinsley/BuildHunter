@@ -17,16 +17,14 @@ ARMOR_KEYSPACE = 'armor'
 WEAPON_KEYSPACE = 'weapon'
 
 def connect():
-    for address in IP_ADDRESSES:
-        global session
-        try:
-            cluster = Cluster(address)
-            session = cluster.connect()
-            return address
-        except Exception as e:
-            log.error('Unable to connect to %s', address)
-            log.exception(e)
-            return None
+    global session
+    try:
+        cluster = Cluster(IP_ADDRESSES)
+        session = cluster.connect()
+    except Exception as e:
+        log.error('Unable to connect to cassandra')
+        log.exception(e)
+        return None
     
 
 
