@@ -1,6 +1,6 @@
 import pickle
 
-ARMORS_PATH = './obj/armors/'
+ARMORS_PATH = '../WebScrapper/obj/armors/'
 WEAPONS_PATH = './obj/weapons/'
 MONSTERS_PATH = './obj/monsters/'
 DECORATIONS_PATH = './obj/decorations/'
