@@ -360,6 +360,7 @@ Item :
                 'Map' : '',
                 'Area' : '',
                 'Gather_Method' : '',
+                'Quantity' : '',
                 'Drop_Rate' : ''
             }
         ]
@@ -726,6 +727,22 @@ def get_combo_list(soup, name_id_map):
         })
     return combo_list
 
+def get_gather_locations(soup):
+    no_results = soup.find('h3', string='Maps').find_next_sibling('p')
+    gather_locations = []
+    if no_results == None:
+        rows = soup.find('h3', string='Maps').find_next_sibling('table').find_all('tr')
+        for r in rows:
+            datas = r.find_all('td')
+            gather_locations.append({
+                'Rank' : datas[0].string,
+                'Map' : datas[1].a.string,
+                'Area' : datas[2].string,
+                'Gather_Method' : datas[3].string,
+                'Quantity' : datas[4].string,
+                'Drop_Rate' : datas[5].string
+            })
+    return gather_locations    
 
 def process_item_data(url, driver, name_id_map):
     # need to determine whether an item is a 'crafting/consumable/misc' item, a 'decoration', or 'monster shit'
@@ -745,7 +762,7 @@ def process_item_data(url, driver, name_id_map):
         buy = soup.find('td', string='Buy').next_sibling.next_sibling.string
         sell = soup.find('td', string='Sell').next_sibling.next_sibling.string
         combo_list = get_combo_list(soup, name_id_map)
-        print(combo_list)
+        gather_locations = get_gather_locations(soup)
 
         
 
@@ -756,8 +773,8 @@ def populate_items_list():
     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
     driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
     links = get_all_item_links()
-    k = 8
-    while k < 15:
+    k = 30
+    while k < 45:
         attempts = 0
         while True:
             try:
