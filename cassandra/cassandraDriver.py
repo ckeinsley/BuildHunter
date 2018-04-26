@@ -43,7 +43,7 @@ def createArmorTable():
     session.execute("""
         create type if not exists skillmap (
             name text,
-            quantity int,
+            value int,
             id int
         )
     """)
@@ -51,11 +51,11 @@ def createArmorTable():
     session.execute("""
         create type if not exists craftmap (
             name text,
-            value int,
+            quantity int,
             id int
         )
     """)
-    
+
     session.execute("""
         create table if not exists %s (
         id int,
