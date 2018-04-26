@@ -131,7 +131,13 @@ def convertDefense(defense):
     defenseDict = {}
     defenseDict['max'] = maximum
     defenseDict['initial'] = initial
-    return defenseDict
+    return replaceDefenseIdentifiers(defenseDict)
+
+def replaceDefenseIdentifiers(defenseDict):
+    value = str(defenseDict)
+    value = value.replace("'max'", 'max')
+    value = value.replace("'initial'", 'initial')
+    return value
 
 def convertResistances(armor):
     resist = []
@@ -140,7 +146,17 @@ def convertResistances(armor):
     resist.append({'water':int(armor.get('Water'))})
     resist.append({'ice':int(armor.get('Ice'))})
     resist.append({'thunder':int(armor.get('Thunder'))})
-    return resist
+    return replaceResistanceIdentifiers(resist)
+    
+def replaceResistanceIdentifiers(resist):
+    value = str(resist)
+    value = value.replace("'fire'",'fire')
+    value = value.replace("'dragon'",'dragon')
+    value = value.replace("'ice'",'ice')
+    value = value.replace("'water'",'water')
+    value = value.replace("'thunder'",'thunder')
+    return value
+
 
 if __name__ == "__main__":
     main()
