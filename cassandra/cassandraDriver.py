@@ -66,8 +66,8 @@ def createArmorTable():
         slot int,
         type text,
         gender text,
-        skill list<frozen<skillmap>>,
-        crafting_item list<frozen<craftmap>>,
+        skill set<frozen<skillmap>>,
+        crafting_item set<frozen<craftmap>>,
         defense map<text,int>,
         resist map<text, int>,
         PRIMARY KEY (id, name)

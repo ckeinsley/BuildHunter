@@ -92,24 +92,24 @@ def convertArmor(armor):
     return convertedArmor
 
 def convertSkillItems(skillItems):
-    skillList = set()
+    skillList = []
     for skill in skillItems:
         skillmap = {}
         skillmap['name'] = skill.get('Name')
         skillmap['value'] = int(skill.get('Value'))
         skillmap['id'] = int(skill.get('id'))
-        skillList.add(skillmap)
-    return skillList
+        skillList.append(skillmap)
+    return str(skillList).replace('[','{').replace(']','}')
 
 def convertCraftingItems(crafting):
-    craftList = set()
+    craftList = []
     for item in crafting:
         craftmap = {}
         craftmap['name'] = item.get('Name')
         craftmap['quantity'] = int(item.get('Quantity'))
         craftmap['id'] = int(item.get('id'))
-        craftList.add(craftmap)
-    return craftList
+        craftList.append(craftmap)
+    return str(craftList).replace('[','{').replace(']','}')
 
 def convertDefense(defense):
     initial = int(defense.get('initial'))
