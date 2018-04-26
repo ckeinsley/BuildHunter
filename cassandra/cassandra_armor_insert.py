@@ -22,8 +22,8 @@ def main():
     print("Load Complete")
     # for armor in armor_item_list:
     armor = convertArmor(armor_item_list[0])
-    db.insertArmor(armor)
     pprint(armor)
+    db.insertArmor(armor)
     print("Processing armor piece " + armor.get('name'))
     # db.insertArmor(armor)
     print("Finished Dumping Files")
@@ -97,7 +97,7 @@ def convertSkillItems(skillItems):
     for skill in skillItems:
         skillmap = {}
         skillmap['name'] = skill.get('Name')
-        skillmap['quantity'] = int(skill.get('Quantity'))
+        skillmap['value'] = int(skill.get('Value'))
         skillmap['id'] = int(skill.get('id'))
         skillList.append(skillmap)
     full_skill_set_map['skill'] = skillList
@@ -109,7 +109,7 @@ def convertCraftingItems(crafting):
     for item in crafting:
         craftmap = {}
         craftmap['name'] = item.get('Name')
-        craftmap['value'] = int(item.get('Value'))
+        craftmap['quantity'] = int(item.get('Quantity'))
         craftmap['id'] = int(item.get('id'))
         craftList.append(craftmap)
     full_crafting_map['crafting_item'] = craftList
