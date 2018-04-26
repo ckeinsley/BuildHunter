@@ -16,6 +16,8 @@ from cassandra.query import dict_factory
 IP_ADDRESSES = ['137.112.89.78', '137.112.89.77', '137.112.89.76', '137.112.89.75']
 KEYSPACE = 'buildhunter'
 ARMOR_TABLE = 'armor'
+CRAFTING_TABLE = 'crafting'
+SKILL_TABLE = 'skills'
 
 def connect():
     global session
@@ -40,21 +42,6 @@ def __createKeyspaceIfNotExists():
         """ % KEYSPACE)
 
 def createArmorTable():
-    session.execute("""
-        create type if not exists skillmap (
-            id int,
-            name text,
-            value int
-        )
-    """)
-
-    session.execute("""
-        create type if not exists craftmap (
-            id int,
-            name text,
-            quantity int
-        )
-    """)
 
     session.execute("""
         create table if not exists %s (
@@ -66,17 +53,62 @@ def createArmorTable():
         slot int,
         type text,
         gender text,
-        skill set<frozen<skillmap>>,
-        crafting_item set<frozen<craftmap>>,
-        defense map<text,int>,
-        resist map<text, int>,
-        PRIMARY KEY (id, name)
+        fire int,
+        dragon int,
+        thunder int,
+        water int,
+        ice int,
+        defense_init int,
+        defense_max int,
+        PRIMARY KEY (id)
         )  
     """ % ARMOR_TABLE)
 
+    session.execute("""
+        create table if not exists %s (
+        id int,
+        item_id int,
+        name text,
+        quantity int,
+        primary key (id, item_id)
+        )  
+    """ % CRAFTING_TABLE)
 
+    session.execute("""
+        create table if not exists %s (
+        id int,
+        skill_id int,
+        name text,
+        value int,
+        primary key (id, skill_id)
+        )  
+    """ % SKILL_TABLE)
 
-def insertArmor(armor):
-    query = SimpleStatement("INSERT INTO " + ARMOR_TABLE + "(name, id, price, part, rarity, slot, type, gender, skill, crafting_item, defense, resist)" +
-    "VALUES ('{name}', {id}, '{price}', '{part}', {rarity}, {slot}, '{type}', '{gender}', {skill}, {crafting_item}, {defense}, {resist})".format_map(armor))
-    session.execute(query)
+def insertArmor(armor, skills, crafting):
+    armorQuery = SimpleStatement("INSERT INTO " + ARMOR_TABLE + 
+        """
+        (id int, name text, part text, price text, rarity int, slot int, type text, gender text, 
+        fire int, dragon int, thunder int, water int, ice int, defense_init int, defense_max int,)
+        VALUES ('{id}', {name}, '{part}', '{price}', {rarity}, {slot}, '{type}', '{gender}', 
+        {fire}, {dragon}, {thunder}, {water}, {ice}, {defense_init}, {defense_max})
+        """.format_map(armor)
+    )
+    session.execute(armorQuery)
+    
+    for skill in skills:
+        skillsQuery = SimpleStatement("INSERT INTO " + SKILL_TABLE + 
+            """
+            (id, skill_id, name, value)
+            VALUES ('{id}', '{skill_id}', {name}, '{value}')
+            """.format_map(skill)
+        )
+        session.execute(skillsQuery)
+
+    for item in crafting:
+        craftsQuery = SimpleStatement("INSERT INTO " + CRAFTING_TABLE + 
+            """
+            (id, item_id, name, quantity)
+            VALUES ('{id}', '{item_id}', {name}, '{quantity}')
+            """.format_map(item)
+        )
+        session.execute(craftsQuery)
