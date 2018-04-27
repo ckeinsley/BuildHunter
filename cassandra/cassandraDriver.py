@@ -92,6 +92,7 @@ def insertArmor(armor, skills, crafting):
     session.execute(armorQuery)
     
     for skill in skills:
+        print(skill)
         skillsQuery = SimpleStatement("INSERT INTO " + SKILL_TABLE + 
             """
             (id, skill_id, name, value)
