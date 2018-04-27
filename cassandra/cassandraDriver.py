@@ -85,6 +85,7 @@ def createArmorTable():
     """ % SKILL_TABLE)
 
 def insertArmor(armor, skills, crafting):
+    print(armor)
     armorQuery = SimpleStatement("INSERT INTO " + ARMOR_TABLE + 
         """
         (id int, name text, part text, price text, rarity int, slot int, type text, gender text, 
