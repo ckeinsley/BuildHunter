@@ -22,6 +22,8 @@ def main():
     print("Load Complete")
     for armor in armor_item_list:
         print("Processing armor piece " + armor.get('Name'))
+        if 'dummy' in armor.get('Name')
+            pass
         main_armor = convertArmor(armor)
         skills = convertSkills(armor)
         crafting = convertCrafting(armor)
