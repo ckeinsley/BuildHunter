@@ -7,6 +7,8 @@
 
 ## Neo4J
 
+With the community edition there is no option for sharding or replication across multiple nodes. Because of this we did not add any support for Scalability in Neo4j. Everything is located on one node and will not be replicated or sharded. There are no real options available to use outside of buying the Enterprise edition. 
+
 ## Redis
 
 ### Scalability
@@ -18,8 +20,6 @@ So redis supports both replication and sharding. There are several ways to imple
 #### Justification
 
 We opted not to shard/partition our redis database because we only have 4 nodes and thought the benefits would not be as great since our system does not have different enough data to justify its necessity. Replication however seemed like a must for us, so that we can make more reads, which is primarily what our application does. We put it on two nodes only because Redis uses a ton of RAM so we did not want to limit some of our other nodes ability to perform.
-
-### Consistency
 
 #### Options
 
@@ -45,8 +45,10 @@ Scaling cassandra can be done in one of two ways, horizontally or vertically. Ho
 Our choice was to setup cassandra in a four node ring where each node is on a different VM. This allows us to read or write from any node and ensures that as long one of our VMs is up that we can query from cassandra.  
 
 ### Consistency
-Cassandra will be eventually consistent using asynchronous updating. When can write to any node which will propose the write request. The write request will be processed once a configured number of nodes accepts the write. Cassandra automatically handles a node going down through a self-healing process which includes scrubbing any corrupt data then reattaching the node to the ring just like a new node being added. This will 
+
+Cassandra will be eventually consistent using asynchronous updating. When can write to any node which will propose the write request. The write request will be processed once a configured number of nodes accepts the write. Cassandra automatically handles a node going down through a self-healing process which includes scrubbing any corrupt data then reattaching the node to the ring just like a new node being added. This ensures that if a write was accepted by the number of nodes specified, which can be done on a by-query basis using consistency levels, the write will eventually be persisted. The consistency levels are used to ensure that the set of nodes have persisted the write to their commit log and memtable before verifying that the write occurred. We can also use read consistencies to ensure that we never read stale data. We will always guarantee that at least 2 nodes accept a write request. Our read requests will only need to 1 node to acknowledge them. This means that we may at some point serve stale data.
+
 
 ### Justification
 
-We picked this because we don't care
+We are okay with penalizing our write speeds somewhat, because the system is going to be fairly small. Writes to cassandra should be relatively infrequent anyway, so there is not much worry about a slow write. We also do not need strict consistency, because the only guarantee we need to make to the user is that their build will eventually be saved and published for other users to view. We do not necessarily need to show users builds that are up to date as of the second that they query. 
