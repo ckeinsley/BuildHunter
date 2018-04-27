@@ -86,7 +86,7 @@ def convertArmor(armor):
     convertedArmor['gender'] = armor.get('Gender')
     extractDefense(convertedArmor, armor)
     extractResistances(convertedArmor, armor)
-    convertedArmor['name'] = armor.get('Name')
+    convertedArmor['name'] = armor.get('Name').replace("'","''")
     return convertedArmor
 
 def extractDefense(armorMap, armor):
