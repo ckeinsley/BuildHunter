@@ -347,6 +347,9 @@ def get_all_weapon_links():
             except TimeoutException:
                 print('TimeoutException: Attempt ', attempts)
                 attempts += 1
+                if attempts%10 == 0:
+                    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
+                    driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
                 continue
             break
     return dict(zip(weapon_categories, link_arrays))
@@ -731,10 +734,30 @@ def write_skills_file():
         pickle.dump(skill, skill_file)
         skill_file.close()
 
-def process_weapon_data(url, driver, name_id_map):
+def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
+    print(url)
     driver.get(url)
+    time.sleep(0.3)
     data = driver.page_source
     soup = BeautifulSoup(data, 'lxml')
+
+    name = soup.find('h1').string
+    uid = name_id_map.get('WEAPON:' + name)
+    details_table = soup.find('h3', string='Details').find_next_sibling('table').tbody.find_all('tr')
+    weapon_family = details_table[0].td.string
+    rarity = soup.find('td', string='Rarity').find_next_sibling('td').string
+    attack = soup.find('td', string='Attack').find_next_sibling('td').string
+    true_attack = soup.find('td', string='True Attack').find_next_sibling('td').string
+    defense = soup.find('td', string='Defense').find_next_sibling('td').string
+    if defense != None:
+        defense = defense.replace('+','')
+    affinity = soup.find('td', string='Affinity').find_next_sibling('td').contents[0]
+    affinity = affinity.strip().replace('+', '').replace('%','')
+    if affinity == '':
+        affinity = None
+    slot = slot_encoder(soup.find('td', string='Slot').find_next_sibling('td').string)
+
+    print('weapon_family',weapon_family, 'rarity', rarity, 'attack', attack, 'true_attack', true_attack, 'defense', defense, 'affinity', affinity, 'slot', slot)
 
 def populate_weapons_list():
     name_id_map = read_name_id_mapping()
@@ -742,7 +765,12 @@ def populate_weapons_list():
     chrome_options.add_argument('--headless')
     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
     driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
-    links = get_all_weapon_links()
+    weapon_links = get_all_weapon_links()
+    links = []
+    for w in weapon_links.values():
+        links += w
+    bm_weapons = ['Great Sword', 'Long Sword', 'Sword', 'Dual Blades', 'Hammer', 'Hunting Horn', 'Lance', 'Gunlance', 'Switch Axe', 'Charge Blade', 'Insect Glaive']
+    g_weapons = ['Bow', 'Light Bowgun', 'Heavy Bowgun']
 
     id_dict = {
         'Blademaster' : [],
@@ -752,15 +780,33 @@ def populate_weapons_list():
         attempts = 0
         while True:
             try:
-                temp = process_weapon_data(k, driver, name_id_map)
+                temp = process_weapon_data(k, driver, name_id_map, bm_weapons, g_weapons)
             except TimeoutException:
                 print('TimeoutException: ', attempts)
                 attempts += 1
                 if attempts % 10 == 0:
                     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
+                    driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
                 continue
             break
-        if temp == None:
-            continue
         print(temp)
-        
+        continue
+        if temp['Weapon_Family'] in bm_weapons:
+            weapon_file = open(WEAPONS_PATH + 'blademaster/' + str(temp['id']) + '.bson', 'wb')
+            weapon_file.write(bson.dumps(temp))
+            weapon_file.close()
+            id_dict['Blademaster'].append(temp)
+        elif temp['Weapon_Family'] in g_weapons:
+            weapon_file = open(WEAPONS_PATH + 'gunner/' + str(temp['id']) + '.bson', 'wb')
+            weapon_file.write(bson.dumps(temp))
+            weapon_file.close()
+            id_dict['Gunner'].append(temp)
+        else:
+            print('Not in a Weapon Family!!!!')
+            return
+    print('Populating complete')
+    id_file = open(WEAPONS_PATH + 'id_dict.bson', 'wb')
+    id_file.write(bson.dumps(id_dict))
+    id_file.close()
+    print('ID dict written')
+
