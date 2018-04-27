@@ -106,7 +106,7 @@ def convertSkills(armor):
         skillmap = {}
         skillmap['id'] = int(armor.get('id'))
         skillmap['skill_id'] = int(skill.get('id'))
-        skillmap['name'] = skill.get('Name')
+        skillmap['name'] = skill.get('Name').replace("'", "''")
         skillmap['value'] = int(skill.get('Value'))
         skillsList.append(skillmap)
     return skillsList
@@ -117,7 +117,7 @@ def convertCrafting(armor):
         craftmap = {}
         craftmap['id'] = int(armor.get('id'))
         craftmap['item_id'] = int(item.get('id'))
-        craftmap['name'] = item.get('Name')
+        craftmap['name'] = item.get('Name').replace("'", "''")
         craftmap['quantity'] = int(item.get('Quantity'))
         craftingList.append(craftmap)
     return craftingList
