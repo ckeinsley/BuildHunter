@@ -99,7 +99,7 @@ def extractDefense(armorMap, armor):
     try:
         maximum = int(armor.get('Defense').get('max'))
     except:
-        maximum = -1;
+        maximum = -1
     armorMap['defense_init'] = initial
     armorMap['defense_max'] = maximum
 
