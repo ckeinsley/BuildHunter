@@ -94,11 +94,9 @@ def insertArmor(armor, skills, crafting):
     for skill in skills:
         print(skill)
         skillsQuery = SimpleStatement("INSERT INTO " + SKILL_TABLE + 
-            """
-            (id, skill_id, name, value)
-            VALUES ('{id}', '{skill_id}', {name}, '{value}')
-            """.format_map(skill)
+            "(id, skill_id, name, value) VALUES ('{id}', '{skill_id}', {name}, '{value}')".format_map(skill)
         )
+        print(skillsQuery)
         session.execute(skillsQuery)
 
     for item in crafting:
