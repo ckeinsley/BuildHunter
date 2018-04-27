@@ -23,7 +23,7 @@ Scaling cassandra can be done in one of two ways, horizontally or vertically. Ho
 Our choice was to setup cassandra in a four node ring where each node is on a different VM. This allows us to read or write from any node and ensures that as long one of our VMs is up that we can query from cassandra.  
 
 ### Consistency
-
+Cassandra will be eventually consistent using asynchronous updating. When can write to any node which will propose the write request. The write request will be processed once a configured number of nodes accepts the write. Cassandra automatically handles a node going down through a self-healing process which includes scrubbing any corrupt data then reattaching the node to the ring just like a new node being added. This will 
 
 ### Justification
 We picked this because we don't care
