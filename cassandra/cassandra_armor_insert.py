@@ -20,19 +20,14 @@ def main():
     print("Begining Load")
     (armor_item_list, id_list) = read_armor_files()
     print("Load Complete")
-    # for armor in armor_item_list:
-    armor = armor_item_list[0]
-    main_armor = convertArmor(armor)
-    skills = convertSkills(armor)
-    crafting = convertCrafting(armor)
-
-    pprint(main_armor)
-    pprint(skills)
-    pprint(crafting)
-
-    db.insertArmor(main_armor, skills, crafting)
-    print("Processing armor piece " + armor.get('name'))
-    # db.insertArmor(armor)
+    for armor in armor_item_list:
+        print("Processing armor piece " + armor.get('Name'))
+        if "dummy" in armor.get('Name'):
+            continue
+        main_armor = convertArmor(armor)
+        skills = convertSkills(armor)
+        crafting = convertCrafting(armor)
+        db.insertArmor(main_armor, skills, crafting)
     print("Finished Dumping Files")
 
 '''
@@ -93,12 +88,20 @@ def convertArmor(armor):
     convertedArmor['gender'] = armor.get('Gender')
     extractDefense(convertedArmor, armor)
     extractResistances(convertedArmor, armor)
-    convertedArmor['name'] = armor.get('Name')
+    convertedArmor['name'] = armor.get('Name').replace("'","''")
     return convertedArmor
 
 def extractDefense(armorMap, armor):
-    armorMap['defense_init'] = int(armor.get('Defense').get('initial'))
-    armorMap['defense_max'] = int(armor.get('Defense').get('max'))
+    try:
+        initial = int(armor.get('Defense').get('initial'))
+    except:
+        initial = -1
+    try:
+        maximum = int(armor.get('Defense').get('max'))
+    except:
+        maximum = -1;
+    armorMap['defense_init'] = initial
+    armorMap['defense_max'] = maximum
 
 def extractResistances(armorMap, armor):
     armorMap['fire'] = int(armor.get('Fire'))
@@ -113,7 +116,7 @@ def convertSkills(armor):
         skillmap = {}
         skillmap['id'] = int(armor.get('id'))
         skillmap['skill_id'] = int(skill.get('id'))
-        skillmap['name'] = skill.get('Name')
+        skillmap['name'] = skill.get('Name').replace("'", "''")
         skillmap['value'] = int(skill.get('Value'))
         skillsList.append(skillmap)
     return skillsList
@@ -124,7 +127,7 @@ def convertCrafting(armor):
         craftmap = {}
         craftmap['id'] = int(armor.get('id'))
         craftmap['item_id'] = int(item.get('id'))
-        craftmap['name'] = item.get('Name')
+        craftmap['name'] = item.get('Name').replace("'", "''")
         craftmap['quantity'] = int(item.get('Quantity'))
         craftingList.append(craftmap)
     return craftingList
