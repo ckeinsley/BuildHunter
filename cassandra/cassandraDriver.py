@@ -87,14 +87,14 @@ def createArmorTable():
 def insertArmor(armor, skills, crafting):
     armorQuery = SimpleStatement("INSERT INTO " + ARMOR_TABLE + 
         "(id, part, name, price, rarity, slot, type, gender, fire, dragon, thunder, water, ice, defense_init, defense_max)"+
-        "VALUES ({id}, '{part}', '{name}', '{price}', {rarity}, {slot}, '{type}', '{gender}', {fire}, {dragon}, {thunder}, {water}, {ice}, {defense_init}, {defense_max})".format_map(armor)
+        'VALUES ({id}, "{part}", "{name}", "{price}", {rarity}, {slot}, "{type}", "{gender}", {fire}, {dragon}, {thunder}, {water}, {ice}, {defense_init}, {defense_max})'.format_map(armor)
     )
     session.execute(armorQuery)
     
     for skill in skills:
         print(skill)
         skillsQuery = SimpleStatement("INSERT INTO " + SKILL_TABLE + 
-            "(id, skill_id, name, value) VALUES ({id}, {skill_id}, '{name}', {value})".format_map(skill)
+            '(id, skill_id, name, value) VALUES ({id}, {skill_id}, "{name}", {value})'.format_map(skill)
         )
         print(skillsQuery)
         session.execute(skillsQuery)
@@ -103,7 +103,7 @@ def insertArmor(armor, skills, crafting):
         craftsQuery = SimpleStatement("INSERT INTO " + CRAFTING_TABLE + 
             """
             (id, item_id, name, quantity)
-            VALUES ({id}, {item_id}, '{name}', {quantity})
+            VALUES ({id}, {item_id}, "{name}", {quantity})
             """.format_map(item)
         )
         session.execute(craftsQuery)
