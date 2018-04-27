@@ -92,8 +92,16 @@ def convertArmor(armor):
     return convertedArmor
 
 def extractDefense(armorMap, armor):
-    armorMap['defense_init'] = int(armor.get('Defense').get('initial'))
-    armorMap['defense_max'] = int(armor.get('Defense').get('max'))
+    try:
+        initial = int(armor.get('Defense').get('initial'))
+    except:
+        initial = -1
+    try:
+        maximum = int(armor.get('Defense').get('max'))
+    except:
+        maximum = -1;
+    armorMap['defense_init'] = initial
+    armorMap['defense_max'] = maximum
 
 def extractResistances(armorMap, armor):
     armorMap['fire'] = int(armor.get('Fire'))
