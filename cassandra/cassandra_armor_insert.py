@@ -111,10 +111,10 @@ def convertSkills(armor):
     skillsList = []
     for skill in armor.get('Skills'):
         skillmap = {}
-        skillmap['id'] = armor.get('id')
-        skillmap['skill_id'] = skill.get('id')
+        skillmap['id'] = int(armor.get('id'))
+        skillmap['skill_id'] = int(skill.get('id'))
         skillmap['name'] = skill.get('Name')
-        skillmap['value'] = skill.get('Value')
+        skillmap['value'] = int(skill.get('Value'))
         skillsList.append(skillmap)
     return skillsList
 
@@ -122,10 +122,10 @@ def convertCrafting(armor):
     craftingList = []
     for item in armor.get('Crafting Items'):
         craftmap = {}
-        craftmap['id'] = armor.get('id')
-        craftmap['item_id'] = item.get('id')
+        craftmap['id'] = int(armor.get('id'))
+        craftmap['item_id'] = int(item.get('id'))
         craftmap['name'] = item.get('Name')
-        craftmap['quantity'] = item.get('Quantity')
+        craftmap['quantity'] = int(item.get('Quantity'))
         craftingList.append(craftmap)
     return craftingList
 
