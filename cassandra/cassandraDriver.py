@@ -88,7 +88,7 @@ def insertArmor(armor, skills, crafting):
     print(armor)
     armorQuery = SimpleStatement("INSERT INTO " + ARMOR_TABLE + 
         "(id int, part text, name text, price text, rarity int, slot int, type text, gender text, fire int, dragon int, thunder int, water int, ice int, defense_init int, defense_max int)"+
-        "VALUES ('{id}', '{part}', '{name}', '{price}', {rarity}, {slot}, '{type}', '{gender}', {fire}, {dragon}, {thunder}, {water}, {ice}, {defense_init}, {defense_max})".format(**armor)
+        "VALUES ('{id}', '{part}', '{name}', '{price}', {rarity}, {slot}, '{type}', '{gender}', {fire}, {dragon}, {thunder}, {water}, {ice}, {defense_init}, {defense_max})".format_map(armor)
     )
     session.execute(armorQuery)
     

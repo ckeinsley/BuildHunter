@@ -30,7 +30,7 @@ def main():
     pprint(skills)
     pprint(crafting)
 
-    db.insertArmor(armor, skills, crafting)
+    db.insertArmor(main_armor, skills, crafting)
     print("Processing armor piece " + armor.get('name'))
     # db.insertArmor(armor)
     print("Finished Dumping Files")
