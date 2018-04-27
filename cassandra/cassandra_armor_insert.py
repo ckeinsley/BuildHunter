@@ -22,7 +22,6 @@ def main():
     print("Load Complete")
     for armor in armor_item_list:
         print("Processing armor piece " + armor.get('Name'))
-        armor = armor_item_list[0]
         main_armor = convertArmor(armor)
         skills = convertSkills(armor)
         crafting = convertCrafting(armor)
