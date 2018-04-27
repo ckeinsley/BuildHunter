@@ -30,7 +30,7 @@ def main():
     pprint(skills)
     pprint(crafting)
 
-    db.insertArmor(armor, skills, crafting)
+    db.insertArmor(main_armor, skills, crafting)
     print("Processing armor piece " + armor.get('name'))
     # db.insertArmor(armor)
     print("Finished Dumping Files")
@@ -84,7 +84,6 @@ Armor_Item:
 '''
 def convertArmor(armor):
     convertedArmor = {}
-    convertedArmor['name'] = armor.get('Name')
     convertedArmor['id'] = int(armor.get('id'))
     convertedArmor['price'] = armor.get('Price')
     convertedArmor['part'] = armor.get('Part')
@@ -94,11 +93,12 @@ def convertArmor(armor):
     convertedArmor['gender'] = armor.get('Gender')
     extractDefense(convertedArmor, armor)
     extractResistances(convertedArmor, armor)
+    convertedArmor['name'] = armor.get('Name')
     return convertedArmor
 
 def extractDefense(armorMap, armor):
-    armorMap['defense_init'] = armor.get('Defense').get('initial')
-    armorMap['defense_max'] = armor.get('Defense').get('max')
+    armorMap['defense_init'] = int(armor.get('Defense').get('initial'))
+    armorMap['defense_max'] = int(armor.get('Defense').get('max'))
 
 def extractResistances(armorMap, armor):
     armorMap['fire'] = int(armor.get('Fire'))
@@ -111,10 +111,10 @@ def convertSkills(armor):
     skillsList = []
     for skill in armor.get('Skills'):
         skillmap = {}
-        skillmap['id'] = armor.get('id')
-        skillmap['skill_id'] = skill.get('id')
+        skillmap['id'] = int(armor.get('id'))
+        skillmap['skill_id'] = int(skill.get('id'))
         skillmap['name'] = skill.get('Name')
-        skillmap['value'] = skill.get('Value')
+        skillmap['value'] = int(skill.get('Value'))
         skillsList.append(skillmap)
     return skillsList
 
@@ -122,10 +122,10 @@ def convertCrafting(armor):
     craftingList = []
     for item in armor.get('Crafting Items'):
         craftmap = {}
-        craftmap['id'] = armor.get('id')
-        craftmap['item_id'] = item.get('id')
+        craftmap['id'] = int(armor.get('id'))
+        craftmap['item_id'] = int(item.get('id'))
         craftmap['name'] = item.get('Name')
-        craftmap['quantity'] = item.get('Quantity')
+        craftmap['quantity'] = int(item.get('Quantity'))
         craftingList.append(craftmap)
     return craftingList
 
