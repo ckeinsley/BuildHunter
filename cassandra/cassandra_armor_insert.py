@@ -20,19 +20,13 @@ def main():
     print("Begining Load")
     (armor_item_list, id_list) = read_armor_files()
     print("Load Complete")
-    # for armor in armor_item_list:
-    armor = armor_item_list[0]
-    main_armor = convertArmor(armor)
-    skills = convertSkills(armor)
-    crafting = convertCrafting(armor)
-
-    pprint(main_armor)
-    pprint(skills)
-    pprint(crafting)
-
-    db.insertArmor(main_armor, skills, crafting)
-    print("Processing armor piece " + armor.get('name'))
-    # db.insertArmor(armor)
+    for armor in armor_item_list:
+        print("Processing armor piece " + armor.get('Name'))
+        armor = armor_item_list[0]
+        main_armor = convertArmor(armor)
+        skills = convertSkills(armor)
+        crafting = convertCrafting(armor)
+        db.insertArmor(main_armor, skills, crafting)
     print("Finished Dumping Files")
 
 '''
