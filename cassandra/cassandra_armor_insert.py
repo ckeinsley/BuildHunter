@@ -84,7 +84,6 @@ Armor_Item:
 '''
 def convertArmor(armor):
     convertedArmor = {}
-    convertedArmor['name'] = armor.get('Name')
     convertedArmor['id'] = int(armor.get('id'))
     convertedArmor['price'] = armor.get('Price')
     convertedArmor['part'] = armor.get('Part')
@@ -94,6 +93,7 @@ def convertArmor(armor):
     convertedArmor['gender'] = armor.get('Gender')
     extractDefense(convertedArmor, armor)
     extractResistances(convertedArmor, armor)
+    convertedArmor['name'] = armor.get('Name')
     return convertedArmor
 
 def extractDefense(armorMap, armor):
