@@ -26,45 +26,8 @@ Generic_Blademaster:
         'Defense' : '',
         'Affinity' : '',
         'Slot' : '',
-        'Price' : '',
-        'Element' : {
-            'Name' : '',
-            'Value' : ''
-        }
-        'Upgrades_To' : [
-            {
-                'id' : '',
-                'Name' : ''
-            }
-        ],
-        'Upgrade_Items' : [
-            {
-                'id' : '',
-                'Name' : '',
-                'Quantity' : ''
-            }
-        ],
-        'From_Scratch_Items' : [
-            {
-                'id' : '',
-                'Name' : '',
-                'Quantity' : ''
-            }
-        ]
-    }
-
-Insect_Glaive:
-    {
-        'id' : '',
-        'Name' : '',
-        'Weapon_Family' : '',
-        'Rarity' : '',
-        'Attack' : '',
-        'True_Attack' : '',
-        'Defense' : '',
-        'Affinity' : '',
-        'Slot' : '',
-        'Price' : '',
+        'Upgrade_Price' : '',
+        'Create_Price' : '',
         'Element' : {
             'Name' : '',
             'Value' : ''
@@ -89,49 +52,11 @@ Insect_Glaive:
                 'Quantity' : ''
             }
         ],
-        'Type' : ''
-    }
-
-Charge_Blade_or_Switch_Axe:
-    {
-        'id' : '',
-        'Name' : '',
-        'Weapon_Family' : '',
-        'Rarity' : '',
-        'Attack' : '',
-        'True_Attack' : '',
-        'Defense' : '',
-        'Affinity' : '',
-        'Slot' : '',
-        'Price' : '',
-        'Element' : {
-            'Name' : '',
-            'Value' : ''
-        }
-        'Upgrades_To' : [
-            {
-                'id' : '',
-                'Name' : ''
-            }
-        ],
-        'Upgrade_Items' : [
-            {
-                'id' : '',
-                'Name' : '',
-                'Quantity' : ''
-            }
-        ],
-        'From_Scratch_Items' : [
-            {
-                'id' : '',
-                'Name' : '',
-                'Quantity' : ''
-            }
-        ],
+        'Glaive_Type' : '',
         'Phial' : ''
     }
 
-Bowgun :
+Generic_Gunner : 
     {
         'id' : '',
         'Name' : '',
@@ -142,7 +67,8 @@ Bowgun :
         'Defense' : '',
         'Affinity' : '',
         'Slot' : '',
-        'Price' : '',
+        'Upgrade_Price' : '',
+        'Create_Price' : '',
         'Element' : {
             'Name' : '',
             'Value' : ''
@@ -174,96 +100,19 @@ Bowgun :
                 'Carry' : '',
                 'isZoom' : ''
             }
-        ]
-    }
-
-Bow :
-    {
-        'id' : '',
-        'Name' : '',
-        'Weapon_Family' : '',
-        'Rarity' : '',
-        'Attack' : '',
-        'True_Attack' : '',
-        'Defense' : '',
-        'Affinity' : '',
-        'Slot' : '',
-        'Price' : '',
-        'Element' : {
-            'Name' : '',
-            'Value' : ''
-        }
-        'Upgrades_To' : [
-            {
-                'id' : '',
-                'Name' : ''
-            }
-        ],
-        'Upgrade_Items' : [
-            {
-                'id' : '',
-                'Name' : '',
-                'Quantity' : ''
-            }
-        ],
-        'From_Scratch_Items' : [
-            {
-                'id' : '',
-                'Name' : '',
-                'Quantity' : ''
-            }
         ],
         'Arc_Shot' : '',
-        'Charge_Lvls' : ['', '', '', '']
+        'Charge_Lvls' : ['', '', '', ''],
         'Coatings' : [
             {
                 'id' : '',
                 'Name' : ''
-            }
-        ]
-    }
-
-Gunlance :
-    {
-        'id' : '',
-        'Name' : '',
-        'Weapon_Family' : '',
-        'Rarity' : '',
-        'Attack' : '',
-        'True_Attack' : '',
-        'Defense' : '',
-        'Affinity' : '',
-        'Slot' : '',
-        'Price' : '',
-         'Element' : {
-            'Name' : '',
-            'Value' : ''
-        }
-        'Upgrades_To' : [
-            {
-                'id' : '',
-                'Name' : ''
-            }
-        ],
-        'Upgrade_Items' : [
-            {
-                'id' : '',
-                'Name' : '',
-                'Quantity' : ''
-            }
-        ],
-        'From_Scratch_Items' : [
-            {
-                'id' : '',
-                'Name' : '',
-                'Quantity' : ''
             }
         ],
         'Shelling' : [
             {'id' : '', 'Name' : ''}
         ]
     }
-
 Armor_Item:
     {
         'id' : '1248329814',
@@ -817,7 +666,6 @@ def populate_items_list():
     id_file.close()
     print('ID file wirtten')
 
-
 def process_skill_data(url, driver, name_id_map):
     driver.get(url)
     data = driver.page_source
@@ -883,4 +731,36 @@ def write_skills_file():
         pickle.dump(skill, skill_file)
         skill_file.close()
 
-populate_items_list()
+def process_weapon_data(url, driver, name_id_map):
+    driver.get(url)
+    data = driver.page_source
+    soup = BeautifulSoup(data, 'lxml')
+
+def populate_weapons_list():
+    name_id_map = read_name_id_mapping()
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
+    driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
+    links = get_all_weapon_links()
+
+    id_dict = {
+        'Blademaster' : [],
+        'Gunner' : []
+    }
+    for k in links:
+        attempts = 0
+        while True:
+            try:
+                temp = process_weapon_data(k, driver, name_id_map)
+            except TimeoutException:
+                print('TimeoutException: ', attempts)
+                attempts += 1
+                if attempts % 10 == 0:
+                    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
+                continue
+            break
+        if temp == None:
+            continue
+        print(temp)
+        
