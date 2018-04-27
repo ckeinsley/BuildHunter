@@ -1,4 +1,5 @@
 import pickle
+import bson
 
 ARMORS_PATH = '../WebScrapper/obj/armors/'
 WEAPONS_PATH = './obj/weapons/'
@@ -38,3 +39,14 @@ def read_name_id_mapping():
     name_id_mapping = pickle.load(f, encoding='unicode')
     f.close()
     return name_id_mapping
+
+def read_items_file():
+    id_file = open(ITEMS_PATH + 'id_dict.bson', 'rb')
+    id_dict = id_file.read()
+    id_dict = bson.loads(id_dict)
+    item_list = []
+    for item in id_dict['ids']:
+        item_file = open(ITEMS_PATH + str(item) + '.bson', 'rb')
+        item_list.append(bson.loads(item_file.read()))
+        item_file.close()
+    return item_list

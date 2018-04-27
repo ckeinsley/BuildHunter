@@ -816,23 +816,6 @@ def populate_items_list():
     id_file.write(bson.dumps(id_dict))
     id_file.close()
     print('ID file wirtten')
-    
-
-def write_item_files():
-    (item_list, id_list) = populate_items_list()
-    print('Populated complete')
-    print('Beginning write')
-    id_file = open(ITEMS_PATH + 'id_list.p', 'wb')
-    pickle.dump(id_list, id_file)
-    id_file.close()
-    print('ID file wirtten')
-    for item in item_list:
-        print('Begin writing', item['Name'])
-        item_file = open(ITEMS_PATH + str(item['id']) + '.p', 'wb')
-        pickle.dump(item, item_file)
-        item_file.close()
-        print('Finished writing,', item['Name'])
-    print('End writing')
 
 
 def process_skill_data(url, driver, name_id_map):
