@@ -756,8 +756,23 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
     if affinity == '':
         affinity = None
     slot = slot_encoder(soup.find('td', string='Slot').find_next_sibling('td').string)
-
-    print('weapon_family',weapon_family, 'rarity', rarity, 'attack', attack, 'true_attack', true_attack, 'defense', defense, 'affinity', affinity, 'slot', slot)
+    create_price = soup.find('h3', string='Crafting Materials').find_next_sibling('table').find('td', string=lambda x: x and re.compile('Create:').search(x.strip())).string
+    create_price = create_price.replace(' ', '').replace('Create:', '')
+    if create_price == 'z':
+        create_price = None
+    upgrade_price = soup.find('h3', string='Crafting Materials').find_next_sibling('table').find_next_sibling('table').find('td', string=lambda x: x and re.compile('Upgrade:').search(x.strip())).string
+    upgrade_price = upgrade_price.replace(' ', '').replace('Upgrade:', '')
+    if upgrade_price == 'z':
+        upgrade_price = None
+    print('weapon_family',weapon_family, 
+    'rarity', rarity,
+    'attack', attack, 
+    'true_attack', true_attack,
+    'defense', defense, 
+    'affinity', affinity, 
+    'slot', slot,
+    'create_price', create_price,
+    'upgrade_price', upgrade_price)
 
 def populate_weapons_list():
     name_id_map = read_name_id_mapping()
@@ -789,7 +804,7 @@ def populate_weapons_list():
                     driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
                 continue
             break
-        print(temp)
+        #print(temp)
         continue
         if temp['Weapon_Family'] in bm_weapons:
             weapon_file = open(WEAPONS_PATH + 'blademaster/' + str(temp['id']) + '.bson', 'wb')
