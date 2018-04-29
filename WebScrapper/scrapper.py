@@ -795,6 +795,41 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
             'id' : name_id_map.get('ITEM:' + data[0].string),
             'Quantity' : data[1].string
         })
+
+    weapon_obj = {
+        'id' : uid,
+        'Name' : name,
+        'Weapon_Family' : weapon_family,
+        'Rarity' : rarity,
+        'Attack' : attack,
+        'True_Attack' : true_attack,
+        'Defense' : defense,
+        'Affinity' : affinity,
+        'Slot' : slot,
+        'Upgrade_Price' : upgrade_price,
+        'Create_Price' : create_price,
+        'Element' : element,
+        'Upgrades_To' : upgrades_to,
+        'Upgrade_Items' : upgrade_items,
+        'Create_Items' : create_items
+    }
+
+    if weapon_family in bm_weapons:
+        tables = soup.find('h3', string='Details').find_next_siblings('table')
+        if len(tables) == 3:
+            misc_table = tables[2]
+        else:
+            misc_table = tables[1]
+        glaive_type = misc_table.find('td', string='Type')
+        if glaive_type != None:
+            glaive_type = glaive_type.find_next_sibling('td').contents[0].strip()
+        phial = misc_table.find('td', string='Phial')
+        if phial != None:
+            phial = phial.find_next_sibling('td').string
+        weapon_obj['Glaive_Type'] = glaive_type
+        weapon_obj['Phial'] = phial
+    elif weapon_family in g_weapons:
+        pass
     print('weapon_family',weapon_family, 
     'rarity', rarity,
     'attack', attack, 
@@ -817,8 +852,11 @@ def populate_weapons_list():
     driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
     weapon_links = get_all_weapon_links()
     links = []
+    count = 0 
     for w in weapon_links.values():
-        links += w
+        if count == 8:
+            links += w
+        count += 1
     bm_weapons = ['Great Sword', 'Long Sword', 'Sword', 'Dual Blades', 'Hammer', 'Hunting Horn', 'Lance', 'Gunlance', 'Switch Axe', 'Charge Blade', 'Insect Glaive']
     g_weapons = ['Bow', 'Light Bowgun', 'Heavy Bowgun']
 
