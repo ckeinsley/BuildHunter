@@ -777,6 +777,18 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
         element = None
     upgrades_to = soup.find('h3', string='Upgrades To').find_next_sibling('ul').find_all('a')
     upgrades_to = list(map(lambda x: {'Name' : x.string, 'id' : name_id_map.get('WEAPON:' + x.string)}, upgrades_to))
+    upgrade_items_rows = soup.find('h3', string='Crafting Materials').find_next_sibling('table').find_next_sibling('table').find_all('tr')
+    upgrade_items = []
+    for i in range(1, len(upgrade_items_rows)):
+        data = upgrade_items_rows[i].find_all('td')
+        upgrade_items.append({
+            'Name' : data[0].string,
+            'id' : name_id_map.get('ITEM:' + data[0].string),
+            'Quantity' : data[1].string
+        })
+    print(upgrade_items)
+
+
     print('weapon_family',weapon_family, 
     'rarity', rarity,
     'attack', attack, 
