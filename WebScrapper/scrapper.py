@@ -45,7 +45,7 @@ Generic_Blademaster:
                 'Quantity' : ''
             }
         ],
-        'From_Scratch_Items' : [
+        'Create_Items' : [
             {
                 'id' : '',
                 'Name' : '',
@@ -86,7 +86,7 @@ Generic_Gunner :
                 'Quantity' : ''
             }
         ],
-        'From_Scratch_Items' : [
+        'Create_Items' : [
             {
                 'id' : '',
                 'Name' : '',
