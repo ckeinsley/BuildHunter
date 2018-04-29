@@ -347,7 +347,7 @@ def get_all_weapon_links():
             except TimeoutException:
                 print('TimeoutException: Attempt ', attempts)
                 attempts += 1
-                if attempts%10 == 0:
+                if attempts % 5 == 0:
                     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
                     driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
                 continue
@@ -648,7 +648,7 @@ def populate_items_list():
             except TimeoutException:
                 print('TimeoutException: ', attempts)
                 attempts += 1
-                if attempts % 10 == 0:
+                if attempts % 5 == 0:
                     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
                 continue
             break
@@ -764,15 +764,27 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
     upgrade_price = upgrade_price.replace(' ', '').replace('Upgrade:', '')
     if upgrade_price == 'z':
         upgrade_price = None
+    element = soup.find('h3', string='Details').find_next_siblings('table')
+    if len(element) == 3:
+        element = element[1].find('td').find_next_sibling('td').contents
+        element_name = element[0]
+        element_value = element[-1]
+        element = {
+            'Name' : element_name,
+            'Value' : element_value
+        }
+    else:
+        element = None
     print('weapon_family',weapon_family, 
     'rarity', rarity,
     'attack', attack, 
     'true_attack', true_attack,
     'defense', defense, 
-    'affinity', affinity, 
+    'affinity', affinity,
     'slot', slot,
     'create_price', create_price,
-    'upgrade_price', upgrade_price)
+    'upgrade_price', upgrade_price,
+    'element', element)
 
 def populate_weapons_list():
     name_id_map = read_name_id_mapping()
@@ -799,7 +811,7 @@ def populate_weapons_list():
             except TimeoutException:
                 print('TimeoutException: ', attempts)
                 attempts += 1
-                if attempts % 10 == 0:
+                if attempts % 5 == 0:
                     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
                     driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
                 continue
@@ -825,3 +837,4 @@ def populate_weapons_list():
     id_file.close()
     print('ID dict written')
 
+populate_weapons_list()
