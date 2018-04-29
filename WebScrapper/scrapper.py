@@ -786,9 +786,15 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
             'id' : name_id_map.get('ITEM:' + data[0].string),
             'Quantity' : data[1].string
         })
-    print(upgrade_items)
-
-
+    create_items_rows = soup.find('h3', string='Crafting Materials').find_next_sibling('table').find_all('tr')
+    create_items = []
+    for i in range(1, len(create_items_rows)):
+        data = create_items_rows[i].find_all('td')
+        create_items.append({
+            'Name' : data[0].string,
+            'id' : name_id_map.get('ITEM:' + data[0].string),
+            'Quantity' : data[1].string
+        })
     print('weapon_family',weapon_family, 
     'rarity', rarity,
     'attack', attack, 
@@ -799,7 +805,9 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
     'create_price', create_price,
     'upgrade_price', upgrade_price,
     'element', element,
-    'upgrades_to', upgrades_to)
+    'upgrades_to', upgrades_to,
+    'upgrade_items', upgrade_items,
+    'create_items', create_items)
 
 def populate_weapons_list():
     name_id_map = read_name_id_mapping()
