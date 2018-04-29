@@ -775,6 +775,8 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
         }
     else:
         element = None
+    upgrades_to = soup.find('h3', string='Upgrades To').find_next_sibling('ul').find_all('a')
+    upgrades_to = list(map(lambda x: {'Name' : x.string, 'id' : name_id_map.get('WEAPON:' + x.string)}, upgrades_to))
     print('weapon_family',weapon_family, 
     'rarity', rarity,
     'attack', attack, 
@@ -784,7 +786,8 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
     'slot', slot,
     'create_price', create_price,
     'upgrade_price', upgrade_price,
-    'element', element)
+    'element', element,
+    'upgrades_to', upgrades_to)
 
 def populate_weapons_list():
     name_id_map = read_name_id_mapping()
