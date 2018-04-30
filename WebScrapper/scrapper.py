@@ -828,16 +828,24 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
             phial = phial.find_next_sibling('td').string
         weapon_obj['Glaive_Type'] = glaive_type
         weapon_obj['Phial'] = phial
+        shelling = misc_table.find('td', string='Shelling')
+        if shelling != None:
+            shelling = shelling.find_next_sibling('td').string.strip()
+        weapon_obj['Glaive_Type'] = glaive_type
+        weapon_obj['Phial'] = phial
+        weapon_obj['Shelling'] = shelling
     elif weapon_family in g_weapons:
         tables = soup.find('h3', string='Details').find_next_siblings('table')
+        arc_shot = None
+        charge_lvls = []
+        coatings = []
+        ammo = []
         if weapon_family == 'Bow':
             arc_shot = tables[-2].find('td', string='Arc Shot').find_next_sibling('td').string
-            charge_lvls = []
             chrge_lvl_rows = tables[-2].find_all('tr')
             chrge_lvl_rows.pop(0)
             for row in chrge_lvl_rows:
                 charge_lvls.append(row.find_all('td')[1].string)
-            coatings = []
             ctings = tables[-1].find_all('tr')
             for coat in ctings:
                 c = coat.find_all('td')
@@ -849,11 +857,7 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
                     'Name' : cname,
                     'Carry' : ccarry
                 })
-            weapon_obj['Arc_Shot'] = arc_shot
-            weapon_obj['Charge_Lvls'] = charge_lvls
-            weapon_obj['Coatings'] = coatings
         else:
-            ammo = []
             shell_rows = tables[-1].find_all('tr')
             for shell in shell_rows:
                 data = shell.find_all('td')
@@ -865,7 +869,10 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
                     'Name' : sname,
                     'Carry' : scarry
                 })
-            weapon_obj['Ammo'] = ammo
+        weapon_obj['Ammo'] = ammo
+        weapon_obj['Arc_Shot'] = arc_shot
+        weapon_obj['Charge_Lvls'] = charge_lvls
+        weapon_obj['Coatings'] = coatings
         print(weapon_obj)
 
 def populate_weapons_list():
