@@ -11,9 +11,9 @@ import sys
 
 # pickle likes to yell if this isn't high
 sys.setrecursionlimit(100000000)
+# pickle sucks, bson is way better for what I am doing
 
 # TODO: Store item drops with monsters, just list id's and rates and such
-# TODO: Separate out the loading functions from the scraping/writing functions
 '''
 Generic_Blademaster:
     {
@@ -174,17 +174,21 @@ Decoration :
                 'Value' : ''
             }
         ],
-        'Crafting_Items' : [
-            {
-                'id' : '',
-                'Name' : '',
-                'Quantity' : ''
-            },
-            {
-                'id' : '',
-                'Name' : '',
-                'Quantity' : ''
-            }
+        'Crafting_Recipes' : [
+            [
+                {
+                    'id' : '',
+                    'Name' : '',
+                    'Quantity' : ''
+                }
+            ],
+            [
+                {
+                    'id' : '',
+                    'Name' : '',
+                    'Quantity' : ''
+                }
+            ]
         ]
     }
 
@@ -278,6 +282,7 @@ ITEMS = 'http://kiranico.com/en/mh4u/item'
 WEAPONS = 'http://kiranico.com/en/mh4u/weapon'
 MONSTERS = 'http://kiranico.com/en/mh4u/monster'
 SKILLS = 'http://kiranico.com/en/mh4u/armor/skill'
+DECORATIONS = 'http://kiranico.com/en/mh4u/armor/jewel'
 ARMORS_PATH = './obj/armors/'
 WEAPONS_PATH = './obj/weapons/'
 MONSTERS_PATH = './obj/monsters/'
@@ -369,6 +374,26 @@ def get_all_armor_links():
     for u in urls:
         master_list += get_armor_links(u)
     return master_list
+
+def get_all_decoration_links():
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
+    driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
+    while True:
+        try:
+            driver.get(DECORATIONS)
+        except TimeoutException:
+            continue
+        break
+    data = driver.page_source
+    soup = BeautifulSoup(data, 'lxml')
+    links = []
+    table_rows = soup.find('table').find_all('tr')
+    for row in table_rows:
+        data = row.find_all('td')
+        links.append(data[0].a['href'])
+    return links
 
 def get_name_from_url(url):
     r = requests.get(url)
