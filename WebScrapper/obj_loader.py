@@ -44,9 +44,17 @@ def read_items_file():
     id_file = open(ITEMS_PATH + 'id_dict.bson', 'rb')
     id_dict = id_file.read()
     id_dict = bson.loads(id_dict)
+    id_file.close()
     item_list = []
     for item in id_dict['ids']:
         item_file = open(ITEMS_PATH + str(item) + '.bson', 'rb')
         item_list.append(bson.loads(item_file.read()))
         item_file.close()
     return item_list
+
+def read_weapon_file():
+    id_file = open(WEAPONS_PATH + 'id_dict.bson', 'rb')
+    weapon_dict = id_file.read()
+    weapon_dict = bson.loads(weapon_dict)
+    id_file.close()
+    return weapon_dict

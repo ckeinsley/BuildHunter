@@ -911,12 +911,12 @@ def populate_weapons_list():
             weapon_file = open(WEAPONS_PATH + 'blademaster/' + str(temp['id']) + '.bson', 'wb')
             weapon_file.write(bson.dumps(temp))
             weapon_file.close()
-            id_dict['Blademaster'].append(temp)
+            id_dict['Blademaster'].append(temp) # oops, should have only been id
         elif temp['Weapon_Family'] in g_weapons:
             weapon_file = open(WEAPONS_PATH + 'gunner/' + str(temp['id']) + '.bson', 'wb')
             weapon_file.write(bson.dumps(temp))
             weapon_file.close()
-            id_dict['Gunner'].append(temp)
+            id_dict['Gunner'].append(temp) # oops, should have only been id
         else:
             print('Not in a Weapon Family!!!!')
             return
@@ -925,5 +925,3 @@ def populate_weapons_list():
     id_file.write(bson.dumps(id_dict))
     id_file.close()
     print('ID dict written')
-
-populate_weapons_list()
