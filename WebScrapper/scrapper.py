@@ -53,7 +53,10 @@ Generic_Blademaster:
             }
         ],
         'Glaive_Type' : '',
-        'Phial' : ''
+        'Phial' : '',
+        'Shelling' : [
+            {'id' : '', 'Name' : ''}
+        ]
     }
 
 Generic_Gunner : 
@@ -97,8 +100,7 @@ Generic_Gunner :
             {
                 'id' : '',
                 'Name' : '',
-                'Carry' : '',
-                'isZoom' : ''
+                'Carry' : ''
             }
         ],
         'Arc_Shot' : '',
@@ -109,9 +111,6 @@ Generic_Gunner :
                 'Name' : '',
                 'Carry' : ''
             }
-        ],
-        'Shelling' : [
-            {'id' : '', 'Name' : ''}
         ]
     }
 Armor_Item:
@@ -850,22 +849,24 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
                     'Name' : cname,
                     'Carry' : ccarry
                 })
-            print(coatings)
+            weapon_obj['Arc_Shot'] = arc_shot
+            weapon_obj['Charge_Lvls'] = charge_lvls
+            weapon_obj['Coatings'] = coatings
         else:
-            pass
-    print('weapon_family',weapon_family, 
-    'rarity', rarity,
-    'attack', attack, 
-    'true_attack', true_attack,
-    'defense', defense, 
-    'affinity', affinity,
-    'slot', slot,
-    'create_price', create_price,
-    'upgrade_price', upgrade_price,
-    'element', element,
-    'upgrades_to', upgrades_to,
-    'upgrade_items', upgrade_items,
-    'create_items', create_items)
+            ammo = []
+            shell_rows = tables[-1].find_all('tr')
+            for shell in shell_rows:
+                data = shell.find_all('td')
+                sname = data[0].a.string
+                sid = name_id_map.get('ITEM:' + sname)
+                scarry = data[1].string
+                ammo.append({
+                    'id' : sid,
+                    'Name' : sname,
+                    'Carry' : scarry
+                })
+            weapon_obj['Ammo'] = ammo
+        print(weapon_obj)
 
 def populate_weapons_list():
     name_id_map = read_name_id_mapping()
@@ -877,7 +878,7 @@ def populate_weapons_list():
     links = []
     count = 0 
     for w in weapon_links.values():
-        if count == 13:
+        if count == 12:
             links += w
         count += 1
     bm_weapons = ['Great Sword', 'Long Sword', 'Sword', 'Dual Blades', 'Hammer', 'Hunting Horn', 'Lance', 'Gunlance', 'Switch Axe', 'Charge Blade', 'Insect Glaive']
