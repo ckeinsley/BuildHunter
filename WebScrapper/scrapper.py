@@ -106,7 +106,8 @@ Generic_Gunner :
         'Coatings' : [
             {
                 'id' : '',
-                'Name' : ''
+                'Name' : '',
+                'Carry' : ''
             }
         ],
         'Shelling' : [
@@ -829,7 +830,29 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
         weapon_obj['Glaive_Type'] = glaive_type
         weapon_obj['Phial'] = phial
     elif weapon_family in g_weapons:
-        pass
+        tables = soup.find('h3', string='Details').find_next_siblings('table')
+        if weapon_family == 'Bow':
+            arc_shot = tables[-2].find('td', string='Arc Shot').find_next_sibling('td').string
+            charge_lvls = []
+            chrge_lvl_rows = tables[-2].find_all('tr')
+            chrge_lvl_rows.pop(0)
+            for row in chrge_lvl_rows:
+                charge_lvls.append(row.find_all('td')[1].string)
+            coatings = []
+            ctings = tables[-1].find_all('tr')
+            for coat in ctings:
+                c = coat.find_all('td')
+                cname = c[0].a.string
+                cid = name_id_map.get('ITEM:' + cname)
+                ccarry = c[1].string
+                coatings.append({
+                    'id' : cid,
+                    'Name' : cname,
+                    'Carry' : ccarry
+                })
+            print(coatings)
+        else:
+            pass
     print('weapon_family',weapon_family, 
     'rarity', rarity,
     'attack', attack, 
@@ -854,7 +877,7 @@ def populate_weapons_list():
     links = []
     count = 0 
     for w in weapon_links.values():
-        if count == 8:
+        if count == 13:
             links += w
         count += 1
     bm_weapons = ['Great Sword', 'Long Sword', 'Sword', 'Dual Blades', 'Hammer', 'Hunting Horn', 'Lance', 'Gunlance', 'Switch Axe', 'Charge Blade', 'Insect Glaive']
