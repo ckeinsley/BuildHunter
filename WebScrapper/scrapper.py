@@ -816,24 +816,25 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
 
     if weapon_family in bm_weapons:
         tables = soup.find('h3', string='Details').find_next_siblings('table')
-        if len(tables) == 3:
-            misc_table = tables[2]
-        else:
-            misc_table = tables[1]
-        glaive_type = misc_table.find('td', string='Type')
-        if glaive_type != None:
-            glaive_type = glaive_type.find_next_sibling('td').contents[0].strip()
-        phial = misc_table.find('td', string='Phial')
-        if phial != None:
-            phial = phial.find_next_sibling('td').string
-        weapon_obj['Glaive_Type'] = glaive_type
-        weapon_obj['Phial'] = phial
-        shelling = misc_table.find('td', string='Shelling')
-        if shelling != None:
-            shelling = shelling.find_next_sibling('td').string.strip()
-        weapon_obj['Glaive_Type'] = glaive_type
-        weapon_obj['Phial'] = phial
-        weapon_obj['Shelling'] = shelling
+        if len(tables) > 1:
+            if len(tables) == 3:
+                misc_table = tables[2]
+            else:
+                misc_table = tables[1]
+            glaive_type = misc_table.find('td', string='Type')
+            if glaive_type != None:
+                glaive_type = glaive_type.find_next_sibling('td').contents[0].strip()
+            phial = misc_table.find('td', string='Phial')
+            if phial != None:
+                phial = phial.find_next_sibling('td').string
+            weapon_obj['Glaive_Type'] = glaive_type
+            weapon_obj['Phial'] = phial
+            shelling = misc_table.find('td', string='Shelling')
+            if shelling != None:
+                shelling = shelling.find_next_sibling('td').string.strip()
+            weapon_obj['Glaive_Type'] = glaive_type
+            weapon_obj['Phial'] = phial
+            weapon_obj['Shelling'] = shelling
     elif weapon_family in g_weapons:
         tables = soup.find('h3', string='Details').find_next_siblings('table')
         arc_shot = None
@@ -873,7 +874,7 @@ def process_weapon_data(url, driver, name_id_map, bm_weapons, g_weapons):
         weapon_obj['Arc_Shot'] = arc_shot
         weapon_obj['Charge_Lvls'] = charge_lvls
         weapon_obj['Coatings'] = coatings
-        print(weapon_obj)
+    return weapon_obj
 
 def populate_weapons_list():
     name_id_map = read_name_id_mapping()
@@ -883,11 +884,8 @@ def populate_weapons_list():
     driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
     weapon_links = get_all_weapon_links()
     links = []
-    count = 0 
     for w in weapon_links.values():
-        if count == 12:
             links += w
-        count += 1
     bm_weapons = ['Great Sword', 'Long Sword', 'Sword', 'Dual Blades', 'Hammer', 'Hunting Horn', 'Lance', 'Gunlance', 'Switch Axe', 'Charge Blade', 'Insect Glaive']
     g_weapons = ['Bow', 'Light Bowgun', 'Heavy Bowgun']
 
@@ -908,8 +906,7 @@ def populate_weapons_list():
                     driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
                 continue
             break
-        #print(temp)
-        continue
+        print(temp)
         if temp['Weapon_Family'] in bm_weapons:
             weapon_file = open(WEAPONS_PATH + 'blademaster/' + str(temp['id']) + '.bson', 'wb')
             weapon_file.write(bson.dumps(temp))
