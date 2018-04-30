@@ -58,3 +58,15 @@ def read_weapon_file():
     weapon_dict = bson.loads(weapon_dict)
     id_file.close()
     return weapon_dict
+
+def read_decoration_file():
+    id_file = open(DECORATIONS_PATH + 'id_dict.bson', 'rb')
+    id_dict = id_file.read()
+    id_dict = bson.loads(id_dict)
+    id_file.close()
+    decorations_list = []
+    for dec in id_dict['ids']:
+        dec_file = open(DECORATIONS_PATH + str(dec) + '.bson', 'rb')
+        decorations_list.append(bson.loads(dec_file.read()))
+        dec_file.close()
+    return decorations_list

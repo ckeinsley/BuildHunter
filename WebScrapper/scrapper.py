@@ -165,30 +165,39 @@ Decoration :
         'Carry' : '',
         'Buy' : '',
         'Sell' : '',
-        'Craft_Price' : '',
-        'Slot' : '',
-        'Skills' : [
+        'Variations' : [
             {
-                'id' : '',
-                'Name' : '',
-                'Value' : ''
+                'Craft_Price' : '',
+                'Skills' : [
+                    {
+                        'id' : '',
+                        'Name' : '',
+                        'Value' : ''
+                    }
+                ],
+                'Slot' : '',
+                'Items' :[{
+                    'id' : '',
+                    'Name' : '',
+                    'Quantity' : ''
+                }]
+            },
+            {
+                'Craft_Price' : '',
+                'Skills' : [
+                    {
+                        'id' : '',
+                        'Name' : '',
+                        'Value' : ''
+                    }
+                ],
+                'Slot' : '',
+                'Items' : [{
+                    'id' : '',
+                    'Name' : '',
+                    'Quantity' : ''
+                }]
             }
-        ],
-        'Crafting_Recipes' : [
-            [
-                {
-                    'id' : '',
-                    'Name' : '',
-                    'Quantity' : ''
-                }
-            ],
-            [
-                {
-                    'id' : '',
-                    'Name' : '',
-                    'Quantity' : ''
-                }
-            ]
         ]
     }
 
@@ -950,3 +959,98 @@ def populate_weapons_list():
     id_file.write(bson.dumps(id_dict))
     id_file.close()
     print('ID dict written')
+
+def process_decoration_data(url, driver, name_id_map):
+    print(url)
+    driver.get(url)
+    time.sleep(0.3)
+    data = driver.page_source
+    soup = BeautifulSoup(data, 'lxml')
+
+    name = soup.find('h1').string
+    uid = name_id_map.get('ITEM:' + name)
+    description = soup.find('h1').next_sibling.next_sibling.string
+    rarity = soup.find('td', string='Rarity').next_sibling.next_sibling.string
+    carry = soup.find('td', string='Carry').next_sibling.next_sibling.string
+    buy = soup.find('td', string='Buy').next_sibling.next_sibling.string
+    sell = soup.find('td', string='Sell').next_sibling.next_sibling.string
+
+    variations = []
+    divs = soup.find('table').parent.find_next_siblings('div')
+    for d in divs:
+        p_tags = d.find_all('p')
+        price = p_tags[0].string
+        slot = slot_encoder(p_tags[1].string)
+        tables = d.find_all('table')
+        skills_rows = tables[0].find_all('tr')
+        skills = []
+        for row in skills_rows:
+            data = row.find_all('td')
+            skill_name = data[0].a.string
+            skill_id = name_id_map.get('SKILL:' + skill_name)
+            skill_value = data[1].string.strip().replace('+','')
+            skills.append({
+                'id' : skill_id,
+                'Name' : skill_name,
+                'Value' : skill_value
+            })
+        items = []
+        item_rows = tables[1].find_all('tr')
+        for row in item_rows:
+            data = row.find_all('td')
+            item_name = data[0].a.string
+            item_id = name_id_map.get('ITEM:' + item_name)
+            item_quantity = data[1].string
+            items.append({
+                'id' : item_id,
+                'Name' : item_name,
+                'Quantity' : item_quantity
+            })
+        variations.append({
+            'Price' : price,
+            'Slot' : slot,
+            'Skills' : skills,
+            'Items' : items
+        })
+    decoration = {
+        'id' : uid,
+        'Name' : name,
+        'Rarity' : rarity,
+        'Carry' : carry,
+        'Sell' : sell,
+        'Buy' : buy,
+        'Variations' : variations
+    }
+    return decoration
+
+
+def populate_decorations_list():
+    name_id_map = read_name_id_mapping()
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
+    driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
+    decoration_links = get_all_decoration_links()
+    id_dict = {'ids' : []}
+    for k in decoration_links:
+        attempts = 0
+        while True:
+            try:
+                temp = process_decoration_data(k, driver, name_id_map)
+            except TimeoutException:
+                print('TimeoutException:', attempts)
+                attempts += 1
+                if attempts % 5 == 0:
+                    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path='./env/chromedriver')
+                    driver.set_page_load_timeout(WEBDRIVER_REQUEST_TIMEOUT)
+                continue
+            break
+        print(temp)
+        dec_file = open(DECORATIONS_PATH + str(temp['id']) + '.bson', 'wb')
+        dec_file.write(bson.dumps(temp))
+        dec_file.close()
+        id_dict['ids'].append(temp['id'])
+    id_file = open(DECORATIONS_PATH + 'id_dict.bson', 'wb')
+    id_file.write(bson.dumps(id_dict))
+    id_file.close()
+    print('Finished populationg decorations')
