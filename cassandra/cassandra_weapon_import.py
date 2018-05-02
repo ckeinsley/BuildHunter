@@ -18,7 +18,7 @@ def main():
     print("Attempting to create Weapon Table")
     # db.createArmorTable()
     print("Begining Load")
-    weapon_list = read_weapon_file
+    weapon_list = read_weapon_file()
     print("Load Complete")
     print(weapon_list)
 
