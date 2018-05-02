@@ -28,3 +28,6 @@ def main():
     #         continue
     #     db.insertArmor(main_armor, skills, crafting)
     # print("Finished Dumping Files")
+
+if __name__ == "__main__":
+    main()
