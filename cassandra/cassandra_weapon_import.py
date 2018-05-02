@@ -20,8 +20,7 @@ def main():
     print("Begining Load")
     weapon_list = read_weapon_file()
     print("Load Complete")
-    print(weapon_list)
-
+    print(weapon_list[0])
     # for armor in weapon_list:
     #     print("Processing armor piece " + armor.get('Name'))
     #     if "dummy" in armor.get('Name'):
