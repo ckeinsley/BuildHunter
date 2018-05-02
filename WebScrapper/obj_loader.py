@@ -2,7 +2,7 @@ import pickle
 import bson
 
 ARMORS_PATH = '../WebScrapper/obj/armors/'
-WEAPONS_PATH = './obj/weapons/'
+WEAPONS_PATH = '../WebScrapper/obj/weapons/'
 MONSTERS_PATH = './obj/monsters/'
 DECORATIONS_PATH = './obj/decorations/'
 SKILLS_PATH = './obj/skills/'
