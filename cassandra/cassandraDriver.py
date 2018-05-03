@@ -176,4 +176,4 @@ def __insertWeaponToTable(weaponToInsert):
     VALUES({id}, {affinity}, '{create_price}', {defense}, '{glaive_type}',
     '{phial}', {rarity}, '{shelling}', {slot}, {true_attack}, '{upgrade_price}',
     '{weapon_family}', '{class}')
-    """)
+    """.format_map(weaponToInsert))
