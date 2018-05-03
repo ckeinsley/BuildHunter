@@ -143,6 +143,8 @@ def intOrNone(possibleInt):
 
 def filterString(someString):
     if someString:
+        if someString == 'None':
+            return None
         return someString.replace("'", "''")
     else:
         return None
