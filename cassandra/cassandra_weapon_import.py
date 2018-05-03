@@ -21,7 +21,8 @@ def main():
     print("Load Complete")
     print("Dumping blademaster Items")
     blademaster_list = weapon_list.get('Blademaster')
-    weapon = blademaster_list[10]
+    weapon = blademaster_list[0]
+    pprint(weapon)
 
     weaponToInsert = parseWeapon(weapon, True)
     createItems = parseCreateItems(weapon)
