@@ -82,17 +82,17 @@ def parseWeapon(weapon, blademaster):
     newWeapon = {}
     newWeapon['affinity'] = intOrNone(weapon.get('Affinity'))
     newWeapon['attack'] = intOrNone(weapon.get('Attack'))
-    newWeapon['create_price'] = weapon.get('Create_Price').replace("'", "''")
+    newWeapon['create_price'] = filterString(weapon.get('Create_Price'))
     newWeapon['defense'] = intOrNone(weapon.get('Defense'))
-    newWeapon['glaive_type'] = weapon.get('Glaive_Type').replace("'", "''")
-    newWeapon['name'] = weapon.get('Name').replace("'", "''")
-    newWeapon['phial'] = weapon.get('Phial').replace("'", "''")
+    newWeapon['glaive_type'] = filterString(weapon.get('Glaive_Type'))
+    newWeapon['name'] = filterString(weapon.get('Name'))
+    newWeapon['phial'] = filterString(weapon.get('Phial'))
     newWeapon['rarity'] = intOrNone('Rarity')
-    newWeapon['shelling'] = weapon.get('Shelling').replace("'", "''")
+    newWeapon['shelling'] = filterString(weapon.get('Shelling'))
     newWeapon['slot'] = intOrNone(weapon.get('Slot'))
     newWeapon['true_attack'] = intOrNone(weapon.get('True_Attack'))
-    newWeapon['upgrade_price'] = weapon.get('Upgrade_Price').replace("'", "''")
-    newWeapon['weapon_family'] = weapon.get('Weapon_Family').replace("'", "''")
+    newWeapon['upgrade_price'] = filterString(weapon.get('Upgrade_Price'))
+    newWeapon['weapon_family'] = filterString(weapon.get('Weapon_Family'))
     newWeapon['id'] = intOrNone(weapon.get('id'))
     if blademaster:
         newWeapon['class'] = 'Blademaster'
@@ -106,7 +106,7 @@ def parseCreateItems(weapon):
     for create_item in weapon.get('Create_Items'):
         item_map = {}
         item_map['id'] = wep_id
-        item_map['name'] = create_item['Name'].replace("'", "''")
+        item_map['name'] = filterString(create_item['Name'])
         item_map['quantity'] = intOrNone(create_item['Quantity'])
         item_map['item_id'] = intOrNone(create_item['id'])
         items.append(item_map)
@@ -118,7 +118,7 @@ def parseUpgradeItems(weapon):
     for upgrade_item in weapon.get('Upgrade_Items'):
         item_map = {}
         item_map['id'] = wep_id
-        item_map['name'] = upgrade_item['Name'].replace("'", "''")
+        item_map['name'] = filterString(upgrade_item['Name'])
         item_map['quantity'] = intOrNone(upgrade_item['Quantity'])
         item_map['item_id'] = intOrNone(upgrade_item['id'])
         items.append(item_map)
@@ -130,7 +130,7 @@ def parseUpgradesTo(weapon):
     for upgrade_item in weapon.get('Upgrades_To'):
         item_map = {}
         item_map['id'] = wep_id
-        item_map['name'] = upgrade_item['Name'].replace("'", "''")
+        item_map['name'] = filterString(upgrade_item['Name'])
         item_map['item_id'] = intOrNone(upgrade_item['id'])
         items.append(item_map)
     return items
@@ -139,6 +139,12 @@ def intOrNone(possibleInt):
     try:
         return int(possibleInt)
     except:
+        return None
+
+def filterString(someString):
+    if someString:
+        return someString.replace("'", "''")
+    else:
         return None
 
 if __name__ == "__main__":
