@@ -19,24 +19,37 @@ def main():
     print("Begining Load")
     weapon_list = read_weapon_file()
     print("Load Complete")
+    
     print("Dumping blademaster Items")
     blademaster_list = weapon_list.get('Blademaster')
     weapon = blademaster_list[0]
-    pprint(weapon)
 
     weaponToInsert = parseWeapon(weapon, True)
     createItems = parseCreateItems(weapon)
     upgradeItems = parseUpgradeItems(weapon)
     upgradesTo = parseUpgradesTo(weapon)
 
-    pprint(weaponToInsert)
-    pprint(createItems)
-    pprint(upgradeItems)
-    pprint(upgradesTo)
+    db.insertWeapon(weaponToInsert,createItems,upgradeItems,upgradesTo)
+
     # for weapon in blademaster_list:
     #     print("Processing " + weapon.get('Name'))
     #     if "dummy" in weapon.get('Name'):
     #         continue
+    #     weaponToInsert = parseWeapon(weapon, True)
+    #     createItems = parseCreateItems(weapon)
+    #     upgradeItems = parseUpgradeItems(weapon)
+    #     upgradesTo = parseUpgradesTo(weapon)
+
+    # print("Dumping Gunner Items")
+    # gunner_list = weapon_list.get('Gunner')
+    # for weapon in gunner_list:
+    #     print("Processing " + weapon.get('Name'))
+    #     if "dummy" in weapon.get('Name'):
+    #         continue
+    #     weaponToInsert = parseWeapon(weapon, True)
+    #     createItems = parseCreateItems(weapon)
+    #     upgradeItems = parseUpgradeItems(weapon)
+    #     upgradesTo = parseUpgradesTo(weapon)
         
     print("Finished Dumping Files")
 
@@ -69,26 +82,35 @@ def parseWeapon(weapon, blademaster):
     newWeapon = {}
     newWeapon['affinity'] = intOrNone(weapon.get('Affinity'))
     newWeapon['attack'] = intOrNone(weapon.get('Attack'))
-    newWeapon['create_price'] = intOrNone(weapon.get('Create_Price'))
+    newWeapon['create_price'] = weapon.get('Create_Price').replace("'", "''")
     newWeapon['defense'] = intOrNone(weapon.get('Defense'))
-    newWeapon['glaive_type'] = weapon.get('Glaive_Type')
-    newWeapon['name'] = weapon.get('Name')
-    newWeapon['phial'] = weapon.get('Phial')
+    newWeapon['glaive_type'] = weapon.get('Glaive_Type').replace("'", "''")
+    newWeapon['name'] = weapon.get('Name').replace("'", "''")
+    newWeapon['phial'] = weapon.get('Phial').replace("'", "''")
     newWeapon['rarity'] = intOrNone('Rarity')
-    newWeapon['shelling'] = weapon.get('Shelling')
+    newWeapon['shelling'] = weapon.get('Shelling').replace("'", "''")
     newWeapon['slot'] = intOrNone(weapon.get('Slot'))
     newWeapon['true_attack'] = intOrNone(weapon.get('True_Attack'))
-    newWeapon['upgrade_price'] = weapon.get('Upgrade_Price')
-    newWeapon['weapon_family'] = weapon.get('Weapon_Family')
+    newWeapon['upgrade_price'] = weapon.get('Upgrade_Price').replace("'", "''")
+    newWeapon['weapon_family'] = weapon.get('Weapon_Family').replace("'", "''")
     newWeapon['id'] = intOrNone(weapon.get('id'))
     if blademaster:
-        newWeapon['class'] = 'BladeMaster'
+        newWeapon['class'] = 'Blademaster'
     else:
         newWeapon['class'] = 'Gunner'
     return newWeapon
 
 def parseCreateItems(weapon):
-    return []
+    items = []
+    wep_id = intOrNone(weapon.get('id'))
+    for create_item in weapon.get('Create_Items'):
+        item_map = {}
+        item_map['id'] = wep_id
+        item_map['name'] = create_item['Name'].replace("'", "''")
+        item_map['quantity'] = intOrNone(create_item['Quantity'])
+        item_map['item_id'] = intOrNone(create_item['id'])
+        items.append(item_map)
+    return items
 
 def parseUpgradeItems(weapon):
     items = []
@@ -96,7 +118,7 @@ def parseUpgradeItems(weapon):
     for upgrade_item in weapon.get('Upgrade_Items'):
         item_map = {}
         item_map['id'] = wep_id
-        item_map['name'] = upgrade_item['Name']
+        item_map['name'] = upgrade_item['Name'].replace("'", "''")
         item_map['quantity'] = intOrNone(upgrade_item['Quantity'])
         item_map['item_id'] = intOrNone(upgrade_item['id'])
         items.append(item_map)
@@ -108,7 +130,7 @@ def parseUpgradesTo(weapon):
     for upgrade_item in weapon.get('Upgrades_To'):
         item_map = {}
         item_map['id'] = wep_id
-        item_map['name'] = upgrade_item['Name']
+        item_map['name'] = upgrade_item['Name'].replace("'", "''")
         item_map['item_id'] = intOrNone(upgrade_item['id'])
         items.append(item_map)
     return items

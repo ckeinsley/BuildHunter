@@ -16,8 +16,14 @@ from cassandra.query import dict_factory
 IP_ADDRESSES = ['137.112.89.78', '137.112.89.77', '137.112.89.76', '137.112.89.75']
 KEYSPACE = 'buildhunter'
 ARMOR_TABLE = 'armor'
-CRAFTING_TABLE = 'crafting'
+ARMOR_CRAFTING_TABLE = 'crafting'
 SKILL_TABLE = 'skills'
+
+WEAPON_TABLE = 'weapon'
+WEAPON_UPGRADES_TO_TABLE = 'upgradesto'
+WEAPON_UPGRADE_ITEMS_TABLE = 'upgradeitems'
+WEAPON_CREATE_ITEMS_TABLE = 'createitems'
+
 
 def connect():
     global session
@@ -72,7 +78,7 @@ def createArmorTable():
         quantity int,
         primary key (id, item_id)
         )  
-    """ % CRAFTING_TABLE)
+    """ % ARMOR_CRAFTING_TABLE)
 
     session.execute("""
         create table if not exists %s (
@@ -92,15 +98,13 @@ def insertArmor(armor, skills, crafting):
     session.execute(armorQuery)
     
     for skill in skills:
-        print(skill)
         skillsQuery = SimpleStatement("INSERT INTO " + SKILL_TABLE + 
             "(id, skill_id, name, value) VALUES ({id}, {skill_id}, '{name}', {value})".format_map(skill)
         )
-        print(skillsQuery)
         session.execute(skillsQuery)
 
     for item in crafting:
-        craftsQuery = SimpleStatement("INSERT INTO " + CRAFTING_TABLE + 
+        craftsQuery = SimpleStatement("INSERT INTO " + ARMOR_CRAFTING_TABLE + 
             """
             (id, item_id, name, quantity)
             VALUES ({id}, {item_id}, '{name}', {quantity})
@@ -110,7 +114,66 @@ def insertArmor(armor, skills, crafting):
 
 
 def createWeaponTable():
-    return 
+    session.execute("""
+        create table if not exists %s (
+        id int,
+        name text,
+        affinity int,
+        create_price text,
+        defense int,
+        glaive_type text,
+        phial text,
+        rarity int,
+        shelling text,
+        slot int, 
+        true_attack int,
+        upgrade_price text,
+        weapon_family text,
+        class text,
+        PRIMARY KEY (id)
+        )  
+    """ % WEAPON_TABLE)
 
-def insertWeapon(weapon):
-    return
+    session.execute("""
+        create table if not exists %s (
+        id int,
+        item_id int,
+        name text,
+        quantity int,
+        primary key (id, item_id)
+        )  
+    
+    """ % WEAPON_CREATE_ITEMS_TABLE)
+
+    session.execute("""
+        create table if not exists %s (
+        id int,
+        item_id int,
+        name text,
+        quantity int,
+        primary key (id, item_id)
+        )  
+    
+    """ % WEAPON_UPGRADE_ITEMS_TABLE)
+
+    session.execute("""
+        create table if not exists %s (
+        id int,
+        item_id int,
+        name text,
+        primary key (id, item_id)
+        )  
+    
+    """ % WEAPON_UPGRADES_TO_TABLE) 
+
+def insertWeapon(weaponToInsert, createItems, upgradeItems, upgradesTo):
+    __insertWeaponToTable(weaponToInsert)
+
+def __insertWeaponToTable(weaponToInsert):
+    session.execute("INSERT INTO " + WEAPON_TABLE + """
+    (id, name, affinity, create_price, defense, glaive_type, phial, rarity,
+    shelling, slot, true_attack, upgrade_price, weapon_family, class)
+    VALUES({id}, {affinity}, '{create_price}', {defense}, '{glaive_type}',
+    '{phial}', {rarity}, '{shelling}', {slot}, {true_attack}, '{upgrade_price}',
+    '{weapon_family}', '{class}')
+    """)
