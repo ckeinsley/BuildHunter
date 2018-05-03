@@ -1,14 +1,13 @@
 import sys
 from neo4j.v1 import GraphDatabase
-from obj_loader import read_skills_file
+
 from pprint import pprint
 
 # Object Loader
 sys.path.insert(0,'../WebScrapper')
-
-
-uri = "bolt://localhost:7687"
-driver = GraphDatabase.driver(uri, auth=("neo4j", "Password"))
+from obj_loader import read_skills_file
+uri = "bolt://433-06.csse.rose-hulman.edu:7688"
+driver = GraphDatabase.driver(uri, auth=("neo4j", "huntallthemonsters247"))
 allSkills = read_skills_file()
 
 allSkills[0][0]['Skills'][0]['Description'] = 'None'
@@ -34,6 +33,8 @@ def add_relations():
                     tx.run("MATCH (attr:Attribute {Name: $name})"
                             "MATCH (newSkill:Skill {Description: $Desc})"
                             "CREATE (attr)-[unlock:UNLOCKS {Skill_Req: $Skill_Req}]->(newSkill)", name = attribute['Name'], Desc = skill['Description'], Skill_Req = skill['Skill_Req'])
+
+
                     
-add_skills()
-add_relations()
+#add_skills()
+#add_relations()
