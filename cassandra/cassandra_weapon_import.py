@@ -12,21 +12,48 @@ import cassandraDriver as db
 KEYSPACE = 'testkeyspace'
 
 def main():
-    # print("Connecting to Cassandra")
-    # db.connect()
-    # print("Connected")
-    print("Attempting to create Weapon Table")
-    # db.createArmorTable()
+    print("Connecting to Cassandra")
+    db.connect()
+    print("Connected")
+    db.createWeaponTable()
     print("Begining Load")
     weapon_list = read_weapon_file()
     print("Load Complete")
-    print(weapon_list.get('Blademaster')[0])
-    # for armor in weapon_list:
-    #     print("Processing armor piece " + armor.get('Name'))
-    #     if "dummy" in armor.get('Name'):
+    print("Dumping blademaster Items")
+    blademaster_list = weapon_list.get('Blademaster')
+    pprint(blademaster_list[10])
+
+
+
+    # for weapon in blademaster_list:
+    #     print("Processing " + weapon.get('Name'))
+    #     if "dummy" in weapon.get('Name'):
     #         continue
-    #     db.insertArmor(main_armor, skills, crafting)
-    # print("Finished Dumping Files")
+        
+    print("Finished Dumping Files")
+
+
+"""
+{'Weapon_Family': 'Great Sword', 
+    'Element': None, 
+    'Slot': 0, 
+    'Create_Price': '750z', 
+    'Upgrade_Price': None, 
+    'id': 5000, 
+    'Upgrade_Items': [], 
+    'Attack': '288', 
+    'Rarity': '1', 
+    'Defense': None, 
+    'Affinity': None, 
+    'True_Attack': '60', 
+    'Glaive_Type': None, 
+    'Phial': None, 
+    'Name': 'Iron Sword', 
+    'Upgrades_To': [{'Name': 'Iron Sword+', 'id': 5001}], 
+    'Shelling': None, 
+    'Create_Items': [{'Name': 'Iron Ore', 'Quantity': '3', 'id': 202}]}
+"""
+
 
 if __name__ == "__main__":
     main()

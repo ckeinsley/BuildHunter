@@ -107,3 +107,10 @@ def insertArmor(armor, skills, crafting):
             """.format_map(item)
         )
         session.execute(craftsQuery)
+
+
+def createWeaponTable():
+    return 
+
+def insertWeapon(weapon):
+    return
