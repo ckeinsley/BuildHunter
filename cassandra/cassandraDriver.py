@@ -179,7 +179,7 @@ def __insertWeaponToTable(weaponToInsert):
     class, attack""" 
     query += identifiers 
     query += """VALUES( {id}, '{name}', {affinity}, {defense}, {rarity}, {slot}, {true_attack},
-    '{weapon_family}', {class}, {attack}""".format_map(weaponToInsert) 
+    '{weapon_family}', '{class}', {attack}""".format_map(weaponToInsert) 
     query += values
     print(query)
 
