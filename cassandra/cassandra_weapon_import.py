@@ -22,34 +22,29 @@ def main():
     
     print("Dumping blademaster Items")
     blademaster_list = weapon_list.get('Blademaster')
-    weapon = blademaster_list[0]
 
-    weaponToInsert = parseWeapon(weapon, True)
-    createItems = parseCreateItems(weapon)
-    upgradeItems = parseUpgradeItems(weapon)
-    upgradesTo = parseUpgradesTo(weapon)
+    for weapon in blademaster_list:
+        print("Processing " + weapon.get('Name'))
+        if "dummy" in weapon.get('Name'):
+            continue
+        weaponToInsert = parseWeapon(weapon, True)
+        createItems = parseCreateItems(weapon)
+        upgradeItems = parseUpgradeItems(weapon)
+        upgradesTo = parseUpgradesTo(weapon)
+        db.insertWeapon(weaponToInsert,createItems,upgradeItems,upgradesTo)
 
-    db.insertWeapon(weaponToInsert,createItems,upgradeItems,upgradesTo)
 
-    # for weapon in blademaster_list:
-    #     print("Processing " + weapon.get('Name'))
-    #     if "dummy" in weapon.get('Name'):
-    #         continue
-    #     weaponToInsert = parseWeapon(weapon, True)
-    #     createItems = parseCreateItems(weapon)
-    #     upgradeItems = parseUpgradeItems(weapon)
-    #     upgradesTo = parseUpgradesTo(weapon)
-
-    # print("Dumping Gunner Items")
-    # gunner_list = weapon_list.get('Gunner')
-    # for weapon in gunner_list:
-    #     print("Processing " + weapon.get('Name'))
-    #     if "dummy" in weapon.get('Name'):
-    #         continue
-    #     weaponToInsert = parseWeapon(weapon, True)
-    #     createItems = parseCreateItems(weapon)
-    #     upgradeItems = parseUpgradeItems(weapon)
-    #     upgradesTo = parseUpgradesTo(weapon)
+    print("Dumping Gunner Items")
+    gunner_list = weapon_list.get('Gunner')
+    for weapon in gunner_list:
+        print("Processing " + weapon.get('Name'))
+        if "dummy" in weapon.get('Name'):
+            continue
+        weaponToInsert = parseWeapon(weapon, True)
+        createItems = parseCreateItems(weapon)
+        upgradeItems = parseUpgradeItems(weapon)
+        upgradesTo = parseUpgradesTo(weapon)
+        db.insertWeapon(weaponToInsert,createItems,upgradeItems,upgradesTo)
         
     print("Finished Dumping Files")
 
