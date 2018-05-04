@@ -23,4 +23,3 @@ def import_armor_types():
     del ids
     for armor in armors:
         _r.sadd('armor:' + armor.get('Part').lower(), armor.get('id'))  
-
