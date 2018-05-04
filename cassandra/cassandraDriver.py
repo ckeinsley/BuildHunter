@@ -15,6 +15,8 @@ from cassandra.query import dict_factory
 
 IP_ADDRESSES = ['137.112.89.78', '137.112.89.77', '137.112.89.76', '137.112.89.75']
 KEYSPACE = 'buildhunter'
+
+# Table Names
 ARMOR_TABLE = 'armor'
 ARMOR_CRAFTING_TABLE = 'crafting'
 SKILL_TABLE = 'skills'
@@ -23,7 +25,6 @@ WEAPON_TABLE = 'weapon'
 WEAPON_UPGRADES_TO_TABLE = 'upgradesto'
 WEAPON_UPGRADE_ITEMS_TABLE = 'upgradeitems'
 WEAPON_CREATE_ITEMS_TABLE = 'createitems'
-
 
 def connect():
     global session
@@ -47,8 +48,8 @@ def __createKeyspaceIfNotExists():
         WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': '3' }
         """ % KEYSPACE)
 
+# ========================= CREATION ==============================================
 def createArmorTable():
-
     session.execute("""
         create table if not exists %s (
         id int,
@@ -112,7 +113,6 @@ def insertArmor(armor, skills, crafting):
         )
         session.execute(craftsQuery)
 
-
 def createWeaponTable():
     session.execute("""
         create table if not exists %s (
@@ -166,6 +166,7 @@ def createWeaponTable():
         )  
     
     """ % WEAPON_UPGRADES_TO_TABLE) 
+
 
 def insertWeapon(weaponToInsert, createItems, upgradeItems, upgradesTo):
     __insertWeaponToTable(weaponToInsert)
@@ -232,3 +233,5 @@ def __insertUpgradesTo(upgradesTo):
         session.execute("INSERT INTO " + WEAPON_UPGRADES_TO_TABLE + 
             """(id, item_id, name) 
             VALUES({id}, {item_id}, '{name}')""".format_map(item))
+
+# =============================== QUERIES =======================================

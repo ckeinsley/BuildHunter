@@ -88,3 +88,48 @@ from cassandra.cluster import Cluster
 cluster = Cluster(['<Node IP Address>'])
 session = cluster.connect()
 ```
+
+## Basic CQL Commands
+
+The Cassandra Query Language (CQL) looks very much like standard SQL. Many of the standard create, update, insert, select queries will look the same, often times with extra arguments available. A full list of the options provided by CQL can be found [online](https://docs.datastax.com/en/cql/3.3/cql/cql_reference/cqlCommandsTOC.html). 
+
+### Keyspaces
+One of the key differences between CQL and SQL is the notion of a keyspace. A keyspace in Cassandra is namespace that defines the data replication on nodes. This acts similarly to the notion of creating a database in SQL. Keyspaces can be created with 
+```
+CREATE KEYSPACE <identifier> WITH <properties>
+```
+Where properties are either `replication` or `durable_writes`. You can learn more about how they work by checking the [documentation for create keyspace](https://www.tutorialspoint.com/cassandra/cassandra_create_keyspace.htm).  
+
+### Create
+A create table (column family) in cassandra looks exactly like a SQL create table command with an additional `WITH` clause which can be used to define different table properties. The additional table properties are optional but can be used to tune data handling, including I/O operations, compression, and compaction. 
+
+- An example command creating a table call cyclist_name where all ids are unique. 
+```
+CREATE TABLE cyclist_name ( 
+   id UUID PRIMARY KEY, 
+   lastname text, 
+   firstname text );
+```
+
+### Read
+Select statements can be used to query Cassandra. However, cql does not support arbitrary where clauses. If you attach a where clause onto something that cassandra knows that it cannot do efficiently, it will warn you with a message similar to
+```
+InvalidRequest: Error from server: code=2200 [Invalid query] message="Cannot execute this query as it might involve data filtering and thus may have unpredictable performance. If you want to execute this query despite the performance unpredictability, use ALLOW FILTERING"
+```
+This usually means that you need to add a secondary index or reconsider the way your data is modeled. This is because cassandra cannot ensure good performance for this query. If you know that most of your data will fit the `WHERE` clause, it may be okay to just add `ALLOW FILTERING` to your query. Otherwise you should **NOT** just allow filtering.
+
+- An example of a `SELECT` statement in CQL
+```
+SELECT * FROM armor WHERE name LIKE 'Rathian';
+```
+
+### Update
+
+
+### Delete
+
+
+## Indexing
+```
+CREATE CUSTOM INDEX employee_firstname_idx ON bth.employee (firstname) USING 'org.apache.cassandra.index.sasi.SASIIndex' WITH OPTIONS = {'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer', 'case_sensitive': 'false'};
+```
