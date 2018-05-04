@@ -17,6 +17,20 @@ def cli():
 def get_active_user():
     print(r.active_user)
 
+@c.option('-u', '--username', prompt=True)
+@cli.command('user-change')
+def change_active_user(username):
+    if r.is_user(username):
+        r.active_user = username
+    else:
+        print(username + ' not found. Creating...')
+        r.add_user(username, True)
+
+@cli.command('user-delete')
+def delete_user():
+    if c.confirm('This will delete all information associated with ' + r.active_user + '. Are you sure you want to continue?'):
+        r.delete_user(r.active_user)
+
 @c.option('--name', '-n', prompt=True)
 @cli.command('build-add')
 def add_build(name):
@@ -52,10 +66,28 @@ def add_part(part, id):
 def delete_part(part):
     r.remove_build_component(part)
 
-@c.option('--id', '-i', type=int)
-@cli.command('weapon-name')
-def get_weapon_name(id):
-    print(r.get_object_name(id, 'weapon').decode('utf-8'))
+@c.option('--id', '-i', prompt=True, type=int)
+@c.option('--type_', '-t', prompt=True, type=c.Choice(r.ITEM_TYPES))
+@cli.command('object-name')
+def get_object_name(id, type_):
+    print(r.get_object_name(id, type_).decode('utf-8'))
+
+@c.option('--name', '-n', prompt=True)
+@c.option('--type_', '-t', prompt=True, type=c.Choice(r.ITEM_TYPES))
+@cli.command('object-name-search')
+def search_object_name(name, type_):
+    for obj in r.search_object_name(name, type_):
+        print(obj[0].decode('utf-8'))
+
+@c.option('--skill', '-s', type=c.Tuple([str, int]), multiple=True)
+@cli.command('generate-armor-sets')
+def generate_armor_sets(skill):
+    skill_list = []
+    for tup in skill:
+        id = int(r.get_object_id(tup[0], 'skill'))
+        value = tup[1]
+        skill_list.append((id, value))
+    print(skill_list) #TODO: Lookup armor set in Neo4J
 
 
 

@@ -53,14 +53,18 @@ class RedisDriver:
     ####----Users----####
     
     def add_user(self, user, setActive=False):
-        #TODO: Input verification
-        self._r.sadd('users', user)
-        if setActive:
-            self.active_user = user
+        if (self._r.sismember('users', user)):
+            raise ValueError('User ' + user +  ' already exists')
+        else:
+            self._r.sadd('users', user)
+            if setActive:
+                self.active_user = user
 
     def delete_user(self, user):
-        #TODO
-        pass
+        if (user is self.active_user):
+            del self.active_user
+        self._r.delete(*self._r.keys(user + ':*'))
+        self._r.srem('users', user)
 
     def is_user(self, user):
         return self._r.sismember('users', user)
@@ -121,16 +125,25 @@ class RedisDriver:
     ITEM_TYPES = ['armor', 'weapon', 'skill', 'item']
 
     def get_object_name(self, id, type_):
-        #TODO: Input verification
-        return self._r.hget(type_+ '_ids', id)
+        result = self._r.hget(type_+ '_ids', id)
+        if result is None:
+            raise ValueError(id + ' is not a valid ' + type_ + ' ID.')
+        return result
+    
+    def search_object_name(self, name, type_):
+        return self._r.hscan_iter(type_ + '_names', '*' + name + '*')
         
     def get_object_type(self, id):
-        #TODO
-        pass
+        for type_ in self.ITEM_TYPES:
+            if self._r.hexists(type_ + '_ids', id):
+                return type_
+        return None
     
     def get_object_id(self, name, type_):
-        #TODO
-        pass
+        result = self._r.hget(type_+ '_names', name)
+        if result is None:
+            raise ValueError(name + ' is not a valid ' + type_ + ' name.')
+        return result
     
 
 
