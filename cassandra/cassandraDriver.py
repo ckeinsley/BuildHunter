@@ -207,6 +207,6 @@ def __findOptionalFields(weaponToInsert):
         identifiers += ", shelling"
         values += ", '" + shelling + "'"
     identifiers += ") " 
-    values += "))"
+    values += ")"
     
     return (identifiers, values)
