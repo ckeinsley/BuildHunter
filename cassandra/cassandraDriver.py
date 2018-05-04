@@ -181,6 +181,7 @@ def __insertWeaponToTable(weaponToInsert):
     query += """VALUES( {id}, '{name}', {defense}, {rarity}, {slot}, {true_attack},
     '{weapon_family}', {attack}""".format_map(weaponToInsert) 
     query += values
+    print(query)
 
     session.execute(query)
 
