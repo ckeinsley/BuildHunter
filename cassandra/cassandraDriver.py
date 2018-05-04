@@ -171,11 +171,17 @@ def insertWeapon(weaponToInsert, createItems, upgradeItems, upgradesTo):
 
 def __insertWeaponToTable(weaponToInsert):
     (identifiers, values) = __findOptionalFields(weaponToInsert)
-    session.execute("INSERT INTO " + WEAPON_TABLE + """
+    query = "INSERT INTO " 
+    query += WEAPON_TABLE 
+    query += """
     (id, name, affinity, defense, rarity, slot, true_attack, weapon_family,
-    class, attack""" + identifiers +
-    """VALUES( {id}, '{name}', {defense}, {rarity}, {slot}, {true_attack},
-    '{weapon_family}', {attack}""".format_map(weaponToInsert) + values)
+    class, attack""" 
+    query += identifiers 
+    query += """VALUES( {id}, '{name}', {defense}, {rarity}, {slot}, {true_attack},
+    '{weapon_family}', {attack}""".format_map(weaponToInsert) 
+    query += values
+
+    print(query)
 
 def __findOptionalFields(weaponToInsert):
     identifiers = ""
