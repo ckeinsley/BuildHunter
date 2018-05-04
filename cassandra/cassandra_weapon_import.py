@@ -40,7 +40,7 @@ def main():
         print("Processing " + weapon.get('Name'))
         if "dummy" in weapon.get('Name'):
             continue
-        weaponToInsert = parseWeapon(weapon, True)
+        weaponToInsert = parseWeapon(weapon, False)
         createItems = parseCreateItems(weapon)
         upgradeItems = parseUpgradeItems(weapon)
         upgradesTo = parseUpgradesTo(weapon)
