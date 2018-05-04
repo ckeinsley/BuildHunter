@@ -169,6 +169,7 @@ def createWeaponTable():
 
 def insertWeapon(weaponToInsert, createItems, upgradeItems, upgradesTo):
     __insertWeaponToTable(weaponToInsert)
+    __insertCrateItems(createItems)
 
 def __insertWeaponToTable(weaponToInsert):
     (identifiers, values) = __findOptionalFields(weaponToInsert)
@@ -212,3 +213,8 @@ def __findOptionalFields(weaponToInsert):
     values += ")"
     
     return (identifiers, values)
+
+def __insertCrateItems(createItems):
+    session.execute("INSERT INTO " + WEAPON_CREATE_ITEMS_TABLE + 
+        """(id, item_id, name, quantity) 
+        VALUES({id}, {item_id}, '{name}', {quantity})""".format_map(createItems))
