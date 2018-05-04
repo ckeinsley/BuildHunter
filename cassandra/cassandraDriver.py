@@ -187,23 +187,23 @@ def __findOptionalFields(weaponToInsert):
     identifiers = ""
     values = ""
     glaive_type = weaponToInsert.get('glaive_type')
-    if glaive_type != 'None':
+    if glaive_type:
         identifiers += ", glaive_type"
         values += ", '"+ glaive_type + "'"
     phial = weaponToInsert.get('phial')
-    if phial != 'None':
+    if phial:
         identifiers += ", phial"
         values += ", '" + phial + "'"
     create_price = weaponToInsert.get('create_price')
-    if create_price != 'None':
+    if create_price:
         identifiers += ", create_price"
         values += ", '" + create_price + "'"
     upgrade_price = weaponToInsert.get('upgrade_price')
-    if upgrade_price != 'None':
+    if upgrade_price:
         identifiers += ", upgrade_price"
         values += ", '" + upgrade_price +"'"
     shelling = weaponToInsert.get('shelling')
-    if shelling != 'None':
+    if shelling:
         identifiers += ", shelling"
         values += ", '" + shelling + "'"
     identifiers += ") " 

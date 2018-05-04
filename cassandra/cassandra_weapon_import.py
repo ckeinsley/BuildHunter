@@ -145,7 +145,7 @@ def filterString(someString):
     if someString:
         return someString.replace("'", "''")
     else:
-        return "Null"
+        return None
 
 if __name__ == "__main__":
     main()
