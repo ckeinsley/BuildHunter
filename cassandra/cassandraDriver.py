@@ -169,7 +169,9 @@ def createWeaponTable():
 
 def insertWeapon(weaponToInsert, createItems, upgradeItems, upgradesTo):
     __insertWeaponToTable(weaponToInsert)
-    __insertCreatItems(createItems)
+    __insertCreateItems(createItems)
+    __insertUpgradeItems(upgradeItems)
+    __insertUpgradesTo(upgradesTo)
 
 def __insertWeaponToTable(weaponToInsert):
     (identifiers, values) = __findOptionalFields(weaponToInsert)
@@ -182,7 +184,6 @@ def __insertWeaponToTable(weaponToInsert):
     query += """VALUES( {id}, '{name}', {affinity}, {defense}, {rarity}, {slot}, {true_attack},
     '{weapon_family}', '{class}', {attack}""".format_map(weaponToInsert) 
     query += values
-    print(query)
 
     session.execute(query)
 
@@ -214,8 +215,20 @@ def __findOptionalFields(weaponToInsert):
     
     return (identifiers, values)
 
-def __insertCreatItems(createItems):
+def __insertCreateItems(createItems):
     for item in createItems:
         session.execute("INSERT INTO " + WEAPON_CREATE_ITEMS_TABLE + 
             """(id, item_id, name, quantity) 
             VALUES({id}, {item_id}, '{name}', {quantity})""".format_map(item))
+
+def __insertUpgradeItems(upgradeItems):
+    for item in upgradeItems:
+        session.execute("INSERT INTO " + WEAPON_UPGRADE_ITEMS_TABLE + 
+            """(id, item_id, name, quantity) 
+            VALUES({id}, {item_id}, '{name}', {quantity})""".format_map(item))
+
+def __insertUpgradesTo(upgradesTo):
+    for item in upgradesTo:
+        session.execute("INSERT INTO " + WEAPON_UPGRADES_TO_TABLE + 
+            """(id, item_id, name, quantity) 
+            VALUES({id}, {item_id}, '{name}')""".format_map(item))
