@@ -86,7 +86,7 @@ def add_part(part, id):
         raise ValueError(str(id) + ' is not a piece of ' + item_type)
     
 @c.option('--part', '-p', type=c.Choice(r.BUILD_PARTS), prompt=True)
-@cli.command('part-delete')
+@cli.command('part-delete') 
 def delete_part(part):
     r.remove_build_component(part)
 
@@ -99,11 +99,18 @@ def get_object_name(id, type_):
     print(r.get_object_name(id, type_).decode('utf-8'))
 
 @c.option('--name', '-n', prompt=True)
-@c.option('--type_', '-t', prompt=True, type=c.Choice(r.ITEM_TYPES))
+@c.option('--type_', '-t', prompt=True, type=c.Choice(r.ITEM_TYPES.union(r.BUILD_PARTS)))
 @cli.command('object-name-search')
 def search_object_name(name, type_):
-    for obj in r.search_object_name(name, type_):
-        print(obj[0].decode('utf-8'))
+    item_type = type_ 
+    if item_type not in r.ITEM_TYPES:
+        item_type = 'armor'
+    for obj in r.search_object_name(name, item_type):
+        if item_type is type_ or r.is_part(int(obj[1].decode()),type_):
+            print(obj[1].decode() + ': ' + obj[0].decode('utf-8'))
+
+
+
 
 
 ####----Advanced Features----####

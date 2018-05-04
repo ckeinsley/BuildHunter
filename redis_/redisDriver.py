@@ -96,7 +96,7 @@ class RedisDriver:
     
     ####----Build Components (e.g. armor pieces, weapons)----####
 
-    BUILD_PARTS = ['head', 'chest', 'arms', 'waist', 'legs', 'weapon']
+    BUILD_PARTS = {'head', 'chest', 'arms', 'waist', 'legs', 'weapon'}
 
     def add_build_component(self, part, itemId):
         self._r.hset(self.get_build_id(), part, itemId)
@@ -132,7 +132,7 @@ class RedisDriver:
 
     ####----Items----####
 
-    ITEM_TYPES = ['armor', 'weapon', 'skill', 'item', 'decoration']
+    ITEM_TYPES = {'armor', 'weapon', 'skill', 'item', 'decoration'}
 
     def get_object_name(self, id, type_):
         result = self._r.hget(type_+ '_ids', id)
