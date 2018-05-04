@@ -2,11 +2,11 @@ import pickle
 import bson
 
 ARMORS_PATH = '../WebScrapper/obj/armors/'
-WEAPONS_PATH = './obj/weapons/'
-MONSTERS_PATH = './obj/monsters/'
-DECORATIONS_PATH = './obj/decorations/'
-SKILLS_PATH = './obj/skills/'
-ITEMS_PATH = './obj/items/'
+WEAPONS_PATH = '../WebScrapper/obj/weapons/'
+MONSTERS_PATH = '../WebScrapper/obj/monsters/'
+DECORATIONS_PATH = '../WebScrapper/obj/decorations/'
+SKILLS_PATH = '../WebScrapper/obj/skills/'
+ITEMS_PATH = '../WebScrapper/obj/items/'
 
 def read_armor_files():
     id_file = open(ARMORS_PATH + 'id_list.p', 'rb')
