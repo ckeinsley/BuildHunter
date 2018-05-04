@@ -170,10 +170,37 @@ def insertWeapon(weaponToInsert, createItems, upgradeItems, upgradesTo):
     __insertWeaponToTable(weaponToInsert)
 
 def __insertWeaponToTable(weaponToInsert):
+    (identifiers, values) = __findOptionalFields(weaponToInsert)
     session.execute("INSERT INTO " + WEAPON_TABLE + """
-    (id, name, affinity, create_price, defense, glaive_type, phial, rarity,
-    shelling, slot, true_attack, upgrade_price, weapon_family, class)
-    VALUES({id}, {affinity}, '{create_price}', {defense}, '{glaive_type}',
-    '{phial}', {rarity}, '{shelling}', {slot}, {true_attack}, '{upgrade_price}',
-    '{weapon_family}', '{class}')
-    """.format_map(weaponToInsert))
+    (id, name, affinity, defense, rarity, slot, true_attack, weapon_family,
+    class, attack""" + identifiers +
+    """VALUES( {id}, '{name}', {defense}, {rarity}, {slot}, {true_attack},
+    {weapon_family}, {attack}""".format_map(weaponToInsert) + values)
+
+def __findOptionalFields(weaponToInsert):
+    identifiers = ""
+    values = ""
+    glaive_type = weaponToInsert.get('glaive_type')
+    if glaive_type:
+        identifiers += ", glaive_type"
+        values += ", "+ glaive_type 
+    phial = weaponToInsert.get('phial')
+    if phial:
+        identifiers += ", phial"
+        values += ", " + phial
+    create_price = weaponToInsert.get('create_price')
+    if create_price:
+        identifiers += ", create_price"
+        values += ", " + create_price
+    upgrade_price = weaponToInsert.get('upgrade_price')
+    if upgrade_price:
+        identifiers += ", upgrade_price"
+        values += ", " + upgrade_price
+    shelling = weaponToInsert.get('shelling')
+    if shelling:
+        identifiers += ", shelling"
+        values += ", " + shelling
+    identifiers += ") " 
+    values += "))"
+    
+    return (identifiers, values)

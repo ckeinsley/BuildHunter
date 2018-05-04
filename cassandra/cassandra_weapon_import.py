@@ -139,15 +139,13 @@ def intOrNone(possibleInt):
     try:
         return int(possibleInt)
     except:
-        return None
+        return -1
 
 def filterString(someString):
     if someString:
-        if someString == 'None':
-            return None
         return someString.replace("'", "''")
     else:
-        return None
+        return "Null"
 
 if __name__ == "__main__":
     main()
