@@ -230,5 +230,5 @@ def __insertUpgradeItems(upgradeItems):
 def __insertUpgradesTo(upgradesTo):
     for item in upgradesTo:
         session.execute("INSERT INTO " + WEAPON_UPGRADES_TO_TABLE + 
-            """(id, item_id, name, quantity) 
+            """(id, item_id, name) 
             VALUES({id}, {item_id}, '{name}')""".format_map(item))
