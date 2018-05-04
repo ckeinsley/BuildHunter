@@ -31,6 +31,8 @@ def delete_user():
     if c.confirm('This will delete all information associated with ' + r.active_user + '. Are you sure you want to continue?'):
         r.delete_user(r.active_user)
 
+####----Builds----####
+
 @c.option('--name', '-n', prompt=True)
 @cli.command('build-add')
 def add_build(name):
@@ -55,16 +57,40 @@ def set_active_build(name):
 def get_active_build():
     print(r.active_build)
 
+@cli.command('build-get-details')
+def get_build_details():
+    part_dict = r.get_build_parts()
+    for part, id in part_dict.items():
+        item_type = 'armor'
+        if part == 'weapon':
+            item_type = part
+        name = r.get_object_name(int(id.decode()), item_type)
+        print(part.decode('utf-8').capitalize() + ': ' + name.decode('utf-8'))
+        
+
+####----Parts----####
+
 @c.option('--part', '-p', type=c.Choice(r.BUILD_PARTS), prompt=True)
 @c.option('--id', '-i', type=int, prompt=True)
 @cli.command('part-add')
 def add_part(part, id):
-    r.add_build_component(part, id)
+    item_type = 'armor'
+    if part == 'weapon':
+        item_type = part
+    if r.is_object(id, item_type):
+        if (r.is_part(id, part)):
+            r.add_build_component(part, id)
+        else:
+            raise ValueError(str(id) + ' is not a valid ' + part)
+    else:
+        raise ValueError(str(id) + ' is not a piece of ' + item_type)
     
 @c.option('--part', '-p', type=c.Choice(r.BUILD_PARTS), prompt=True)
 @cli.command('part-delete')
 def delete_part(part):
     r.remove_build_component(part)
+
+####----Objects----####
 
 @c.option('--id', '-i', prompt=True, type=int)
 @c.option('--type_', '-t', prompt=True, type=c.Choice(r.ITEM_TYPES))
@@ -78,6 +104,9 @@ def get_object_name(id, type_):
 def search_object_name(name, type_):
     for obj in r.search_object_name(name, type_):
         print(obj[0].decode('utf-8'))
+
+
+####----Advanced Features----####
 
 @c.option('--skill', '-s', type=c.Tuple([str, int]), multiple=True)
 @cli.command('generate-armor-sets')

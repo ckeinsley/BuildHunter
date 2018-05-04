@@ -94,10 +94,6 @@ class RedisDriver:
     def get_all_builds(self):
         return self._r.smembers(self.active_user + ':builds')
     
-    def get_build_details(self):
-        #TODO
-        pass
-
     ####----Build Components (e.g. armor pieces, weapons)----####
 
     BUILD_PARTS = ['head', 'chest', 'arms', 'waist', 'legs', 'weapon']
@@ -109,6 +105,14 @@ class RedisDriver:
         self._r.hdel(self.get_build_id(), part)
         self._r.delete(self.get_build_id() + ':' + part)
     
+    def get_build_parts(self):
+        return self._r.hgetall(self.get_build_id())
+
+    def is_part(self, id, part):
+        if (part == 'weapon'):
+            return self.is_object(id, 'weapon')
+        return self._r.sismember('armor:' + part, id)
+    
     ####----Decorations----####
 
     def add_decoration(self, part, itemId):
@@ -117,12 +121,18 @@ class RedisDriver:
     def remove_decoration(self, part, itemId):
         self._r.srem(self.get_build_id + ':' + part, itemId)
 
+    def get_decorations(self, part):
+        self._r.smembers(self.get_build_id + ':' + part)
+
     def remove_all_decorations(self, part):
         self._r.delete(self.get_build_id + ':' + part)
 
+    def is_decoration(self, id):
+        return self._r.sismember('decoration_ids', id)
+
     ####----Items----####
 
-    ITEM_TYPES = ['armor', 'weapon', 'skill', 'item']
+    ITEM_TYPES = ['armor', 'weapon', 'skill', 'item', 'decoration']
 
     def get_object_name(self, id, type_):
         result = self._r.hget(type_+ '_ids', id)
@@ -144,6 +154,9 @@ class RedisDriver:
         if result is None:
             raise ValueError(name + ' is not a valid ' + type_ + ' name.')
         return result
+    
+    def is_object(self, id, type_):
+        return self._r.hget(type_+ '_ids', id) is not None
     
 
 
