@@ -175,7 +175,7 @@ def __insertWeaponToTable(weaponToInsert):
     (id, name, affinity, defense, rarity, slot, true_attack, weapon_family,
     class, attack""" + identifiers +
     """VALUES( {id}, '{name}', {defense}, {rarity}, {slot}, {true_attack},
-    {weapon_family}, {attack}""".format_map(weaponToInsert) + values)
+    '{weapon_family}', {attack}""".format_map(weaponToInsert) + values)
 
 def __findOptionalFields(weaponToInsert):
     identifiers = ""
@@ -183,23 +183,23 @@ def __findOptionalFields(weaponToInsert):
     glaive_type = weaponToInsert.get('glaive_type')
     if glaive_type:
         identifiers += ", glaive_type"
-        values += ", "+ glaive_type 
+        values += ", '"+ glaive_type + "'"
     phial = weaponToInsert.get('phial')
     if phial:
         identifiers += ", phial"
-        values += ", " + phial
+        values += ", '" + phial + "'"
     create_price = weaponToInsert.get('create_price')
     if create_price:
         identifiers += ", create_price"
-        values += ", " + create_price
+        values += ", '" + create_price + "'"
     upgrade_price = weaponToInsert.get('upgrade_price')
     if upgrade_price:
         identifiers += ", upgrade_price"
-        values += ", " + upgrade_price
+        values += ", '" + upgrade_price +"'"
     shelling = weaponToInsert.get('shelling')
     if shelling:
         identifiers += ", shelling"
-        values += ", " + shelling
+        values += ", '" + shelling + "'"
     identifiers += ") " 
     values += "))"
     
