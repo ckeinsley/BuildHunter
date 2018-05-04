@@ -181,7 +181,7 @@ def __insertWeaponToTable(weaponToInsert):
     '{weapon_family}', {attack}""".format_map(weaponToInsert) 
     query += values
 
-    print(query)
+    session.execute(query)
 
 def __findOptionalFields(weaponToInsert):
     identifiers = ""
