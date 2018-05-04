@@ -126,6 +126,7 @@ def createWeaponTable():
         rarity int,
         shelling text,
         slot int, 
+        attack int,
         true_attack int,
         upgrade_price text,
         weapon_family text,
