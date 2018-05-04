@@ -53,14 +53,18 @@ class RedisDriver:
     ####----Users----####
     
     def add_user(self, user, setActive=False):
-        #TODO: Input verification
-        self._r.sadd('users', user)
-        if setActive:
-            self.active_user = user
+        if (self._r.sismember('users', user)):
+            raise ValueError('User ' + user +  ' already exists')
+        else:
+            self._r.sadd('users', user)
+            if setActive:
+                self.active_user = user
 
     def delete_user(self, user):
-        #TODO
-        pass
+        if (user is self.active_user):
+            del self.active_user
+        self._r.delete(*self._r.keys(user + ':*'))
+        self._r.srem('users', user)
 
     def is_user(self, user):
         return self._r.sismember('users', user)
@@ -90,13 +94,9 @@ class RedisDriver:
     def get_all_builds(self):
         return self._r.smembers(self.active_user + ':builds')
     
-    def get_build_details(self):
-        #TODO
-        pass
-
     ####----Build Components (e.g. armor pieces, weapons)----####
 
-    BUILD_PARTS = ['head', 'chest', 'arms', 'waist', 'legs', 'weapon']
+    BUILD_PARTS = {'head', 'chest', 'arms', 'waist', 'legs', 'weapon'}
 
     def add_build_component(self, part, itemId):
         self._r.hset(self.get_build_id(), part, itemId)
@@ -104,6 +104,14 @@ class RedisDriver:
     def remove_build_component(self, part):
         self._r.hdel(self.get_build_id(), part)
         self._r.delete(self.get_build_id() + ':' + part)
+    
+    def get_build_parts(self):
+        return self._r.hgetall(self.get_build_id())
+
+    def is_part(self, id, part):
+        if (part == 'weapon'):
+            return self.is_object(id, 'weapon')
+        return self._r.sismember('armor:' + part, id)
     
     ####----Decorations----####
 
@@ -113,24 +121,42 @@ class RedisDriver:
     def remove_decoration(self, part, itemId):
         self._r.srem(self.get_build_id + ':' + part, itemId)
 
+    def get_decorations(self, part):
+        self._r.smembers(self.get_build_id + ':' + part)
+
     def remove_all_decorations(self, part):
         self._r.delete(self.get_build_id + ':' + part)
 
+    def is_decoration(self, id):
+        return self._r.sismember('decoration_ids', id)
+
     ####----Items----####
 
-    ITEM_TYPES = ['armor', 'weapon', 'skill', 'item']
+    ITEM_TYPES = {'armor', 'weapon', 'skill', 'item', 'decoration'}
 
     def get_object_name(self, id, type_):
-        #TODO: Input verification
-        return self._r.hget(type_+ '_ids', id)
+        result = self._r.hget(type_+ '_ids', id)
+        if result is None:
+            raise ValueError(id + ' is not a valid ' + type_ + ' ID.')
+        return result
+    
+    def search_object_name(self, name, type_):
+        return self._r.hscan_iter(type_ + '_names', '*' + name + '*')
         
     def get_object_type(self, id):
-        #TODO
-        pass
+        for type_ in self.ITEM_TYPES:
+            if self._r.hexists(type_ + '_ids', id):
+                return type_
+        return None
     
     def get_object_id(self, name, type_):
-        #TODO
-        pass
+        result = self._r.hget(type_+ '_names', name)
+        if result is None:
+            raise ValueError(name + ' is not a valid ' + type_ + ' name.')
+        return result
+    
+    def is_object(self, id, type_):
+        return self._r.hget(type_+ '_ids', id) is not None
     
 
 
