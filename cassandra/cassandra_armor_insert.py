@@ -20,6 +20,7 @@ def main():
     print("Begining Load")
     (armor_item_list, id_list) = read_armor_files()
     print("Load Complete")
+    print(armor_item_list[10])
     for armor in armor_item_list:
         print("Processing armor piece " + armor.get('Name'))
         if "dummy" in armor.get('Name'):
