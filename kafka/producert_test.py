@@ -9,7 +9,7 @@ armorToInsert = {'Crafting Items': [{'Quantity': '2', 'Name': 'Bnahabra Shell', 
 
 def main():
     producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    producer.send('my-topic', json.dumps(armorToInsert))
+    producer.send('armor-insert', json.dumps(armorToInsert))
     producer.close()
 
 if __name__ == "__main__":
