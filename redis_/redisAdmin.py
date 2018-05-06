@@ -6,8 +6,9 @@ sys.path.insert(0, '../WebScrapper')
 
 from obj_loader import read_armor_files
 from obj_loader import read_decoration_file
+from obj_loader import read_items_file
 
-_r = redis.StrictRedis(host='433-05.csse.rose-hulman.edu', port=6379, db=1, password='huntallthemonsters247')
+_r = redis.StrictRedis(host='433-05.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
 
 def import_data(filename):
     file = open(filename, 'rb')
@@ -51,6 +52,28 @@ def import_decoration_info():
                 _r.hset('decoration:' + id + ':variances:' + str(k) + ':items:' + str(n), 'quantity', item.get('Quantity'))
             k += 1
     print('Import Complete')
-        
-import_decoration_info()
-        
+
+def import_item_info():
+    item_list = read_items_file()
+    for item in item_list:
+        id = str(item.get('id'))
+        _r.hset('item:' + id, 'rarity', item.get('Rarity'))
+        _r.hset('item:' + id, 'carry', item.get('Carry'))
+        _r.hset('item:' + id, 'buy', item.get('Buy'))
+        _r.hset('item:' + id, 'sell', item.get('Sell'))
+        k = 0
+        for combo in item.get('Combo_List'):
+            _r.rpush('item:' + id + ':combo_list', 'item:' + id + ':combo_list:' + str(k))
+            _r.hset('item:' + id + ':combo_list:' + str(k), 'id_1', combo.get('id_1'))
+            _r.hset('item:' + id + ':combo_list:' + str(k), 'name_1', combo.get('Name_1'))
+            _r.hset('item:' + id + ':combo_list:' + str(k), 'id_2', combo.get('id_2'))
+            _r.hset('item:' + id + ':combo_list:' + str(k), 'name_2', combo.get('Name_2'))
+        m = 0
+        for loc in item.get('Gather_Locations'):
+            _r.rpush('item:' + id + ':gather_locations', 'item:' + id + ':gather_locations:' + str(m))
+            _r.hset('item:' + id + ':gather_locations:' + str(m), 'rank', loc.get('Rank'))
+            _r.hset('item:' + id + ':gather_locations:' + str(m), 'map', loc.get('Map'))
+            _r.hset('item:' + id + ':gather_locations:' + str(m), 'area', loc.get('Area'))
+            _r.hset('item:' + id + ':gather_locations:' + str(m), 'gather_method', loc.get('Gather_Method'))
+            _r.hset('item:' + id + ':gather_locations:' + str(m), 'quantity', loc.get('Quantity'))
+            _r.hset('item:' + id + ':gather_locations:' + str(m), 'drop_rate', loc.get('Drop_Rate'))
