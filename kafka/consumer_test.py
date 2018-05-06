@@ -1,3 +1,10 @@
+import sys
+
+# Cassandra Driver
+sys.path.insert(0,'../cassandra')
+import cassandraDriver as db
+
+
 from confluent_kafka import Consumer, KafkaError
 import json
 
@@ -11,24 +18,46 @@ settings = {
     'default.topic.config': {'auto.offset.reset': 'smallest'}
 }
 
-c = Consumer(settings)
-c.subscribe([topic])
 
-try:
-    while True:
-        msg = c.poll(0.1)
-        if msg is None:
-            continue
-        elif not msg.error():
-            print('Received message: {0}'.format(msg.value()))
-        elif msg.error().code() == KafkaError._PARTITION_EOF:
-            print('End of partition reached {0}/{1}'
-                  .format(msg.topic(), msg.partition()))
-        else:
-            print('Error occured: {0}'.format(msg.error().str()))
+def repl():
+    c = Consumer(settings)
+    c.subscribe([topic])
+    try:
+        while True:
+            if not verifyCassandraHeartbeat():
+                db.connect()
+                continue
+            msg = c.poll(0.1)
+            if msg is None:
+                continue
+            elif not msg.error():
+                insertArmor(msg.value())
 
-except KeyboardInterrupt:
-    pass
+                print('Received message: {0}'.format(msg.value()))
+            elif msg.error().code() == KafkaError._PARTITION_EOF:
+                print('End of partition reached {0}/{1}'
+                    .format(msg.topic(), msg.partition()))
+            else:
+                print('Error occurred: {0}'.format(msg.error().str()))
 
-finally:
-    c.close()
+    except KeyboardInterrupt:
+        pass
+
+    finally:
+        c.close()
+
+def verifyCassandraHeartbeat():
+    return db.heartBeat()
+
+def insertArmor(msg):
+    armor = json.loads(msg)
+    print(armor)
+
+
+def main():
+    print('Starting Cassandra Consumer')
+    repl()
+
+
+if __name__ == "__main__":
+    main()

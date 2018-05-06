@@ -2,6 +2,7 @@
 
 # Utility Imports
 import logging
+import datetime
 log = logging.getLogger()
 log.setLevel('DEBUG')
 handler = logging.StreamHandler()
@@ -34,11 +35,24 @@ def connect():
         __createKeyspaceIfNotExists()
         session.set_keyspace(KEYSPACE)
         session.row_factory = dict_factory
+        __createHeartBeatTable()
     except Exception as e:
         log.error('Unable to connect to cassandra')
         log.exception(e)
         return None
-    
+
+def __createHeartBeatTable():
+    session.execute("CREATE TABLE IF NOT EXISTS heart (stamp timestamp, id text, PRIMARY KEY(id))")
+    session.execute("INSERT INTO heart (id, stamp) VALUES ('last', " + datetime.date.today().isoformat() + ")")
+
+def heartBeat():
+    try:
+        session.execute("SELECT * from heart")
+        return True
+    except:
+        return False
+
+
 def __createKeyspaceIfNotExists():
     rows = session.execute("SELECT keyspace_name FROM system_schema.keyspaces")
     if KEYSPACE in [row[0] for row in rows]:
