@@ -7,6 +7,7 @@ import cassandraDriver as db
 
 from confluent_kafka import Consumer, KafkaError
 import json
+import time
 
 topic = "armor-insert"
 settings = {
@@ -32,13 +33,13 @@ def repl():
                 continue
             elif not msg.error():
                 insertArmor(msg.value())
-
                 print('Received message: {0}'.format(msg.value()))
             elif msg.error().code() == KafkaError._PARTITION_EOF:
                 print('End of partition reached {0}/{1}'
                     .format(msg.topic(), msg.partition()))
             else:
                 print('Error occurred: {0}'.format(msg.error().str()))
+            time.sleep(10)
 
     except KeyboardInterrupt:
         pass

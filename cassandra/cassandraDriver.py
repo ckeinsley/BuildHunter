@@ -115,7 +115,9 @@ def insertArmor(armor):
         "(id, part, name, price, rarity, slot, type, gender, fire, dragon, thunder, water, ice, defense_init, defense_max)"+
         "VALUES ({id}, '{part}', '{name}', '{price}', {rarity}, {slot}, '{type}', '{gender}', {fire}, {dragon}, {thunder}, {water}, {ice}, {defense_init}, {defense_max})".format(**armorToInsert)
     )
-    session.execute(armorQuery)
+    result = session.execute(armorQuery)
+
+    print(result)
     
     for skill in skills:
         skillsQuery = SimpleStatement("INSERT INTO " + SKILL_TABLE + 
