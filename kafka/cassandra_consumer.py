@@ -8,6 +8,7 @@ import cassandraDriver as db
 from confluent_kafka import Consumer, KafkaError
 import json
 import time
+from pprint import pprint
 
 topic = "armor-insert"
 settings = {
@@ -29,18 +30,20 @@ def repl():
                 db.connect()
                 continue
             msg = c.poll(0.1)
+            # No message present
             if msg is None:
                 continue
+            # Found a message
             elif not msg.error():
+                # Try to insert
                 result = insertArmor(msg.value())
-                print('Received message: {0}'.format(msg.value()))
                 if result: 
-                    print('Added Successfully')
+                    pprint('Added Successfully ' + msg.value())
                     c.commit()
                 else:
                     c.unsubscribe()
                     c.subscribe([topic])
-                    print('Error Adding')
+                    print('Error Occurred Adding to Cassandra')
             elif msg.error().code() == KafkaError._PARTITION_EOF:
                 print('End of partition reached {0}/{1}'
                     .format(msg.topic(), msg.partition()))
