@@ -12,10 +12,7 @@ def main():
         msg = consumer.poll()
         if not msg:
             continue
-        if msg.error():
-            print("Error occurred" + msg.error())
-        else:
-            print(msg)
+        print(msg)
 
 if __name__ == "__main__":
     main()
