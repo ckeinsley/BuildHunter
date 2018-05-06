@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
 # Utility Imports
-import logging
+import logging as log
 from datetime import datetime
-logging.basicConfig(filename='cassandra_driver.log',level=logging.DEBUG)
-log = logging.getLogger()
+log.basicConfig(filename='cassandra_driver.log',level=logging.DEBUG)
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
 log.addHandler(handler)
