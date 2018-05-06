@@ -46,7 +46,7 @@ def repl():
                     .format(msg.topic(), msg.partition()))
             else:
                 print('Error occurred: {0}'.format(msg.error().str()))
-            time.sleep(10)
+            time.sleep(1)
 
     except KeyboardInterrupt:
         pass
