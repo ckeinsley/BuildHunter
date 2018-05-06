@@ -51,7 +51,7 @@ def verifyCassandraHeartbeat():
 
 def insertArmor(msg):
     armor = json.loads(msg)
-    db.insertArmor(msg)
+    db.insertArmor(armor)
 
 
 def main():
