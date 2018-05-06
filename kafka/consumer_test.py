@@ -1,4 +1,4 @@
-from kafka import KafkaConsumer, KafkaError
+from kafka import KafkaConsumer
 import json
 
 topic = "armor-insert"
@@ -13,8 +13,6 @@ def main():
         if not msg:
             continue
         if msg.error():
-            if msg.error().code() == KafkaError._PARTITION_EOF:
-                print("Reached End of Partition")
             print("Error occurred" + msg.error())
         else:
             print(msg)
