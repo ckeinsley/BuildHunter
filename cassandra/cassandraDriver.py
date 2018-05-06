@@ -44,8 +44,8 @@ def connect():
 
 def __createHeartBeatTable():
     session.execute("CREATE TABLE IF NOT EXISTS heart (stamp timestamp, id text, PRIMARY KEY(id))")
-    session.execute("INSERT INTO heart (id, stamp) VALUES ('last', " + datetime.now() + ")")
-    print("INSERT INTO heart (id, stamp) VALUES ('last', " + datetime.now() + ")")
+    session.execute("INSERT INTO heart (id, stamp) VALUES ('last', " + datetime.isoformat(datetime.now()) + ")")
+    print("INSERT INTO heart (id, stamp) VALUES ('last', " + datetime.isoformat(datetime.now()) + ")")
 
 def heartBeat():
     try:
