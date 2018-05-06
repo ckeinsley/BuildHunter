@@ -16,7 +16,7 @@ settings = {
     'client.id': 'cassandra',
     'enable.auto.commit': False,
     'session.timeout.ms': 6000,
-    'default.topic.config': {'auto.offset.reset': 'smallest'}
+    'default.topic.config': {'auto.offset.reset': 'latest'}
 }
 
 
@@ -32,8 +32,15 @@ def repl():
             if msg is None:
                 continue
             elif not msg.error():
-                insertArmor(msg.value())
+                result = insertArmor(msg.value())
                 print('Received message: {0}'.format(msg.value()))
+                if result: 
+                    print('Added Successfully')
+                    c.commit()
+                else:
+                    c.unsubscribe()
+                    c.subscribe([topic])
+                    print('Error Adding')
             elif msg.error().code() == KafkaError._PARTITION_EOF:
                 print('End of partition reached {0}/{1}'
                     .format(msg.topic(), msg.partition()))
@@ -50,10 +57,14 @@ def repl():
 def verifyCassandraHeartbeat():
     return db.heartBeat()
 
+#Attempt to insert the armor. If no errors occur, we can commit
 def insertArmor(msg):
     armor = json.loads(msg)
-    db.insertArmor(armor)
-
+    try:
+        db.insertArmor(armor)
+        return True
+    except:
+        return False
 
 def main():
     print('Starting Cassandra Consumer')
