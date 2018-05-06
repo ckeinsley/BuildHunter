@@ -13,6 +13,7 @@ log.addHandler(handler)
 from cassandra.cluster import Cluster
 from cassandra.query import SimpleStatement
 from cassandra.query import dict_factory
+import cassandra_weapon_conversion as convert
 
 IP_ADDRESSES = ['137.112.89.78', '137.112.89.77', '137.112.89.76', '137.112.89.75']
 KEYSPACE = 'buildhunter'
@@ -105,10 +106,14 @@ def createArmorTable():
         )  
     """ % SKILL_TABLE)
 
-def insertArmor(armor, skills, crafting):
+def insertArmor(armor):
+    armorToInsert = convert.convertArmor(armor)
+    skills = convert.convertSkills(armor)
+    crafting = convert.convertCrafting(armor)
+    
     armorQuery = SimpleStatement("INSERT INTO " + ARMOR_TABLE + 
         "(id, part, name, price, rarity, slot, type, gender, fire, dragon, thunder, water, ice, defense_init, defense_max)"+
-        "VALUES ({id}, '{part}', '{name}', '{price}', {rarity}, {slot}, '{type}', '{gender}', {fire}, {dragon}, {thunder}, {water}, {ice}, {defense_init}, {defense_max})".format_map(armor)
+        "VALUES ({id}, '{part}', '{name}', '{price}', {rarity}, {slot}, '{type}', '{gender}', {fire}, {dragon}, {thunder}, {water}, {ice}, {defense_init}, {defense_max})".format_map(armorToInsert)
     )
     session.execute(armorQuery)
     
