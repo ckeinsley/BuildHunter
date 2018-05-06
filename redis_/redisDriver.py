@@ -2,12 +2,24 @@ import redis
 
 class RedisDriver:
 
-    _r = redis.StrictRedis(host='433-05.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
+    _r = None
+    #_r = redis.StrictRedis(host='433-05.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
     #_r = redis.StrictRedis()
 
     def __init__(self):
         self._active_user = None
         self._active_build = None
+
+    def connect(self):
+        self._r = redis.StrictRedis(host='433-05.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
+
+    def check_alive(self):
+        try:
+            response = self._r.ping()
+            return response
+        except Exception as ex:
+            print(str(ex))
+            return False
 
     ####----active_user and active_build properties----####
 
@@ -157,6 +169,8 @@ class RedisDriver:
     
     def is_object(self, id, type_):
         return self._r.hget(type_+ '_ids', id) is not None
+
+    
     
 
 
