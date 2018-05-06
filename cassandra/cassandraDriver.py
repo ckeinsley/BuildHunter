@@ -2,7 +2,7 @@
 
 # Utility Imports
 import logging
-import datetime import datetime
+from datetime import datetime
 log = logging.getLogger()
 log.setLevel('DEBUG')
 handler = logging.StreamHandler()
