@@ -6,6 +6,9 @@ from redisDriver import RedisDriver
 
 class CliState:
 
+    BUILD_PARTS = {'head', 'chest', 'arms', 'waist', 'legs', 'weapon'}
+    ITEM_TYPES = {'armor', 'weapon', 'skill', 'item', 'decoration'}
+
     def __init__(self):
         self._db = RedisDriver()
         self._active_user = None
