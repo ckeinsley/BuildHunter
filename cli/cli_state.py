@@ -1,8 +1,10 @@
 import sys
 
 sys.path.insert(0,'../redis_')
+sys.path.insert(0,'../kafka_')
 
 from redis_ import redisDriver
+from kafka_.producert_test import add_build as prod_add_build
 
 class CliState:
 
@@ -72,8 +74,9 @@ class CliState:
     
     def add_build(self, build):
         build_id = self.active_user + ':' + build
+        prod_add_build(self.active_user, build_id)
         #Add build to user builds
-        self._db.add_build(self.active_user, build_id)
+        #self._db.add_build(self.active_user, build_id)
     
     def delete_build(self, build):
         build_id = self.active_user + ':' + build

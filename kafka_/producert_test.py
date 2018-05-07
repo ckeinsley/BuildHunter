@@ -12,5 +12,11 @@ def main():
     producer.send('armor-insert', json.dumps(armorToInsert))
     producer.close()
 
+def add_build(user, build_id):
+    producer = KafkaProducer(bootstrap_servers='localhost:9092')
+    add_build_msg = {'user' : user, 'build_id' : build_id}
+    producer.send('add-build', json.dumps(add_build_msg))
+    producer.close()
+
 if __name__ == "__main__":
     main()

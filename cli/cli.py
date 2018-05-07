@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, '../cli_')
+sys.path.insert(0, '../cli')
 from click_shell import shell 
 import click as c
 from cli import cli_state
