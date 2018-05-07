@@ -1,4 +1,4 @@
-from cli import cli
+from cli_ import cli
 
 def main():
     cli.cli()
