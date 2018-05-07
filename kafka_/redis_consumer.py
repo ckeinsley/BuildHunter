@@ -10,7 +10,7 @@ from pprint import pprint
 
 from redis_ import redisDriver
 
-topics = ["build-insert"]
+topics = ["add-build"]
 settings = {
     'bootstrap.servers': 'localhost:9092',
     'group.id': 'buildHunter',
