@@ -56,7 +56,7 @@ class CliState:
         if self._db.is_user(user):
             raise ValueError('User ' + user +  ' already exists')
         else:
-            self._db.add(user)
+            self._db.add_user(user)
             if setActive:
                 self.active_user = user
 
