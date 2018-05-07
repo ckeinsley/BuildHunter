@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 
-sys.path.insert(0,'../redis')
+sys.path.insert(0,'../redis_')
 
 from confluent_kafka import Consumer, KafkaError
 import json
