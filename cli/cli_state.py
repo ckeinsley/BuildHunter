@@ -101,7 +101,7 @@ class CliState:
         return self._db.get_build_parts(self.get_build_id())
 
     def is_part(self, id, part):
-        return self._db.is_part(id, partt)
+        return self._db.is_part(id, part)
 
     ####----Decorations----####
 
@@ -116,6 +116,9 @@ class CliState:
 
     def remove_all_decorations(self, part):
         self._db.remove_all_decorations(self.get_build_id, part)
+
+    def is_decoration(self, id):
+        return self._db.is_decoration(id)
 
     ####----Items----####
 
@@ -138,3 +141,6 @@ class CliState:
         if result is None:
             raise ValueError(name + ' is not a valid ' + type_ + ' name.')
         return result
+    
+    def is_object(self, id, type_):
+        return self._db.is_object(id, type_)
