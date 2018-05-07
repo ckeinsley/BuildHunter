@@ -2,12 +2,12 @@ import sys
 
 sys.path.insert(0,'../redis_')
 
-from redisDriver import RedisDriver
+from redis_ import redisDriver
 
 class CliState:
 
     def __init__(self):
-        self._db = RedisDriver()
+        self._db = redisDriver.RedisDriver()
         self._active_user = None
         self._active_build = None
 

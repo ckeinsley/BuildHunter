@@ -5,6 +5,9 @@ class RedisDriver:
     _r = redis.StrictRedis(host='433-05.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
     #_r = redis.StrictRedis()
 
+    def __init__(self):
+        pass
+
     def ping(self):
         try:
             response = self._r.ping()

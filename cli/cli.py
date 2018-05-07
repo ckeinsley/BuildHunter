@@ -1,10 +1,10 @@
 import sys
-sys.path.insert(0, '../redis_')
+sys.path.insert(0, '../cli_')
 from click_shell import shell 
 import click as c
-from cli_state import CliState
+from cli import cli_state
 
-r = CliState()
+r = cli_state.CliState()
 
 @shell(prompt= 'BuildHunter> ', intro='Welcome to BuildHunter!')
 def cli():
