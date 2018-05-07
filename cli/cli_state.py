@@ -125,19 +125,19 @@ class CliState:
     ITEM_TYPES = {'armor', 'weapon', 'skill', 'item', 'decoration'}
 
     def get_object_name(self, id, type_):
-        result = self._db.get_object_name(type_, id)
+        result = self._db.get_object_name(id, type_)
         if result is None:
             raise ValueError(id + ' is not a valid ' + type_ + ' ID.')
         return result
     
     def search_object_name(self, name, type_):
-        return self._db.search_object_name(type_ , name)
+        return self._db.search_object_name(name, type_)
         
     def get_object_type(self, id):
         return self._db.get_object_type(id)
     
     def get_object_id(self, name, type_):
-        result = self._db.get_object_id(type_, name)
+        result = self._db.get_object_id(name, type_)
         if result is None:
             raise ValueError(name + ' is not a valid ' + type_ + ' name.')
         return result
