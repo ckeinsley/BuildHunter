@@ -128,7 +128,6 @@ def generate_armor_sets(skill):
     print(skill_list) #TODO: Lookup armor set in Neo4J
 
 def main():
-    print('Welcome to BuildHunter')
     cli()
 
 if __name__ == "__main__":
