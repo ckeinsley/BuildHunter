@@ -1,8 +1,10 @@
+import sys
+sys.path.insert(0, '../redis_')
 from click_shell import shell 
 import click as c
-from redis_ import redisDriver
+from cli_state import CliState
 
-r = redisDriver.RedisDriver()
+r = CliState()
 
 @shell(prompt= 'BuildHunter> ', intro='Welcome to BuildHunter!')
 def cli():
