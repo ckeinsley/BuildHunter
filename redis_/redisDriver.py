@@ -94,7 +94,7 @@ class RedisDriver:
         return self._r.hget(type_+ '_ids', id)
     
     def search_object_name(self, name, type_):
-        return self._r.hscan_iter(type_ + '_names', '*' + name + '*')
+        return self._r.hscan_iter(type_ + '_names', '.*' + name + '.*')
         
     def get_object_type(self, id):
         for type_ in self.ITEM_TYPES:
