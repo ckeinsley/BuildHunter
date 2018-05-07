@@ -8,7 +8,7 @@ import json
 import time
 from pprint import pprint
 
-from redisDriver import RedisDriver
+from redis_ import redisDriver
 
 topics = ["build-insert"]
 settings = {
@@ -68,7 +68,7 @@ def insert_build(msg):
 def main():
     print('Starting Redis Consumer')
     global red
-    red = RedisDriver()
+    red = redisDriver.RedisDriver()
     repl()
 
 
