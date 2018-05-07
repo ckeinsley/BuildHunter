@@ -2,7 +2,7 @@ import sys
 
 sys.path.insert(0,'../redis_')
 
-from redisDriver import RedisDriver()
+from redisDriver import RedisDriver
 
 class CliState:
 
