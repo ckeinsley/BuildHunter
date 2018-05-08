@@ -116,6 +116,6 @@ class RedisDriver:
     # TODO May need to import crafting recipes and stuff as weill into this, we'll see
     def add_armor_data(self, armor):
         if self.is_object(int(armor.get('id')), 'armor'):
-            self._r.hset('armor:' + id, 'part', armor.get('Part'))
-            self._r.hset('armor:' + id, 'type', armor.get('Type'))
-            self._r.hset('armor:' + id, 'slot', armor.get('Slot'))
+            self._r.hset('armor:' + armor.get('id'), 'part', armor.get('Part'))
+            self._r.hset('armor:' + armor.get('id'), 'type', armor.get('Type'))
+            self._r.hset('armor:' + armor.get('id'), 'slot', armor.get('Slot'))
