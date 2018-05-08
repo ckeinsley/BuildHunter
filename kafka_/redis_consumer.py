@@ -35,7 +35,7 @@ def repl():
             # Found message
             elif not msg.error():
                 # Try to handle
-                print('Msg.topic',msg.topic)
+                print('Msg.topic',msg.topic())
                 if msg.topic() == 'add-build':
                     result = add_build(msg.value())
                 elif msg.topic() == 'armor-insert':
