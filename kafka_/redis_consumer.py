@@ -35,8 +35,6 @@ def repl():
             # Found message
             elif not msg.error():
                 # Try to handle
-                print(msg.topic() == u'armor-insert')
-                print(msg.topic())
                 if msg.topic() == u'add-build':
                     result = add_build(msg.value())
                 elif msg.topic() == u'armor-insert':
@@ -74,7 +72,8 @@ def insert_armor(msg):
     try:
         red.add_armor_data(armor)
         return True
-    except:
+    except Exception as e:
+        print(e)
         return False
 
 
