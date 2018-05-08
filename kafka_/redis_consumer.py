@@ -35,10 +35,9 @@ def repl():
             # Found message
             elif not msg.error():
                 # Try to handle
-                print('Msg.topic', msg.topic().encode("utf-8"))
-                if msg.topic().encode("utf-8") == u'add-build':
+                if msg.topic().encode("utf-8") == 'add-build':
                     result = add_build(msg.value())
-                elif msg.topic().encode("utf-8") == u'armor-insert':
+                elif msg.topic().encode("utf-8") == 'armor-insert':
                     result = insert_armor(msg.value())
                 if result:
                     pprint('Added Successfully ' + msg.value())
