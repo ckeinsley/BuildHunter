@@ -6,6 +6,23 @@ sys.path.insert(0,'../kafka_')
 from redis_ import redisDriver
 from kafka_.producert_test import add_build as prod_add_build
 
+'''
+build : {
+    'head' : id, 
+    'chest' : id,
+    'arms' : id, 
+    'waist' : id, 
+    'legs' : id, 
+    'weapon' : id,
+    'head_decorations' : id, 
+    'chest_decorations' : id,
+    'arms_decorations' : id,
+    'waist_decorations' : id,
+    'legs_decorations' : id, 
+    'weapon_decorations' : id,
+}
+'''
+
 class CliState:
 
     def __init__(self):

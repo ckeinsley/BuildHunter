@@ -10,7 +10,7 @@ from pprint import pprint
 
 from redis_ import redisDriver
 
-topics = ["add-build"]
+topics = ["add-build", "armor-insert"]
 settings = {
     'bootstrap.servers': 'localhost:9092',
     'group.id': 'buildHunter',
@@ -35,7 +35,10 @@ def repl():
             # Found message
             elif not msg.error():
                 # Try to handle
-                result = insert_build(msg.value())
+                if msg.topic() == 'add-build':
+                    result = add_build(msg.value())
+                elif msg.topic() == 'armor-insert':
+                    result = insert_armor(msg.value())
                 if result:
                     pprint('Added Successfully ' + msg.value())
                     c.commit()
@@ -56,13 +59,22 @@ def repl():
         c.close()
         
                            
-def insert_build(msg):
+def add_build(msg):
     args = json.loads(msg)
     try:
         red.add_build(args['user'], args['build_id'])
         return True
     except:
         return False
+
+def insert_armor(msg):
+    armor = json.loads(msg)
+    try:
+        red.add_armor_data(armor)
+        return True
+    except:
+        return False
+
 
 
 def main():

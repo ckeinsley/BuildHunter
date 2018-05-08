@@ -111,9 +111,11 @@ class RedisDriver:
     def is_object(self, id, type_):
         return self._r.hget(type_+ '_ids', id) is not None
 
-    
-    
+    ####----Armor----####
 
-
-
-
+    # TODO May need to import crafting recipes and stuff as weill into this, we'll see
+    def add_armor_data(self, armor):
+        if self.is_object(int(armor.get('id')), 'armor'):
+            self._r.hset('armor:' + id, 'part', armor.get('Part'))
+            self._r.hset('armor:' + id, 'type', armor.get('Type'))
+            self._r.hset('armor:' + id, 'slot', armor.get('Slot'))
