@@ -64,7 +64,7 @@ def add_build(msg):
     try:
         red.add_build(args['user'], args['build_id'])
         return True
-    except:
+    except Exception as e:
         return False
 
 def insert_armor(msg):
@@ -73,7 +73,6 @@ def insert_armor(msg):
         red.add_armor_data(armor)
         return True
     except Exception as e:
-        print(e)
         return False
 
 
