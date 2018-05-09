@@ -40,14 +40,19 @@ def import_decoration_info():
         for skill in dec.get('Skills'):
             _r.sadd('decoration:' + id + ':skills', 'decoration:' + id + ':skills:' + str(m))
             _r.hset('decoration:' + id + ':skills:' + str(m), 'id', skill.get('id'))
+            _r.hset('decoration:' + id + ':skills:' + str(m), 'name', skill.get('Name'))
             _r.hset('decoration:' + id + ':skills:' + str(m), 'value', skill.get('Value'))
             m += 1
         n = 0
-        for item in dec.get('Items'):
-            _r.sadd('decoration:' + id + ':items', 'decoration:' + id + ':items:' + str(n))
-            _r.hset('decoration:' + id + ':items:' + str(n), 'id', item.get('id'))
-            _r.hset('decoration:' + id + ':items:' + str(n), 'name', item.get('Name')
-            _r.hset('decoration:' + id + ':items:' + str(n), 'quantity', item.get('Quantity'))
+        for recipe in dec.get('Recipes'):
+            p = 0
+            for item in recipe:
+                _r.sadd('decoration:' + id + ':items', 'decoration:' + id + ':items:' + str(n))
+                _r.hset('decoration:' + id + ':items:' + str(n), 'id', item.get('id'))
+                _r.hset('decoration:' + id + ':items:' + str(n), 'name', item.get('Name'))
+                _r.hset('decoration:' + id + ':items:' + str(n), 'quantity', item.get('Quantity'))
+                p += 1
+            n += 1
     print('Import Complete')
 
 def import_item_info():
