@@ -34,23 +34,20 @@ def import_decoration_info():
         _r.hset('decoration:' + id, 'carry', dec.get('Carry'))
         _r.hset('decoration:' + id, 'buy', dec.get('Buy'))
         _r.hset('decoration:' + id, 'sell', dec.get('Sell'))
-        k = 0
-        for var in dec.get('Variations'):
-            _r.rpush('decoration:' + id + ':variances', 'decoration:' + id + ':variances:' + str(k))
-            _r.hset('decoration:' + id + ':variances:' + str(k), 'craft_price', var.get('Craft_Price'))
-            _r.hset('decoration:' + id + ':variances:' + str(k), 'slot', var.get('Slot'))
-            m = 0
-            for skill in var.get('Skills'):
-                _r.rpush('decoration:' + id + ':variances:' + str(k) + ':skills', 'decoration:' + id + ':variances:skills:' + str(m))
-                _r.hset('decoration:' + id + ':variances:' + str(k) + ':skills:' + str(m), 'id', skill.get('id'))
-                _r.hset('decoration:' + id + ':variances:' + str(k) + ':skills:' + str(m), 'value', skill.get('Value'))
-                m += 1
-            n = 0
-            for item in var.get('Items'):
-                _r.rpush('decoration:' + id + ':variances:' + str(k) + ':items', 'decoration:' + id + ':variances:items:' + str(n))
-                _r.hset('decoration:' + id + ':variances:' + str(k) + ':items:' + str(n), 'id', item.get('id'))
-                _r.hset('decoration:' + id + ':variances:' + str(k) + ':items:' + str(n), 'quantity', item.get('Quantity'))
-            k += 1
+        _r.hset('decoration:' + id, 'slot', dec.get('Slots'))
+        _r.hset('decoration:' + id, 'craft_price', dec.get('Craft_Price'))
+        m = 0
+        for skill in dec.get('Skills'):
+            _r.sadd('decoration:' + id + ':skills', 'decoration:' + id + ':skills:' + str(m))
+            _r.hset('decoration:' + id + ':skills:' + str(m), 'id', skill.get('id'))
+            _r.hset('decoration:' + id + ':skills:' + str(m), 'value', skill.get('Value'))
+            m += 1
+        n = 0
+        for item in dec.get('Items'):
+            _r.sadd('decoration:' + id + ':items', 'decoration:' + id + ':items:' + str(n))
+            _r.hset('decoration:' + id + ':items:' + str(n), 'id', item.get('id'))
+            _r.hset('decoration:' + id + ':items:' + str(n), 'name', item.get('Name')
+            _r.hset('decoration:' + id + ':items:' + str(n), 'quantity', item.get('Quantity'))
     print('Import Complete')
 
 def import_item_info():

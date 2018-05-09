@@ -150,7 +150,7 @@ class RedisDriver:
             print('No item matching id: %s' % str(item.get('id')))
 
     def get_item_data(self, id):
-        if True: # self.is_object(id, 'item'):
+        if self.is_object(id, 'item'):
             item_dict = {}
             item_dict['name'] = self._r.hget('item:' + str(id), 'name')
             item_dict['rarity'] = self._r.hget('item:' + str(id), 'rarity')
@@ -181,3 +181,8 @@ class RedisDriver:
         else:
             print('No item matching id: %s' % str(id))
             return {}
+
+    ####----Decorations----####
+    
+
+    
