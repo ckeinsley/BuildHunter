@@ -57,20 +57,21 @@ def import_item_info():
     item_list = read_items_file()
     for item in item_list:
         id = str(item.get('id'))
+        _r.hset('item:' + id, 'name', item.get('Name'))
         _r.hset('item:' + id, 'rarity', item.get('Rarity'))
         _r.hset('item:' + id, 'carry', item.get('Carry'))
         _r.hset('item:' + id, 'buy', item.get('Buy'))
         _r.hset('item:' + id, 'sell', item.get('Sell'))
         k = 0
         for combo in item.get('Combo_List'):
-            _r.rpush('item:' + id + ':combo_list', 'item:' + id + ':combo_list:' + str(k))
+            _r.sadd('item:' + id + ':combo_list', 'item:' + id + ':combo_list:' + str(k))
             _r.hset('item:' + id + ':combo_list:' + str(k), 'id_1', combo.get('id_1'))
             _r.hset('item:' + id + ':combo_list:' + str(k), 'name_1', combo.get('Name_1'))
             _r.hset('item:' + id + ':combo_list:' + str(k), 'id_2', combo.get('id_2'))
             _r.hset('item:' + id + ':combo_list:' + str(k), 'name_2', combo.get('Name_2'))
         m = 0
         for loc in item.get('Gather_Locations'):
-            _r.rpush('item:' + id + ':gather_locations', 'item:' + id + ':gather_locations:' + str(m))
+            _r.sadd('item:' + id + ':gather_locations', 'item:' + id + ':gather_locations:' + str(m))
             _r.hset('item:' + id + ':gather_locations:' + str(m), 'rank', loc.get('Rank'))
             _r.hset('item:' + id + ':gather_locations:' + str(m), 'map', loc.get('Map'))
             _r.hset('item:' + id + ':gather_locations:' + str(m), 'area', loc.get('Area'))
