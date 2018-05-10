@@ -164,3 +164,7 @@ class CliState:
     
     def is_object(self, id, type_):
         return self._db.is_object(id, type_)
+
+    def get_item_info(self, id):
+        return self._db.get_item_data(id)
+        

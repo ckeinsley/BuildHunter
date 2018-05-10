@@ -152,30 +152,30 @@ class RedisDriver:
     def get_item_data(self, id):
         if self.is_object(id, 'item'):
             item_dict = {}
-            item_dict['name'] = self._r.hget('item:' + str(id), 'name')
-            item_dict['rarity'] = self._r.hget('item:' + str(id), 'rarity')
-            item_dict['carry'] = self._r.hget('item:' + str(id), 'carry')
-            item_dict['buy'] = self._r.hget('item:' + str(id), 'buy')
-            item_dict['sell'] = self._r.hget('item:' + str(id), 'sell')
+            item_dict['name'] = self._r.hget('item:' + str(id), 'name').decode('utf-8')
+            item_dict['rarity'] = self._r.hget('item:' + str(id), 'rarity').decode('utf-8')
+            item_dict['carry'] = self._r.hget('item:' + str(id), 'carry').decode('utf-8')
+            item_dict['buy'] = self._r.hget('item:' + str(id), 'buy').decode('utf-8')
+            item_dict['sell'] = self._r.hget('item:' + str(id), 'sell').decode('utf-8')
             item_dict['combo_list'] = []
             item_dict['gather_locations'] = []
             combo_ids = self._r.smembers('item:' + str(id) + ':combo_list')
             for cid in combo_ids:
                 temp_combo = {}
-                temp_combo['id_1'] = self._r.hget(cid, 'id_1')
-                temp_combo['name_1'] = self._r.hget(cid, 'name_1')
-                temp_combo['id_2'] = self._r.hget(cid, 'id_2')
-                temp_combo['name_2'] = self._r.hget(cid, 'name_2')
+                temp_combo['id_1'] = self._r.hget(cid, 'id_1').decode('utf-8')
+                temp_combo['name_1'] = self._r.hget(cid, 'name_1').decode('utf-8')
+                temp_combo['id_2'] = self._r.hget(cid, 'id_2').decode('utf-8')
+                temp_combo['name_2'] = self._r.hget(cid, 'name_2').decode('utf-8')
                 item_dict['combo_list'].append(temp_combo)
             gather_loc_ids = self._r.smembers('item:' + str(id) + ':gather_locations')
             for locs in gather_loc_ids:
                 temp_loc = {}
-                temp_loc['rank'] = self._r.hget(locs, 'rank')
-                temp_loc['map'] = self._r.hget(locs, 'map')
-                temp_loc['area'] = self._r.hget(locs, 'area')
-                temp_loc['gather_method'] = self._r.hget(locs, 'gather_method')
-                temp_loc['quantity'] = self._r.hget(locs, 'quantity')
-                temp_loc['drop_rate'] = self._r.hget(locs, 'drop_rate')
+                temp_loc['rank'] = self._r.hget(locs, 'rank').decode('utf-8')
+                temp_loc['map'] = self._r.hget(locs, 'map').decode('utf-8')
+                temp_loc['area'] = self._r.hget(locs, 'area').decode('utf-8')
+                temp_loc['gather_method'] = self._r.hget(locs, 'gather_method').decode('utf-8')
+                temp_loc['quantity'] = self._r.hget(locs, 'quantity').decode('utf-8')
+                temp_loc['drop_rate'] = self._r.hget(locs, 'drop_rate').decode('utf-8')
                 item_dict['gather_locations'].append(temp_loc)
             return item_dict
         else:

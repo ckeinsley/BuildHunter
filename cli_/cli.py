@@ -4,6 +4,8 @@ from click_shell import shell
 import click as c
 from cli_ import cli_state
 
+from pprint import pprint
+
 r = cli_state.CliState()
 
 @shell(prompt= 'BuildHunter> ', intro='Welcome to BuildHunter!')
@@ -112,7 +114,12 @@ def search_object_name(name, type_):
             print(obj[1].decode() + ': ' + obj[0].decode('utf-8'))
 
 
+####----Items----####
 
+@c.option('--id', '-i', prompt=True, type=int)
+@cli.command('item-info')
+def get_item_info(id):
+    pprint(r.get_item_info(id))
 
 
 ####----Advanced Features----####

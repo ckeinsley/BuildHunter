@@ -2,18 +2,28 @@ import redis
 import pickle
 import sys
 
-sys.path.insert(0, '../BuildHunter')
-sys.path.insert(0, '../WebScrapper')
+sys.path.insert(0, '../BuildHunter/')
+sys.path.insert(0, '../WebScrapper/')
 
-from WebScrapper.obj_loader import read_armor_files
-from WebScrapper.obj_loader import read_decoration_file
-from WebScrapper.obj_loader import read_items_file
+from obj_loader import read_armor_files
+from obj_loader import read_decoration_file
+from obj_loader import read_items_file
+from obj_loader import read_name_id_mapping
 
 _r = redis.StrictRedis(host='433-05.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
 
 def import_data(filename):
     file = open(filename, 'rb')
     data = pickle.load(file, encoding='unicode')
+    types = ['armor', 'weapon', 'skill', 'item', 'decoration']
+    for key, value in data.items():
+        for type_ in types:
+            if key.startswith(type_.upper()):
+                _r.hset(type_+'_ids', value, key.partition(':')[2])
+                _r.hset(type_+'_names', key.partition(':')[2], value)
+
+def import_data_without_filename():
+    data = read_name_id_mapping()
     types = ['armor', 'weapon', 'skill', 'item', 'decoration']
     for key, value in data.items():
         for type_ in types:
@@ -83,5 +93,7 @@ def import_item_info():
             _r.hset('item:' + id + ':gather_locations:' + str(m), 'quantity', loc.get('Quantity'))
             _r.hset('item:' + id + ':gather_locations:' + str(m), 'drop_rate', loc.get('Drop_Rate'))
 
+import_data_without_filename()
+import_armor_types()
 import_decoration_info()
 import_item_info()
