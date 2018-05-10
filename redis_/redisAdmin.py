@@ -41,6 +41,7 @@ def import_decoration_info():
     decoration_list = read_decoration_file()
     for dec in decoration_list:
         id = str(dec.get('id'))
+        _r.hset('decoration:' + id, 'name', dec.get('Name'))
         _r.hset('decoration:' + id, 'rarity', dec.get('Rarity'))
         _r.hset('decoration:' + id, 'carry', dec.get('Carry'))
         _r.hset('decoration:' + id, 'buy', dec.get('Buy'))
