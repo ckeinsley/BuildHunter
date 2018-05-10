@@ -2,11 +2,12 @@ import redis
 import pickle
 import sys
 
+sys.path.insert(0, '../BuildHunter')
 sys.path.insert(0, '../WebScrapper')
 
-from obj_loader import read_armor_files
-from obj_loader import read_decoration_file
-from obj_loader import read_items_file
+from WebScrapper.obj_loader import read_armor_files
+from WebScrapper.obj_loader import read_decoration_file
+from WebScrapper.obj_loader import read_items_file
 
 _r = redis.StrictRedis(host='433-05.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
 
@@ -45,12 +46,13 @@ def import_decoration_info():
             m += 1
         n = 0
         for recipe in dec.get('Recipes'):
+            _r.sadd('decoration:' + id + ':recipes', 'decoration:' + id + ':recipe:' + str(n))
             p = 0
             for item in recipe:
-                _r.sadd('decoration:' + id + ':items', 'decoration:' + id + ':items:' + str(n))
-                _r.hset('decoration:' + id + ':items:' + str(n), 'id', item.get('id'))
-                _r.hset('decoration:' + id + ':items:' + str(n), 'name', item.get('Name'))
-                _r.hset('decoration:' + id + ':items:' + str(n), 'quantity', item.get('Quantity'))
+                _r.sadd('decoration:' + id + ':recipe:' + str(n), 'decoration:' + id + ':recipe:' + str(n) + ':item:' + str(p))
+                _r.hset('decoration:' + id + ':recipe:' + str(n) + ':item:' + str(p), 'id', item.get('id'))
+                _r.hset('decoration:' + id + ':recipe:' + str(n) + ':item:' + str(p), 'name', item.get('Name'))
+                _r.hset('decoration:' + id + ':recipe:' + str(n) + ':item:' + str(p), 'quantity', item.get('Quantity'))
                 p += 1
             n += 1
     print('Import Complete')
@@ -80,3 +82,6 @@ def import_item_info():
             _r.hset('item:' + id + ':gather_locations:' + str(m), 'gather_method', loc.get('Gather_Method'))
             _r.hset('item:' + id + ':gather_locations:' + str(m), 'quantity', loc.get('Quantity'))
             _r.hset('item:' + id + ':gather_locations:' + str(m), 'drop_rate', loc.get('Drop_Rate'))
+
+import_decoration_info()
+import_item_info()
