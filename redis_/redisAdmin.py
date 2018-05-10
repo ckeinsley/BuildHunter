@@ -34,43 +34,46 @@ def import_decoration_info():
         _r.hset('decoration:' + id, 'carry', dec.get('Carry'))
         _r.hset('decoration:' + id, 'buy', dec.get('Buy'))
         _r.hset('decoration:' + id, 'sell', dec.get('Sell'))
-        k = 0
-        for var in dec.get('Variations'):
-            _r.rpush('decoration:' + id + ':variances', 'decoration:' + id + ':variances:' + str(k))
-            _r.hset('decoration:' + id + ':variances:' + str(k), 'craft_price', var.get('Craft_Price'))
-            _r.hset('decoration:' + id + ':variances:' + str(k), 'slot', var.get('Slot'))
-            m = 0
-            for skill in var.get('Skills'):
-                _r.rpush('decoration:' + id + ':variances:' + str(k) + ':skills', 'decoration:' + id + ':variances:skills:' + str(m))
-                _r.hset('decoration:' + id + ':variances:' + str(k) + ':skills:' + str(m), 'id', skill.get('id'))
-                _r.hset('decoration:' + id + ':variances:' + str(k) + ':skills:' + str(m), 'value', skill.get('Value'))
-                m += 1
-            n = 0
-            for item in var.get('Items'):
-                _r.rpush('decoration:' + id + ':variances:' + str(k) + ':items', 'decoration:' + id + ':variances:items:' + str(n))
-                _r.hset('decoration:' + id + ':variances:' + str(k) + ':items:' + str(n), 'id', item.get('id'))
-                _r.hset('decoration:' + id + ':variances:' + str(k) + ':items:' + str(n), 'quantity', item.get('Quantity'))
-            k += 1
+        _r.hset('decoration:' + id, 'slot', dec.get('Slots'))
+        _r.hset('decoration:' + id, 'craft_price', dec.get('Craft_Price'))
+        m = 0
+        for skill in dec.get('Skills'):
+            _r.sadd('decoration:' + id + ':skills', 'decoration:' + id + ':skills:' + str(m))
+            _r.hset('decoration:' + id + ':skills:' + str(m), 'id', skill.get('id'))
+            _r.hset('decoration:' + id + ':skills:' + str(m), 'name', skill.get('Name'))
+            _r.hset('decoration:' + id + ':skills:' + str(m), 'value', skill.get('Value'))
+            m += 1
+        n = 0
+        for recipe in dec.get('Recipes'):
+            p = 0
+            for item in recipe:
+                _r.sadd('decoration:' + id + ':items', 'decoration:' + id + ':items:' + str(n))
+                _r.hset('decoration:' + id + ':items:' + str(n), 'id', item.get('id'))
+                _r.hset('decoration:' + id + ':items:' + str(n), 'name', item.get('Name'))
+                _r.hset('decoration:' + id + ':items:' + str(n), 'quantity', item.get('Quantity'))
+                p += 1
+            n += 1
     print('Import Complete')
 
 def import_item_info():
     item_list = read_items_file()
     for item in item_list:
         id = str(item.get('id'))
+        _r.hset('item:' + id, 'name', item.get('Name'))
         _r.hset('item:' + id, 'rarity', item.get('Rarity'))
         _r.hset('item:' + id, 'carry', item.get('Carry'))
         _r.hset('item:' + id, 'buy', item.get('Buy'))
         _r.hset('item:' + id, 'sell', item.get('Sell'))
         k = 0
         for combo in item.get('Combo_List'):
-            _r.rpush('item:' + id + ':combo_list', 'item:' + id + ':combo_list:' + str(k))
+            _r.sadd('item:' + id + ':combo_list', 'item:' + id + ':combo_list:' + str(k))
             _r.hset('item:' + id + ':combo_list:' + str(k), 'id_1', combo.get('id_1'))
             _r.hset('item:' + id + ':combo_list:' + str(k), 'name_1', combo.get('Name_1'))
             _r.hset('item:' + id + ':combo_list:' + str(k), 'id_2', combo.get('id_2'))
             _r.hset('item:' + id + ':combo_list:' + str(k), 'name_2', combo.get('Name_2'))
         m = 0
         for loc in item.get('Gather_Locations'):
-            _r.rpush('item:' + id + ':gather_locations', 'item:' + id + ':gather_locations:' + str(m))
+            _r.sadd('item:' + id + ':gather_locations', 'item:' + id + ':gather_locations:' + str(m))
             _r.hset('item:' + id + ':gather_locations:' + str(m), 'rank', loc.get('Rank'))
             _r.hset('item:' + id + ':gather_locations:' + str(m), 'map', loc.get('Map'))
             _r.hset('item:' + id + ':gather_locations:' + str(m), 'area', loc.get('Area'))

@@ -157,7 +157,7 @@ Armor_Item:
         ]
     }
 
-Decoration :
+Decoration_Old :
     {
         'id' : '19323214',
         'Name' : 'Leader Jewel 1',
@@ -198,6 +198,35 @@ Decoration :
                     'Quantity' : ''
                 }]
             }
+        ]
+    }
+
+Decoration_New :
+    {
+        'id' : '19323214',
+        'Name' : 'Leader Jewel 1',
+        'Description' : '',
+        'Rarity' : '',
+        'Carry' : '',
+        'Buy' : '',
+        'Sell' : '',
+        'Craft_Price' : '',
+        'Slot' : '',
+        'Skills' : [
+            {
+                'id' : '',
+                'Name' : '',
+                'Value' : ''
+            }
+        ],
+        'Recipes' : [
+            [
+                {
+                    'id' : '',
+                    'Name' : '',
+                    'Quantity' : ''
+                }
+            ]
         ]
     }
 
@@ -968,7 +997,7 @@ def process_decoration_data(url, driver, name_id_map):
     soup = BeautifulSoup(data, 'lxml')
 
     name = soup.find('h1').string
-    uid = name_id_map.get('ITEM:' + name)
+    uid = name_id_map.get('DECORATION:' + name)
     description = soup.find('h1').next_sibling.next_sibling.string
     rarity = soup.find('td', string='Rarity').next_sibling.next_sibling.string
     carry = soup.find('td', string='Carry').next_sibling.next_sibling.string
@@ -1012,15 +1041,27 @@ def process_decoration_data(url, driver, name_id_map):
             'Skills' : skills,
             'Items' : items
         })
+
+    slots = variations[0].get('Slot')
+    craft_price = variations[0].get('Price')
+    skills = variations[0].get('Skills')
+
+    recipes = list(map(lambda x: x.get('Items'), variations))
+    
     decoration = {
         'id' : uid,
         'Name' : name,
+        'Description' : description,
         'Rarity' : rarity,
         'Carry' : carry,
         'Sell' : sell,
         'Buy' : buy,
-        'Variations' : variations
+        'Slots' : slots,
+        'Craft_Price' : craft_price,
+        'Skills' : skills,
+        'Recipes' : recipes
     }
+
     return decoration
 
 
@@ -1054,3 +1095,5 @@ def populate_decorations_list():
     id_file.write(bson.dumps(id_dict))
     id_file.close()
     print('Finished populationg decorations')
+
+populate_decorations_list()

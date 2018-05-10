@@ -71,3 +71,5 @@ def read_decoration_file():
         decorations_list.append(bson.loads(dec_file.read()))
         dec_file.close()
     return decorations_list
+
+print(read_decoration_file())

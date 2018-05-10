@@ -6,107 +6,66 @@ class RedisDriver:
     #_r = redis.StrictRedis()
 
     def __init__(self):
-        self._active_user = None
-        self._active_build = None
+        pass
+
+    def ping(self):
+        try:
+            response = self._r.ping()
+            return response
+        except Exception as ex:
+            print(str(ex))
+            return False
 
     ####----active_user and active_build properties----####
 
-    @property
-    def active_user(self):
-        if self._active_user is None:
-            raise ValueError('No active user set.')
-        return self._active_user
-
-    @active_user.setter
-    def active_user(self, user):
-        if self._r.sismember('users', user):
-            self._active_user = user
-        else:
-            raise ValueError(user + ' is not a registered user.')
-
-    @active_user.deleter
-    def active_user(self):
-        self._active_user = None
-        self._active_build = None
-
-    @property
-    def active_build(self):
-        if self._active_build is None:
-            raise ValueError('No active build set.')
-        return self._active_build
+    def is_user(self, user):
+        return self._r.sismember('users', user)
     
-    @active_build.setter
-    def active_build(self, build):
-        temp = self._active_build
-        self._active_build = build
-        if not self._r.sismember(self.active_user + ':builds', self.get_build_id()):
-            self._active_build = temp
-            raise ValueError('Build does not exist for the current active user')
-            
-    @active_build.deleter
-    def active_build(self):
-        self._active_build = None
-    
-    def get_build_id(self):
-        return self.active_user + ':' + self.active_build
+    def build_exists_for_user(self, user, build_id):
+        return self._r.sismember(user + ':builds', build_id)
 
     ####----Users----####
-    
-    def add_user(self, user, setActive=False):
-        if (self._r.sismember('users', user)):
-            raise ValueError('User ' + user +  ' already exists')
-        else:
-            self._r.sadd('users', user)
-            if setActive:
-                self.active_user = user
+
+    def add_user(self, user):
+        self._r.sadd('users', user)
 
     def delete_user(self, user):
-        if (user is self.active_user):
-            del self.active_user
         self._r.delete(*self._r.keys(user + ':*'))
         self._r.srem('users', user)
 
-    def is_user(self, user):
-        return self._r.sismember('users', user)
-
     ####----Builds----####
     
-    def add_build(self, build):
-        buildId = self.active_user + ':' + build
-
+    def add_build(self, user, buildId):
         #Add build to user builds
-        self._r.sadd(self.active_user + ":builds", buildId)
+        self._r.sadd(user + ":builds", buildId)
     
-    def delete_build(self, build):
-        buildId = self.active_user + ':' + build
-        if build == self.active_build:
-            del self.active_build
+    def delete_build(self, user, buildId, build_parts):
         #Remove from user build list
-        self._r.srem(self.active_user + ":builds", buildId)
+        self._r.srem(user + ":builds", buildId)
 
         #Delete build hash
         self._r.delete(buildId)
 
         #Delete decoration sets
-        for part in self.BUILD_PARTS:
+        for part in build_parts:
             self._r.delete(buildId + ':' + part)
-
-    def get_all_builds(self):
-        return self._r.smembers(self.active_user + ':builds')
+    
+    def get_all_builds(self, user):
+        return self._r.smembers(user)
     
     ####----Build Components (e.g. armor pieces, weapons)----####
 
     BUILD_PARTS = {'head', 'chest', 'arms', 'waist', 'legs', 'weapon'}
 
-    def add_build_component(self, part, itemId):
-        self._r.hset(self.get_build_id(), part, itemId)
+    def add_build_component(self, build_id, part, item_id):
+        self._r.hset(build_id, part, item_id)
 
-    def remove_build_component(self, part):
-        self._r.hdel(self.get_build_id(), part)
-        self._r.delete(self.get_build_id() + ':' + part)
+    def remove_build_component(self, part, build_id):
+        self._r.hdel(build_id, part)
+        self._r.delete(build_id + ':' + part)
     
-    def get_build_parts(self):
-        return self._r.hgetall(self.get_build_id())
+    def get_build_parts(self, build_id):
+        return self._r.hgetall(build_id)
 
     def is_part(self, id, part):
         if (part == 'weapon'):
@@ -115,17 +74,17 @@ class RedisDriver:
     
     ####----Decorations----####
 
-    def add_decoration(self, part, itemId):
-        self._r.sadd(self.get_build_id + ':' + part, itemId)
+    def add_decoration(self, build_id, part, itemId):
+        self._r.sadd(build_id + ':' + part, itemId)
     
-    def remove_decoration(self, part, itemId):
-        self._r.srem(self.get_build_id + ':' + part, itemId)
+    def remove_decoration(self, build_id, part, itemId):
+        self._r.srem(build_id + ':' + part, itemId)
 
-    def get_decorations(self, part):
-        self._r.smembers(self.get_build_id + ':' + part)
+    def get_decorations(self, build_id, part):
+        self._r.smembers(build_id + ':' + part)
 
-    def remove_all_decorations(self, part):
-        self._r.delete(self.get_build_id + ':' + part)
+    def remove_all_decorations(self, build_id, part):
+        self._r.delete(build_id + ':' + part)
 
     def is_decoration(self, id):
         return self._r.sismember('decoration_ids', id)
@@ -135,10 +94,7 @@ class RedisDriver:
     ITEM_TYPES = {'armor', 'weapon', 'skill', 'item', 'decoration'}
 
     def get_object_name(self, id, type_):
-        result = self._r.hget(type_+ '_ids', id)
-        if result is None:
-            raise ValueError(id + ' is not a valid ' + type_ + ' ID.')
-        return result
+        return self._r.hget(type_+ '_ids', id)
     
     def search_object_name(self, name, type_):
         return self._r.hscan_iter(type_ + '_names', '*' + name + '*')
@@ -150,15 +106,83 @@ class RedisDriver:
         return None
     
     def get_object_id(self, name, type_):
-        result = self._r.hget(type_+ '_names', name)
-        if result is None:
-            raise ValueError(name + ' is not a valid ' + type_ + ' name.')
-        return result
+        return self._r.hget(type_+ '_names', name)
     
     def is_object(self, id, type_):
         return self._r.hget(type_+ '_ids', id) is not None
+
+    ####----Armor----####
+
+    # TODO May need to import crafting recipes and stuff as weill into this, we'll see
+    def add_armor_data(self, armor):
+        if self.is_object(int(armor.get('id')), 'armor'):
+            self._r.hset('armor:' + str(armor.get('id')), 'part', armor.get('Part'))
+            self._r.hset('armor:' + str(armor.get('id')), 'type', armor.get('Type'))
+            self._r.hset('armor:' + str(armor.get('id')), 'slot', armor.get('Slot'))
+
+    ####----Item----####
+
+    def add_item_data(self, item):
+        if self.is_object(item.get('id'), 'item'):
+            id = str(item.get('id'))
+            self._r.hset('item:' + id, 'name', item.get('Name'))
+            self._r.hset('item:' + id, 'rarity', item.get('Rarity'))
+            self._r.hset('item:' + id, 'carry', item.get('Carry'))
+            self._r.hset('item:' + id, 'buy', item.get('Buy'))
+            self._r.hset('item:' + id, 'sell', item.get('Sell'))
+            k = 0
+            for combo in item.get('Combo_List'):
+                self._r.sadd('item:' + id + ':combo_list', 'item:' + id + ':combo_list:' + str(k))
+                self._r.hset('item:' + id + ':combo_list:' + str(k), 'id_1', combo.get('id_1'))
+                self._r.hset('item:' + id + ':combo_list:' + str(k), 'name_1', combo.get('Name_1'))
+                self._r.hset('item:' + id + ':combo_list:' + str(k), 'id_2', combo.get('id_2'))
+                self._r.hset('item:' + id + ':combo_list:' + str(k), 'name_2', combo.get('Name_2'))
+            m = 0
+            for loc in item.get('Gather_Locations'):
+                self._r.sadd('item:' + id + ':gather_locations', 'item:' + id + ':gather_locations:' + str(m))
+                self._r.hset('item:' + id + ':gather_locations:' + str(m), 'rank', loc.get('Rank'))
+                self._r.hset('item:' + id + ':gather_locations:' + str(m), 'map', loc.get('Map'))
+                self._r.hset('item:' + id + ':gather_locations:' + str(m), 'area', loc.get('Area'))
+                self._r.hset('item:' + id + ':gather_locations:' + str(m), 'gather_method', loc.get('Gather_Method'))
+                self._r.hset('item:' + id + ':gather_locations:' + str(m), 'quantity', loc.get('Quantity'))
+                self._r.hset('item:' + id + ':gather_locations:' + str(m), 'drop_rate', loc.get('Drop_Rate'))
+        else:
+            print('No item matching id: %s' % str(item.get('id')))
+
+    def get_item_data(self, id):
+        if self.is_object(id, 'item'):
+            item_dict = {}
+            item_dict['name'] = self._r.hget('item:' + str(id), 'name')
+            item_dict['rarity'] = self._r.hget('item:' + str(id), 'rarity')
+            item_dict['carry'] = self._r.hget('item:' + str(id), 'carry')
+            item_dict['buy'] = self._r.hget('item:' + str(id), 'buy')
+            item_dict['sell'] = self._r.hget('item:' + str(id), 'sell')
+            item_dict['combo_list'] = []
+            item_dict['gather_locations'] = []
+            combo_ids = self._r.smembers('item:' + str(id) + ':combo_list')
+            for cid in combo_ids:
+                temp_combo = {}
+                temp_combo['id_1'] = self._r.hget(cid, 'id_1')
+                temp_combo['name_1'] = self._r.hget(cid, 'name_1')
+                temp_combo['id_2'] = self._r.hget(cid, 'id_2')
+                temp_combo['name_2'] = self._r.hget(cid, 'name_2')
+                item_dict['combo_list'].append(temp_combo)
+            gather_loc_ids = self._r.smembers('item:' + str(id) + ':gather_locations')
+            for locs in gather_loc_ids:
+                temp_loc = {}
+                temp_loc['rank'] = self._r.hget(locs, 'rank')
+                temp_loc['map'] = self._r.hget(locs, 'map')
+                temp_loc['area'] = self._r.hget(locs, 'area')
+                temp_loc['gather_method'] = self._r.hget(locs, 'gather_method')
+                temp_loc['quantity'] = self._r.hget(locs, 'quantity')
+                temp_loc['drop_rate'] = self._r.hget(locs, 'drop_rate')
+                item_dict['gather_locations'].append(temp_loc)
+            return item_dict
+        else:
+            print('No item matching id: %s' % str(id))
+            return {}
+
+    ####----Decorations----####
     
 
-
-
-
+    

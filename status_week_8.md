@@ -1,23 +1,30 @@
-# Weekly Status Report
+# Week 9 goals
 
-* updated cli to handle build creation
-* finished scraping what we want for now
-* imported weapon data into Cassandra
-* Added CQL queries to lab
-* Fixed remote connection to Neo4j
-* Populated Neo4j with armors and skills
-
-# Cli
+## Cli
 
 * need to start connecting to other dbs
-* 
+* need a local state for a build
+* STRETCH GOAL: get multiple fallbacks workings for when different services are down
 
-# Redis
+## Redis
 
-# Neo4j
+* Need to import soome minimal armor info for offline build making
+* Finish up the search calls on items/decorations and whatnot
 
-# Cassandra
+## Neo4j
 
-# Lab
+* need to hook up to insert calls in kafka
+* write build generator query
 
-# Kafka
+## Cassandra
+
+* Add more queries to the driver, finish up what is needed for cli calls
+
+## Lab
+
+* Finish it
+
+## Kafka
+
+* finish connecting kafka so that all writes go through kafka
+* ensure remote connections work for producers (not too worried on this)

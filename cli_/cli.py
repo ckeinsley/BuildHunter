@@ -1,8 +1,10 @@
+import sys
+sys.path.insert(0, '../cli_')
 from click_shell import shell 
 import click as c
-from redis_ import redisDriver
+from cli_ import cli_state
 
-r = redisDriver.RedisDriver()
+r = cli_state.CliState()
 
 @shell(prompt= 'BuildHunter> ', intro='Welcome to BuildHunter!')
 def cli():
@@ -125,5 +127,9 @@ def generate_armor_sets(skill):
         skill_list.append((id, value))
     print(skill_list) #TODO: Lookup armor set in Neo4J
 
+def main():
+    cli()
 
+if __name__ == "__main__":
+    main()
 
