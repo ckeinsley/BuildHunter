@@ -140,6 +140,9 @@ class CliState:
     def is_decoration(self, id):
         return self._db.is_decoration(id)
 
+    def get_decoration_data(self, id):
+        return self._db.get_decoration_data(id)
+
     ####----Items----####
 
     ITEM_TYPES = {'armor', 'weapon', 'skill', 'item', 'decoration'}
@@ -165,6 +168,6 @@ class CliState:
     def is_object(self, id, type_):
         return self._db.is_object(id, type_)
 
-    def get_item_info(self, id):
+    def get_item_data(self, id):
         return self._db.get_item_data(id)
         

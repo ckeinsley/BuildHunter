@@ -119,8 +119,14 @@ def search_object_name(name, type_):
 @c.option('--id', '-i', prompt=True, type=int)
 @cli.command('item-info')
 def get_item_info(id):
-    pprint(r.get_item_info(id))
+    pprint(r.get_item_data(id))
 
+####----Decorations----####
+
+@c.option('--id', '-i', prompt=True, type=int)
+@cli.command('decoration-info')
+def get_decoration_data(id):
+    pprint(r.get_decoration_data(id))
 
 ####----Advanced Features----####
 

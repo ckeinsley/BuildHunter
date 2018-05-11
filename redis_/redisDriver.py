@@ -113,7 +113,7 @@ class RedisDriver:
 
     ####----Armor----####
 
-    def add_armor_data(self, armor):
+    """ def add_armor_data(self, armor):
         if self.is_object(int(armor.get('id')), 'armor'):
             self._r.hset('armor:' + str(armor.get('id')), 'name', armor.get('Name'))
             self._r.hset('armor:' + str(armor.get('id')), 'part', armor.get('Part'))
@@ -145,7 +145,7 @@ class RedisDriver:
             return armor_dict
         else:
             print('No armor matching id: %s' % str(id))
-            return {}
+            return {} """
 
 
     ####----Item----####
@@ -215,6 +215,7 @@ class RedisDriver:
     def add_decoration_data(self, decoration):
         dec = decoration
         id = str(dec.get('id'))
+        self._r.hset('decoration:' + id, 'name', dec.get('Name'))
         self._r.hset('decoration:' + id, 'rarity', dec.get('Rarity'))
         self._r.hset('decoration:' + id, 'carry', dec.get('Carry'))
         self._r.hset('decoration:' + id, 'buy', dec.get('Buy'))
