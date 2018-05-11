@@ -23,12 +23,22 @@ build : {
 }
 '''
 
+EMPTY_BUILD = {
+            'head' : None,
+            'chest' : None,
+            'arms' : None,
+            'waist' : None,
+            'legs' : None,
+            'weapon' : None
+        }
+
 class CliState:
 
     def __init__(self):
         self._db = redisDriver.RedisDriver()
         self._active_user = None
         self._active_build = None
+        self._local_build = EMPTY_BUILD
 
     @property
     def active_user(self):
@@ -61,6 +71,11 @@ class CliState:
         if not self._db.build_exists_for_user(self.active_user, self.get_build_id()):
             self._active_build = temp
             raise ValueError('Build does not exist for the current active user')
+        else:
+            new_build = self.get_build_parts()
+            self._local_build = EMPTY_BUILD
+            for item in new_build.items():
+                self._local_build[item[0].decode('utf-8')] = item[1].decode('utf-8')
 
     @active_build.deleter
     def active_build(self):
@@ -91,9 +106,9 @@ class CliState:
     
     def add_build(self, build):
         build_id = self.active_user + ':' + build
-        prod_add_build(self.active_user, build_id)
+        #prod_add_build(self.active_user, build_id)
         #Add build to user builds
-        #self._db.add_build(self.active_user, build_id)
+        self._db.add_build(self.active_user, build_id)
     
     def delete_build(self, build):
         build_id = self.active_user + ':' + build
@@ -150,7 +165,7 @@ class CliState:
     def get_object_name(self, id, type_):
         result = self._db.get_object_name(id, type_)
         if result is None:
-            raise ValueError(id + ' is not a valid ' + type_ + ' ID.')
+            raise ValueError(str(id) + ' is not a valid ' + type_ + ' ID.')
         return result
     
     def search_object_name(self, name, type_):

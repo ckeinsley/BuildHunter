@@ -51,7 +51,7 @@ class RedisDriver:
             self._r.delete(buildId + ':' + part)
     
     def get_all_builds(self, user):
-        return self._r.smembers(user)
+        return self._r.smembers(user + ':builds')
     
     ####----Build Components (e.g. armor pieces, weapons)----####
 

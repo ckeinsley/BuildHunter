@@ -66,8 +66,8 @@ def get_build_details():
     part_dict = r.get_build_parts()
     for part, id in part_dict.items():
         item_type = 'armor'
-        if part == 'weapon':
-            item_type = part
+        if part.decode('utf-8') == 'weapon':
+            item_type = part.decode('utf-8')
         name = r.get_object_name(int(id.decode()), item_type)
         print(part.decode('utf-8').capitalize() + ': ' + name.decode('utf-8'))
         
