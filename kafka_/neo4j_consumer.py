@@ -3,8 +3,7 @@
 import sys
 
 # Cassandra Driver
-sys.path.insert(0,'../BuildHunter')
-sys.path.insert(0,'../neo4j_')
+sys.path.insert(0,'../')
 
 from neo4j_ import neo4jDriver as db 
 
@@ -30,9 +29,9 @@ def repl():
     db.connect()
     try:
         while True:
-            # if not verifyCassandraHeartbeat():
-            #     db.connect()
-            #     continue
+            if not db.ping():
+                db.connect()
+                continue
             msg = c.poll(0.1)
             # No message present
             if msg is None:
