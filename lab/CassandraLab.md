@@ -91,6 +91,12 @@ cluster = Cluster(['<Node IP Address>'])
 session = cluster.connect()
 ```
 
+Queries can be executed with 
+```
+// TODO
+session.execute('SELECT * FROM )
+```
+
 # Basic CQL Commands
 
 The Cassandra Query Language (CQL) looks very much like standard SQL. Many of the standard create, update, insert, select queries will look the same, often times with extra arguments available. A full list of the options provided by CQL can be found [online](https://docs.datastax.com/en/cql/3.3/cql/cql_reference/cqlCommandsTOC.html). 
@@ -174,10 +180,6 @@ Let's say that we want to use Cassandra as a database for a library system. Here
 3. Edit book information
 4. Search by title, author, or isbn
 5. Sort by title, author, # of pages or isbn
-<!-- 6. Add Borrower&#39;s (Name, Username, Phone) to library
-7. Delete Borrowers from library
-8. Edit Borrower information
-9. Search by name, username -->
 
 The first thing to do is to design the data model. Looking at the library system, it seems like we want to be able to do a lot of reads, with probably not as many writes. For instance, consider how often book information should change. Because of this, it is probably okay to make our writing complicated and include tables that help optimize our sorting and searching functions. 
 
@@ -192,6 +194,8 @@ Since we want to search or books by any of Title, Author, ISBN, or Number of Pag
 
 This will optimize our ability to query the data set. Here we can look for a book by any of the fields and we only have to query one table and one partition. Note that one table will have author as a primary key. If a book has two authors, it will show up in this table multiple times. That is okay for our purposes as it makes the query perform better. The author table will have to have a composite key so that we can have the same author linked to different ISBNs.  
 
+**NOTE:** There is one key problem 
+
 0. Create a Keyspace and tables
     - We need to create the keyspace then create the tables for our books. Note that putting single quotes around things will keep the case, otherwise Cassandra will remove the casing.  
 ```SQL
@@ -202,7 +206,7 @@ USE library;
 -- Create our table for ISBN searches
 CREATE TABLE isbntobook (isbn int, title text, pages int, authors set<text>, PRIMARY KEY (isbn));
 -- Create the table for title searches
-CREATE TABLE titletobook (isbn int, title text, pages int, authors set<text>, PRIMARY KEY(title, isbn));
+CREATE TABLE titletobook (isbn int, title text, pages int, authors set<text>, PRIMARY KEY(isbn, title));
 -- Create the table for pages searches
 CREATE TABLE pagestobook (isbn int, title text, pages int, authors set<text>, PRIMARY KEY(pages, isbn));
 -- Create table for author searches
@@ -224,12 +228,21 @@ INSERT INTO pagestobook (isbn, title, pages, authors) VALUES (0395315557, 'The T
 
 INSERT INTO authortobook (isbn, title, pages, author) VALUES (0395315557, 'The Two Towers', 878, 'J. R. R. Tolkein');
 
--- Inserting a book with multiple authors
-INSERT INTO isbntobook (isbn, title, pages, authors) VALUES (1501192272, 'The Talisman', 560, {'Stephen King', 'Peter Straub'});
+-- A duplicate Two Towers rip off with a different isbn for demo purposes
+INSERT INTO isbntobook (isbn, title, pages, authors) VALUES (0395315558, 'The Two Towers', 878, {'J. R. R. Tolkien'});
 
-INSERT INTO titletobook (isbn, title, pages, authors) VALUES (1501192272, 'The Talisman', 560, {'Stephen King', 'Peter Straub'});
-INSERT INTO pagestobook (isbn, title, pages, authors) VALUES (1501192272, 'The Talisman', 560, {'Stephen King', 'Peter Straub'});
-INSERT INTO authortobook (isbn, title, pages, author) VALUES (1501192272, 'The Talisman', 560, 'Peter Straub');
+INSERT INTO titletobook (isbn, title, pages, authors) VALUES (0395315558, 'The Two Towers', 878, {'J. R. R. Tolkien'});
+
+INSERT INTO pagestobook (isbn, title, pages, authors) VALUES (0395315558, 'The Two Towers', 878, {'J. R. R. Tolkien'});
+
+INSERT INTO authortobook (isbn, title, pages, author) VALUES (0395315558, 'The Two Towers', 878, 'J. R. R. Tolkien');
+
+-- Inserting a book with multiple authors
+INSERT INTO isbntobook (isbn, title, pages, authors) VALUES (1501192272, 'The Talisman', 560, {'Stephen King', 'Peter straub'});
+
+INSERT INTO titletobook (isbn, title, pages, authors) VALUES (1501192272, 'The Talisman', 560, {'Stephen King', 'Peter straub'});
+INSERT INTO pagestobook (isbn, title, pages, authors) VALUES (1501192272, 'The Talisman', 560, {'Stephen King', 'Peter straub'});
+INSERT INTO authortobook (isbn, title, pages, author) VALUES (1501192272, 'The Talisman', 560, 'Peter straub');
 INSERT INTO authortobook (isbn, title, pages, author) VALUES (1501192272, 'The Talisman', 560, 'Stephen King');
 
 -- Inserting another book
@@ -253,9 +266,35 @@ DELETE FROM pagestobook where isbn = 0345339703 and pages = 967;
 DELETE FROM authortobook where isbn = 0345339703 and author = 'J. R. R. Tolkein';
 ```
 3. Edit book information
+    - Updates become a little tricky because of how the other attributes are being used as keys in other tables.  
+    - When we change a value, one of our tables will require a delete and reinsert, because we cannot change primary keys.  
+    - We also have to be careful to change the `set` of authors correctly in the other queries. 
+```SQL
+-- Let's change the author Peter straub to fix his last name
+UPDATE isbntobook SET authors = authors - {'Peter straub'} WHERE isbn = 1501192272;
+UPDATE isbntobook SET authors = authors + {'Peter Straub'} WHERE isbn = 1501192272;
+
+UPDATE pagestobook SET authors = authors - {'Peter straub'} WHERE isbn = 1501192272 and pages = 560;
+UPDATE pagestobook SET authors = authors + {'Peter Straub'} WHERE isbn = 1501192272 and pages = 560;
+
+UPDATE titletobook SET authors = authors - {'Peter straub'} WHERE isbn = 1501192272 and title = 'The Talisman';
+UPDATE titletobook SET authors = authors + {'Peter Straub'} WHERE isbn = 1501192272 and title = 'The Talisman';
+
+DELETE FROM authortobook WHERE isbn = 1501192272 and author = 'Peter straub';
+INSERT INTO authortobook (isbn, title, pages, author) VALUES (1501192272, 'The Talisman', 560, 'Peter Straub');
+```
 4. Search by title, author, or isbn
-5. Sort by title, author, # of pages or isbn
-6. Add Borrower&#39;s (Name, Username, Phone) to library
-7. Delete Borrowers from library
-8. Edit Borrower information
-9. Search by name, username
+    - Title
+    ```SQL
+    -- Return books by this title. Should return 2 books; the real and fake copies
+    SELECT * FROM titletobook WHERE title = 'The Two Towers';
+    ```
+    - Author
+    ```SQL
+    -- Note this doesn't return the copy of The Two Towers because the authors name is different
+    SELECT * FROM authortobook where author = 'J. R. R. Tolkein';
+    ```
+    - Isbn
+    ```SQL
+    SELECT * FROM isbntobook where isbn = 1501192272;
+    ```
