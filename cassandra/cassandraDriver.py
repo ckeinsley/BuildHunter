@@ -28,6 +28,15 @@ WEAPON_UPGRADES_TO_TABLE = 'upgradesto'
 WEAPON_UPGRADE_ITEMS_TABLE = 'upgradeitems'
 WEAPON_CREATE_ITEMS_TABLE = 'createitems'
 
+PREPARED_QUERIES = {
+    'ARMOR_ALL':'select * from armor where id=?',
+    'WEAPON_ALL': 'select * from weapon where id=?',
+    'BUILD_TOTAL_DEFENSE': 'select sum(defense_max) from armor where id in ?;',
+    'BUILD_TOTAL_RESISTANCE': 'select sum(dragon) as dragon, sum(fire) as fire, sum(ice) as ice, sum(thunder) as thunder, sum(water) as water from armor WHERE id in ?',
+    'BUILD_SKILLS': 'select name, value, skill_id from skills where id in ?'
+}
+
+
 def connect():
     global session
     try:
@@ -41,6 +50,11 @@ def connect():
         log.error('Unable to connect to cassandra')
         log.exception(e)
         return None
+    __prepareStatements()
+
+def __prepareStatements():
+    for (name, query) in PREPARED_QUERIES.items():
+        PREPARED_QUERIES[name] = session.prepare(query)
 
 def __createHeartBeatTable():
     session.execute("CREATE TABLE IF NOT EXISTS heart (stamp timestamp, id text, PRIMARY KEY(id))")
@@ -254,3 +268,42 @@ def __insertUpgradesTo(upgradesTo):
             VALUES({id}, {item_id}, '{name}')""".format_map(item))
 
 # =============================== QUERIES =======================================
+
+#armor dump all
+#weapon dump all
+#build total defence 
+#buld total resistance
+#build attribute sums
+
+def getArmorStats(armorId):
+    result = session.execute(PREPARED_QUERIES['ARMOR_ALL'], [armorId])[0]
+    skills = []
+    for row in session.execute(PREPARED_QUERIES['BUILD_SKILLS'], [[armorId]]):
+        skills.append(row)
+    result['skills'] = skills
+    return result
+
+
+def getWeaponStats(weaponId):
+    return session.execute(PREPARED_QUERIES['WEAPON_ALL'], [weaponId])[0]
+
+def getBuildDefense(build):
+    return session.execute(PREPARED_QUERIES['BUILD_TOTAL_DEFENSE'], [__getIDList(build)])[0]['system.sum(defense_max)']
+
+def getBuildResistances(build):
+    return session.execute(PREPARED_QUERIES['BUILD_TOTAL_RESISTANCE'], [__getIDList(build)])[0]
+
+def getBuildSkills(build):
+    skills = {}
+    for row in session.execute(PREPARED_QUERIES['BUILD_SKILLS'], [__getIDList(build)]):
+        skills[row['name']] = skills.get(row['name'], 0) + row['value']
+    return skills
+            
+def __getIDList(build):
+    ids = []
+    for (_, id) in build.items():
+        ids.append(id)
+    return ids
+
+
+

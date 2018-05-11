@@ -29,7 +29,13 @@ EMPTY_BUILD = {
             'arms' : None,
             'waist' : None,
             'legs' : None,
-            'weapon' : None
+            'weapon' : None,
+            'head:decorations' : [],
+            'chest:decorations' : [],
+            'arms:decorations' : [],
+            'waist:decorations' : [],
+            'legs:decorations' : [],
+            'weapon:decorations' : []
         }
 
 class CliState:
@@ -72,14 +78,17 @@ class CliState:
             self._active_build = temp
             raise ValueError('Build does not exist for the current active user')
         else:
-            new_build = self.get_build_parts()
+            new_parts = self._db.get_build_parts(self.get_build_id())
             self._local_build = EMPTY_BUILD
-            for item in new_build.items():
+            for item in new_parts.items():
                 self._local_build[item[0].decode('utf-8')] = item[1].decode('utf-8')
+                new_decorations = self._db.get_decorations(self.get_build_id(), item[0].decode('utf-8'))
+                self._local_build[item[0].decode('utf-8') + ':decorations'] = new_decorations
 
     @active_build.deleter
     def active_build(self):
         self._active_build = None
+        self._local_build = EMPTY_BUILD
 
     def get_build_id(self):
         return self.active_user + ':' + self.active_build
@@ -122,34 +131,49 @@ class CliState:
 
     ####----Build Components (e.g. armor pieces, weapons)----####
 
-    # TODO Need build local build state
-
     BUILD_PARTS = {'head', 'chest', 'arms', 'waist', 'legs', 'weapon'}
 
+    # TODO worry about blademaster/gunner/all later
     def add_build_component(self, part, item_id):
+        self._local_build['part'] = item_id
         self._db.add_build_component(self.get_build_id(), part, item_id)
 
     def remove_build_component(self, part):
+        self._local_build['part'] = None
         self._db.remove_build_component(self.get_build_id(), part)
     
+    # TODO shouldn't be the get build details method
     def get_build_parts(self):
-        return self._db.get_build_parts(self.get_build_id())
+        #return self._db.get_build_parts(self.get_build_id())
+        return {
+            'head' : self._local_build.get('head'),
+            'chest' : self._local_build.get('chest'),
+            'arms' : self._local_build.get('arms'),
+            'waist' : self._local_build.get('waist'),
+            'legs' : self._local_build.get('legs'),
+            'weapon' : self._local_build.get('weapon')
+        }
 
     def is_part(self, id, part):
         return self._db.is_part(id, part)
 
     ####----Decorations----####
 
+    # TODO worry about slots taken up by a decoration later
     def add_decoration(self, part, itemId):
+        self._local_build[part + ':decorations'].append(itemId)
         self._db.add_decoration(self.get_build_id, part, itemId)
     
     def remove_decoration(self, part, itemId):
+        self._local_build[part + ':decorations'].remove(itemId)
         self._db.remove_decoration(self.get_build_id, part, itemId)
 
     def get_decorations(self, part):
-        self._db.get_decorations(self.get_build_id, part)
+        return self._local_build.get(part + ':decorations')
+        #return self._db.get_decorations(self.get_build_id(), part)
 
     def remove_all_decorations(self, part):
+        self._local_build[part + ':decorations'] = []
         self._db.remove_all_decorations(self.get_build_id, part)
 
     def is_decoration(self, id):
