@@ -36,7 +36,7 @@ def read_skills_file():
     return (skill_list, id_list)
 
 def read_name_id_mapping():
-    f = open('./obj/name_id_map.p', 'rb')
+    f = open('../WebScrapper/obj/name_id_map.p', 'rb')
     name_id_mapping = pickle.load(f, encoding='unicode')
     f.close()
     return name_id_mapping
@@ -71,5 +71,3 @@ def read_decoration_file():
         decorations_list.append(bson.loads(dec_file.read()))
         dec_file.close()
     return decorations_list
-
-print(read_decoration_file())

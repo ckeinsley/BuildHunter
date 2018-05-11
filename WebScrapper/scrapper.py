@@ -468,12 +468,12 @@ def write_name_id_mapping():
             name_id_map[name] = master_id
             master_id += 1
     print('Next Available Id')
-    f = open('./obj/name_id_map.p', 'wb')
+    f = open('./obj/name_id_map_1.p', 'wb')
     pickle.dump(name_id_map, f)
     f.close()
 
 def read_name_id_mapping():
-    f = open('./obj/name_id_map.p', 'rb')
+    f = open('./obj/name_id_map_1.p', 'rb')
     name_id_mapping = pickle.load(f, encoding='unicode')
     f.close()
     return name_id_mapping
@@ -997,7 +997,7 @@ def process_decoration_data(url, driver, name_id_map):
     soup = BeautifulSoup(data, 'lxml')
 
     name = soup.find('h1').string
-    uid = name_id_map.get('DECORATION:' + name)
+    uid = name_id_map.get('ITEM:' + name)
     description = soup.find('h1').next_sibling.next_sibling.string
     rarity = soup.find('td', string='Rarity').next_sibling.next_sibling.string
     carry = soup.find('td', string='Carry').next_sibling.next_sibling.string
@@ -1096,4 +1096,5 @@ def populate_decorations_list():
     id_file.close()
     print('Finished populationg decorations')
 
+#write_name_id_mapping()
 populate_decorations_list()
