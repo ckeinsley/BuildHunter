@@ -201,7 +201,7 @@ Since we want to search or books by any of Title, Author, ISBN, or Number of Pag
 
 This will optimize our ability to query the data set. Here we can look for a book by any of the fields and we only have to query one table and one partition. Note that one table will have author as a primary key. If a book has two authors, it will show up in this table multiple times. That is okay for our purposes as it makes the query perform better. The author table will have to have a composite key so that we can have the same author linked to different ISBNs.  
 
-**NOTE:** There is one additional feature that we might want with this database. We might want the ability to return results in a sorted order. This is something that Cassandra does not support well. It is possible to attempt to force Cassandra to return things in a sorted order using tactics like introducing dummy partition keys, or using a Byte Ordered Partition (BOP) this is **not** a good idea as it introduces load balancing problems and encourages bad data modeling. Sorting in Cassandra is only sorted within a partition key. That is, if you want results to be sorted, you can specify the clustering column to sort on or use the `ORDER BY` clause when there `WHERE` clause specifies a partition to sort.  
+**NOTE:** There is one additional feature that we might want with this database. We might want the ability to return results in a sorted order. This is something that Cassandra does not support well. It is possible to attempt to force Cassandra to return things in a sorted order using tactics like introducing dummy partition keys, or using a Byte Ordered Partition (BOP) this is **not** a good idea as it introduces load balancing problems and encourages bad data modeling. Data in Cassandra can only be sorted within a partition key. That is, if you want results to be sorted, you can specify a clustering column to sort on or use the `ORDER BY` clause when the `WHERE` clause specifies a partition to sort.  
 
 ```SQL
 -- This query will be allowed for our tables because the WHERE clause identifies a partition and the clustering key 'isbn' allows ordering
@@ -214,6 +214,7 @@ SELECT * FROM isbntobook WHERE title = 'The Two Towers' ORDER BY authors ALLOW F
 -- The next error that you will receive will inform you that ORDER BY is only supported when the partition key is restricted to either = or IN. This is telling you that the WHERE clause must restrict the query to some partition(s)
 ```
 
+## Queries to Create the Library
 0. Create a Keyspace and tables
     - We need to create the keyspace then create the tables for our books. Note that putting single quotes around things will keep the case, otherwise Cassandra will remove the casing.  
 ```SQL
