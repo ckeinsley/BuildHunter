@@ -33,7 +33,7 @@ PREPARED_QUERIES = {
     'WEAPON_ALL': 'select * from weapon where id=?',
     'BUILD_TOTAL_DEFENSE': 'select sum(defense_max) from armor where id in ?;',
     'BUILD_TOTAL_RESISTANCE': 'select sum(dragon) as dragon, sum(fire) as fire, sum(ice) as ice, sum(thunder) as thunder, sum(water) as water from armor WHERE id in ?',
-    'BUILD_SKILLS': 'select * from skills where id in ?'
+    'BUILD_SKILLS': 'select name, value, skill_id from skills where id in ?'
 }
 
 
@@ -276,7 +276,13 @@ def __insertUpgradesTo(upgradesTo):
 #build attribute sums
 
 def getArmorStats(armorId):
-    return session.execute(PREPARED_QUERIES['ARMOR_ALL'], [armorId])[0]
+    result = session.execute(PREPARED_QUERIES['ARMOR_ALL'], [armorId])[0]
+    skills = []
+    for row in session.execute(PREPARED_QUERIES['BUILD_SKILLS'], [[armorId]]):
+        skills.append(row)
+    result['skills'] = skills
+    return result
+
 
 def getWeaponStats(weaponId):
     return session.execute(PREPARED_QUERIES['WEAPON_ALL'], [weaponId])[0]
@@ -293,9 +299,6 @@ def getBuildSkills(build):
         skills[row['name']] = skills.get(row['name'], 0) + row['value']
     return skills
             
-
-
-
 def __getIDList(build):
     ids = []
     for (_, id) in build.items():
