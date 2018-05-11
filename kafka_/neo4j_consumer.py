@@ -39,7 +39,7 @@ def repl():
             # Found a message
             elif not msg.error():
                 # Try to insert
-                result = add_new_armor(msg.value())
+                result = insertArmor(msg.value())
                 if result: 
                     pprint('Added Successfully ' + msg.value())
                     c.commit()
@@ -67,7 +67,7 @@ def verifyCassandraHeartbeat():
 def insertArmor(msg):
     armor = json.loads(msg)
     try:
-        db.neo4jDriver.add_new_armor(armor)
+        db.add_new_armor(armor)
         return True
     except:
         return False
