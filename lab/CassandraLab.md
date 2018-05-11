@@ -171,7 +171,17 @@ One good place to start with is by looking at creating a table to answer a query
 Remember to consider how many elements will be under each partition key. Having 100 partition keys where 80% of the data is under 1 key is still a bad thing. In order to help fix this, you can add additional columns to the primary key to form a compound partition key.  
 
 # Scalability Options
-// TODO
+
+Cassandra clusters operates in a ring. All nodes in the ring are considered equal. There is no master node so there is no reason to worry about which node you are writing to or reading from. There is no single point of failure.  
+
+Cassandra also supports the notion of a Data Center with options for both virtual and physical data centers. A cassandra cluster can span multiple data centers. Cassandra will allow us to query either the entire cluster or just the local data center. The benefit of this is that we can act like we are talking to the same cluster regardless of where we are, but only query the local nodes if we do not need the information from a data center in another country. This can greatly decrease the latency and amount of data needed to be transferred.  
+
+Cassandra also supports replication out of the box. In cassandra these replicas are complete copies of the data such that if a single node goes down, the data can be retrieved from another node. These replica sets are customizable at the table/column-family level. This customization allows for choosing how many copies of the data should exist and where on the server-rack they should be.  
+Replication can be in single data center, across multiple data centers, or across different cloud providers. When replicating across multiple data centers, the number of copies in each data center is configurable.  
+
+Scaling cassandra can be done in one of two ways, horizontally or vertically. Horizontal scaling in cassandra is adding more data centers. Vertical scaling is adding more nodes to a single data center. With cassandra there are no special cares that need to be taken when adding a new node, as it comes with a load balancer that will ensure the node takes on a portion of the current data-set when it comes online.  
+
+Cassandra will be eventually consistent using asynchronous updating. We can write to any node which will propose the write request. The write request will be processed once a configured number of nodes accepts the write. Cassandra automatically handles a node going down through a self-healing process which includes scrubbing any corrupt data then reattaching the node to the ring just like a new node being added. This ensures that if a write was accepted by the number of nodes specified, which can be done on a by-query basis using consistency levels, the write will eventually be persisted. The consistency levels are used to ensure that the set of nodes have persisted the write to their commit log and memtable before verifying that the write occurred. We can also use read consistencies to ensure that we never read stale data, configuring a number of nodes that need to acknowlegde the value returned for a read query.
 
 # Walk-through Lab (The Library Example)
 Let's say that we want to use Cassandra as a database for a library system. Here are some of the features we might want to have. 
