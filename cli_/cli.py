@@ -4,6 +4,8 @@ from click_shell import shell
 import click as c
 from cli_ import cli_state
 
+from pprint import pprint
+
 r = cli_state.CliState()
 
 @shell(prompt= 'BuildHunter> ', intro='Welcome to BuildHunter!')
@@ -59,6 +61,7 @@ def set_active_build(name):
 def get_active_build():
     print(r.active_build)
 
+# TODO need MAJOR refactor
 @cli.command('build-get-details')
 def get_build_details():
     part_dict = r.get_build_parts()
@@ -66,8 +69,8 @@ def get_build_details():
         item_type = 'armor'
         if part == 'weapon':
             item_type = part
-        name = r.get_object_name(int(id.decode()), item_type)
-        print(part.decode('utf-8').capitalize() + ': ' + name.decode('utf-8'))
+        name = r.get_object_name(int(id), item_type)
+        print(part.capitalize() + ': ' + name.decode('utf-8'))
         
 
 ####----Parts----####
@@ -112,8 +115,19 @@ def search_object_name(name, type_):
             print(obj[1].decode() + ': ' + obj[0].decode('utf-8'))
 
 
+####----Items----####
 
+@c.option('--id', '-i', prompt=True, type=int)
+@cli.command('item-info')
+def get_item_info(id):
+    pprint(r.get_item_data(id))
 
+####----Decorations----####
+
+@c.option('--id', '-i', prompt=True, type=int)
+@cli.command('decoration-info')
+def get_decoration_data(id):
+    pprint(r.get_decoration_data(id))
 
 ####----Advanced Features----####
 
