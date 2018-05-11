@@ -75,13 +75,13 @@ class RedisDriver:
     ####----Decorations----####
 
     def add_decoration(self, build_id, part, itemId):
-        self._r.sadd(build_id + ':' + part, itemId)
+        self._r.rpush(build_id + ':' + part, itemId)
     
     def remove_decoration(self, build_id, part, itemId):
-        self._r.srem(build_id + ':' + part, itemId)
+        self._r.lrem(build_id + ':' + part, 1, itemId)
 
     def get_decorations(self, build_id, part):
-        self._r.smembers(build_id + ':' + part)
+        self._r.lrange(build_id + ':' + part, 0, -1)
 
     def remove_all_decorations(self, build_id, part):
         self._r.delete(build_id + ':' + part)
