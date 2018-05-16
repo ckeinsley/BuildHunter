@@ -256,18 +256,24 @@ def __findOptionalFields(weaponToInsert):
     return (identifiers, values)
 
 def __insertCreateItems(createItems):
+    if not createItems:
+        return
     for item in createItems:
         session.execute("INSERT INTO " + WEAPON_CREATE_ITEMS_TABLE + 
             """(id, item_id, name, quantity) 
             VALUES({id}, {item_id}, '{name}', {quantity})""".format_map(item))
 
 def __insertUpgradeItems(upgradeItems):
+    if not upgradeItems:
+        return
     for item in upgradeItems:
         session.execute("INSERT INTO " + WEAPON_UPGRADE_ITEMS_TABLE + 
             """(id, item_id, name, quantity) 
             VALUES({id}, {item_id}, '{name}', {quantity})""".format_map(item))
 
 def __insertUpgradesTo(upgradesTo):
+    if not upgradesTo:
+        return
     for item in upgradesTo:
         session.execute("INSERT INTO " + WEAPON_UPGRADES_TO_TABLE + 
             """(id, item_id, name) 
