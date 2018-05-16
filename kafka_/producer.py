@@ -49,7 +49,7 @@ def delete_item(id):
 
 def insert_decoration(decoration):
     producer = get_producer()
-    producer.send('inser_decoration', json.dumps(decoration).encode())
+    producer.send('insert_decoration', json.dumps(decoration).encode())
     producer.close()
 
 def delete_decoration(id):
@@ -60,7 +60,7 @@ def delete_decoration(id):
 def add_build(user, build_id):
     producer = get_producer()
     add_build_msg = {'user' : user, 'build_id' : build_id}
-    producer.send('add-build', json.dumps(add_build_msg).encode())
+    producer.send('add_build', json.dumps(add_build_msg).encode())
     producer.close()
 
 def delete_build(user, build_id, build_parts):
@@ -108,7 +108,7 @@ def remove_decoration(build_id, part, item_id):
 def remove_all_decorations(build_id, part):
     producer = get_producer()
     remove_all_decorations_msg = {'build_id' : build_id, 'part' : part}
-    producer.send('remove_all_decorations_msg', json.dumps(remove_all_decorations_msg).encodes())
+    producer.send('remove_all_decorations', json.dumps(remove_all_decorations_msg).encodes())
     producer.close()
 
 
