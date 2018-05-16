@@ -54,15 +54,16 @@ def repl():
         c.close()
 
 def insert_armor(msg, c):
+    print(msg.value())
     result = insertArmor(msg.value())
     checkResult(result, msg, c) 
 
 def insert_weapon(msg, c):
+    print(msg.value())
     result = insertWeapon(msg.value())
     checkResult(result, msg, c)
 
 def checkResult(result, msg, c):
-    print(msg.value())
     if result: 
         pprint('Added Successfully ' + msg.value())
         c.commit()
