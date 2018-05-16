@@ -13,7 +13,9 @@ log.addHandler(handler)
 from cassandra.cluster import Cluster
 from cassandra.query import SimpleStatement
 from cassandra.query import dict_factory
-import cassandra_weapon_conversion as convert
+import weapon_conversion as weapon_convert
+import armor_conversion as armor_convert
+
 
 IP_ADDRESSES = ['137.112.89.78', '137.112.89.77', '137.112.89.76', '137.112.89.75']
 KEYSPACE = 'buildhunter'
@@ -121,15 +123,15 @@ def createArmorTable():
     """ % SKILL_TABLE)
 
 def insertArmor(armor):
-    armorToInsert = convert.convertArmor(armor)
-    skills = convert.convertSkills(armor)
-    crafting = convert.convertCrafting(armor)
+    armorToInsert = armor_convert.convertArmor(armor)
+    skills = armor_convert.convertSkills(armor)
+    crafting = armor_convert.convertCrafting(armor)
 
     armorQuery = SimpleStatement("INSERT INTO " + ARMOR_TABLE + 
         "(id, part, name, price, rarity, slot, type, gender, fire, dragon, thunder, water, ice, defense_init, defense_max)"+
         "VALUES ({id}, '{part}', '{name}', '{price}', {rarity}, {slot}, '{type}', '{gender}', {fire}, {dragon}, {thunder}, {water}, {ice}, {defense_init}, {defense_max})".format(**armorToInsert)
     )
-    result = session.execute(armorQuery)
+    session.execute(armorQuery)
     
     for skill in skills:
         skillsQuery = SimpleStatement("INSERT INTO " + SKILL_TABLE + 
@@ -201,7 +203,11 @@ def createWeaponTable():
     """ % WEAPON_UPGRADES_TO_TABLE) 
 
 
-def insertWeapon(weaponToInsert, createItems, upgradeItems, upgradesTo):
+def insertWeapon(weaponToInsert):
+    weaponToInsert = weapon_convert.convertWeapon(weaponToInsert) 
+    createItems = weapon_convert.convertCreateItems(weaponToInsert)
+    upgradeItems = weapon_convert.convertUpgradeItems(weaponToInsert)
+    upgradesTo = weapon_convert.convertUpgradesTo(weaponToInsert)
     __insertWeaponToTable(weaponToInsert)
     __insertCreateItems(createItems)
     __insertUpgradeItems(upgradeItems)
