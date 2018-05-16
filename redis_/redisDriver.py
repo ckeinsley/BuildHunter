@@ -61,7 +61,9 @@ class RedisDriver:
         self._r.hset(build_id, part, item_id)
 
     def remove_build_component(self, part, build_id):
-        self._r.hdel(build_id, part)
+        print(build_id, part)
+        result = self._r.hdel(build_id, part)
+        print(result)
         self._r.delete(build_id + ':' + part)
     
     def get_build_parts(self, build_id):
