@@ -30,6 +30,7 @@ def main():
     producer = KafkaProducer(bootstrap_servers='433-05.csse.rose-hulman.edu:9092')
     producer.send('insert_weapon', json.dumps(weaponToInsert).encode())
     producer.close()
+    print('Added new weapon')
 
 def add_build(user, build_id):
     producer = KafkaProducer(bootstrap_servers='433-05.csse.rose-hulman.edu:9092')
