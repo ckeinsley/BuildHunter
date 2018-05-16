@@ -27,7 +27,6 @@ def __isBlademaster(weapon):
     return not weapon_family in gun
 
 def convertCreateItems(weapon):
-    print(weapon)
     items = []
     wep_id = __intOrNone(weapon.get('id'))
     for create_item in weapon.get('Create_Items'):
