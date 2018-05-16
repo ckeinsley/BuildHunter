@@ -54,12 +54,10 @@ def repl():
         c.close()
 
 def insert_armor(msg, c):
-    print(msg.value())
     result = insertArmor(msg.value())
     checkResult(result, msg, c) 
 
 def insert_weapon(msg, c):
-    print(msg.value())
     result = insertWeapon(msg.value())
     checkResult(result, msg, c)
 
@@ -78,6 +76,7 @@ def verifyCassandraHeartbeat():
 
 #Attempt to insert the armor. If no errors occur, we can commit
 def insertArmor(msg):
+    msg = str(msg)
     armor = json.loads(msg)
     try:
         db.insertArmor(armor)
@@ -87,6 +86,8 @@ def insertArmor(msg):
         return False
 
 def insertWeapon(msg):
+    msg = str(msg)
+    print(msg)
     armor = json.loads(msg)
     try:
         db.insertWeapon(armor)
