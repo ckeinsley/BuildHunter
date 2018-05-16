@@ -42,7 +42,7 @@ def repl():
                 elif msg.topic() == u'add_user':
                     result = add_user(msg.value())
                 elif msg.topic() == u'delete_user':
-                    result = delete_user(msg.vlaue())
+                    result = delete_user(msg.value())
                 elif msg.topic() == u'add_build_component':
                     result = add_build_component(msg.value())
                 elif msg.topic() == u'remove_build_component':
@@ -54,7 +54,7 @@ def repl():
                 elif msg.topic() == u'remove_all_decorations':
                     result = remove_all_decorations(msg.value())
                 if result:
-                    pprint('Added Successfully ' + msg.value())
+                    pprint('Success ' + msg.value())
                     c.commit()
                 else:
                     c.unsubscribe()
