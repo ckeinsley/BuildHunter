@@ -24,7 +24,7 @@ def main():
     blademaster_list = weapon_list.get('Blademaster')
 
     for weapon in blademaster_list:
-        print("Processing " + weapon.get('Name'))
+        print("Processing " + weapon.get('Name'))        
         if "dummy" in weapon.get('Name'):
             continue
         db.insertWeapon(weapon)

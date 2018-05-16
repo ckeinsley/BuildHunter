@@ -10,7 +10,7 @@ import json
 import time
 from pprint import pprint
 
-topic = "armor-insert"
+topics = ["insert_armor", "insert_weapon"]
 settings = {
     'bootstrap.servers': 'localhost:9092',
     'group.id': 'buildHunter',
@@ -23,7 +23,7 @@ settings = {
 
 def repl():
     c = Consumer(settings)
-    c.subscribe([topic])
+    c.subscribe(topics)
     try:
         while True:
             if not verifyCassandraHeartbeat():
@@ -35,15 +35,11 @@ def repl():
                 continue
             # Found a message
             elif not msg.error():
-                # Try to insert
-                result = insertArmor(msg.value())
-                if result: 
-                    pprint('Added Successfully ' + msg.value())
-                    c.commit()
-                else:
-                    c.unsubscribe()
-                    c.subscribe([topic])
-                    print('Error Occurred Adding to Cassandra')
+                # Which message was it?
+                if msg.topic() == u'insert_armor':
+                    insert_armor(msg, c)
+                elif msg.topic() == u'insert_weapon':
+                    insert_weapon(msg, c)
             elif msg.error().code() == KafkaError._PARTITION_EOF:
                 print('End of partition reached {0}/{1}'
                     .format(msg.topic(), msg.partition()))
@@ -57,16 +53,44 @@ def repl():
     finally:
         c.close()
 
+def insert_armor(msg, c):
+    result = insertArmor(msg.value())
+    checkResult(result, msg, c) 
+
+def insert_weapon(msg, c):
+    result = insertWeapon(msg.value())
+    checkResult(result, msg, c)
+
+def checkResult(result, msg, c):
+    if result: 
+        pprint('Added Successfully ' + msg.value())
+        c.commit()
+    else:
+        c.unsubscribe()
+        c.subscribe(topics)
+        print('Error Occurred Adding to Cassandra')
+
+
 def verifyCassandraHeartbeat():
     return db.heartBeat()
 
 #Attempt to insert the armor. If no errors occur, we can commit
 def insertArmor(msg):
-    armor = json.loads(msg)
+    armor = json.loads(str(msg))
     try:
         db.insertArmor(armor)
         return True
-    except:
+    except Exception as e:
+        print(e)
+        return False
+
+def insertWeapon(msg):
+    armor = json.loads(str(msg))
+    try:
+        db.insertWeapon(armor)
+        return True
+    except Exception as e:
+        print(e)
         return False
 
 def main():
