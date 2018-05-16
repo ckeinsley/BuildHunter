@@ -113,6 +113,7 @@ def add_build_component(msg):
     args = json.loads(msg)
     try:
         red.add_build_component(args['build_id'], args['part'], args['item_id'])
+        return True
     except Exception as e:
         print(e)
         return False
@@ -121,6 +122,7 @@ def remove_build_component(msg):
     args = json.loads(msg)
     try:
         red.remove_build_component(args['part'], args['build_id'])
+        return True
     except Exception as e:
         print(e)
         return False
@@ -129,6 +131,7 @@ def add_decoration(msg):
     args = json.loads(msg)
     try:
         red.add_decoration(args['build_id'], args['part'], args['item_id'])
+        return True
     except Exception as e:
         print(e)
         return False
@@ -137,6 +140,7 @@ def remove_decoration(msg):
     args = json.loads(msg)
     try:
         red.remove_decoration(args['build_id'], args['part'], args['item_id'])
+        return True
     except Exception as e:
         print(e)
         return False
@@ -145,6 +149,7 @@ def remove_all_decorations(msg):
     args = json.loads(msg)
     try:
         red.remove_all_decorations(args['build_id'], args['part'])
+        return True
     except Exception as e:
         print(e)
         return False
