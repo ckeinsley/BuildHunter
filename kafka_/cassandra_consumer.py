@@ -76,7 +76,7 @@ def verifyCassandraHeartbeat():
 
 #Attempt to insert the armor. If no errors occur, we can commit
 def insertArmor(msg):
-    armor = json.loads(msg)
+    armor = json.loads(str(msg))
     try:
         db.insertArmor(armor)
         return True
@@ -85,7 +85,7 @@ def insertArmor(msg):
         return False
 
 def insertWeapon(msg):
-    armor = json.loads(msg)
+    armor = json.loads(str(msg))
     try:
         db.insertWeapon(armor)
         return True
