@@ -80,7 +80,8 @@ def insertArmor(msg):
     try:
         db.insertArmor(armor)
         return True
-    except:
+    except Exception as e:
+        print(e)
         return False
 
 def insertWeapon(msg):
@@ -88,7 +89,8 @@ def insertWeapon(msg):
     try:
         db.insertWeapon(armor)
         return True
-    except:
+    except Exception as e:
+        print(e)
         return False
 
 def main():
