@@ -85,9 +85,9 @@ class RedisDriver:
     @connection_decorator
     def add_build_component(self, build_id, part, item_id):
         self._r.hset(build_id, part, item_id)
-    
+
     @connection_decorator
-    def remove_build_component(self, part, build_id):
+    def remove_build_component(self, build_id, part):
         self._r.hdel(build_id, part)
         self._r.delete(build_id + ':' + part)
     

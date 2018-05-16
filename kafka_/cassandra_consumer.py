@@ -38,10 +38,8 @@ def repl():
                 # Which message was it?
                 if msg.topic() == u'insert_armor':
                     insert_armor(msg, c)
-                    print('Error Occurred Adding to Cassandra')
                 elif msg.topic() == u'insert_weapon':
                     insert_weapon(msg, c)
-                    print('Error Occurred Adding to Cassandra')
             elif msg.error().code() == KafkaError._PARTITION_EOF:
                 print('End of partition reached {0}/{1}'
                     .format(msg.topic(), msg.partition()))
@@ -57,21 +55,21 @@ def repl():
 
 def insert_armor(msg, c):
     result = insertArmor(msg.value())
-    if result: 
-        pprint('Added Successfully ' + msg.value())
-        c.commit()
-    else:
-        c.unsubscribe()
-        c.subscribe(topics)
+    checkResult(result, msg, c) 
 
 def insert_weapon(msg, c):
     result = insertWeapon(msg.value())
+    checkResult(result, msg, c)
+
+def checkResult(result, msg, c):
     if result: 
         pprint('Added Successfully ' + msg.value())
         c.commit()
     else:
         c.unsubscribe()
         c.subscribe(topics)
+        print('Error Occurred Adding to Cassandra')
+
 
 def verifyCassandraHeartbeat():
     return db.heartBeat()
@@ -82,7 +80,8 @@ def insertArmor(msg):
     try:
         db.insertArmor(armor)
         return True
-    except:
+    except Exception as e:
+        print(e)
         return False
 
 def insertWeapon(msg):
@@ -90,7 +89,8 @@ def insertWeapon(msg):
     try:
         db.insertWeapon(armor)
         return True
-    except:
+    except Exception as e:
+        print(e)
         return False
 
 def main():
