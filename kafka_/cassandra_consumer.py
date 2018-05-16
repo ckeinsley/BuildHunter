@@ -62,6 +62,7 @@ def insert_weapon(msg, c):
     checkResult(result, msg, c)
 
 def checkResult(result, msg, c):
+    print(msg.value())
     if result: 
         pprint('Added Successfully ' + msg.value())
         c.commit()
