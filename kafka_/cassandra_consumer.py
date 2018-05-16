@@ -85,7 +85,6 @@ def insertArmor(msg):
         return False
 
 def insertWeapon(msg):
-    print(msg)
     armor = json.loads(msg)
     try:
         db.insertWeapon(armor)
