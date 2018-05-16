@@ -5,6 +5,7 @@ sys.path.insert(0,'../redis_')
 
 from confluent_kafka import Consumer, KafkaError
 import json
+import bson
 import time
 from pprint import pprint
 
@@ -74,7 +75,7 @@ def repl():
         
                            
 def add_build(msg):
-    args = json.loads(msg)
+    args = bson.loads(msg)
     try:
         red.add_build(args['user'], args['build_id'])
         return True
@@ -82,7 +83,7 @@ def add_build(msg):
         return False
 
 def delete_build(msg):
-    args = json.loads(msg)
+    args = bson.loads(msg)
     try:
         red.delete_build(args['user'], args['build_id'], args['build_parts'])
         return True
