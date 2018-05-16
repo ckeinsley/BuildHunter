@@ -79,6 +79,7 @@ def add_build(msg):
         red.add_build(args['user'], args['build_id'])
         return True
     except Exception as e:
+        print(e)
         return False
 
 def delete_build(msg):
@@ -87,6 +88,7 @@ def delete_build(msg):
         red.delete_build(args['user'], args['build_id'], args['build_parts'])
         return True
     except Exception as e:
+        print(e)
         return False
 
 def add_user(msg):
@@ -95,6 +97,7 @@ def add_user(msg):
         red.add_user(args['user'])
         return True
     except Exception as e:
+        print(e)
         return False
 
 def delete_user(msg):
@@ -103,6 +106,7 @@ def delete_user(msg):
         red.delete_user(args['user'])
         return True
     except Exception as e:
+        print(e)
         return False
 
 def add_build_component(msg):
@@ -110,6 +114,7 @@ def add_build_component(msg):
     try:
         red.add_build_component(args['build_id'], args['part'], args['item_id'])
     except Exception as e:
+        print(e)
         return False
 
 def remove_build_component(msg):
@@ -117,6 +122,7 @@ def remove_build_component(msg):
     try:
         red.remove_build_component(args['part'], args['build_id'])
     except Exception as e:
+        print(e)
         return False
 
 def add_decoration(msg):
@@ -124,6 +130,7 @@ def add_decoration(msg):
     try:
         red.add_decoration(args['build_id'], args['part'], args['item_id'])
     except Exception as e:
+        print(e)
         return False
 
 def remove_decoration(msg):
@@ -131,6 +138,7 @@ def remove_decoration(msg):
     try:
         red.remove_decoration(args['build_id'], args['part'], args['item_id'])
     except Exception as e:
+        print(e)
         return False
 
 def remove_all_decorations(msg):
@@ -138,6 +146,7 @@ def remove_all_decorations(msg):
     try:
         red.remove_all_decorations(args['build_id'], args['part'])
     except Exception as e:
+        print(e)
         return False
 
 
