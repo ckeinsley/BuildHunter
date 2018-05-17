@@ -55,6 +55,32 @@ def get_armor_by_attribute_dec_only(attribute):
                 print(obj[0].properties)
 
 
+def generate_build_one(attr, val):
+    attribute_one = attr[0]
+    value_1 = val[0]
+    value = int(value_1 / 5)
+    with driver.session() as session:
+        with session.begin_transaction() as tx:
+            builds = tx.run("Match (aH:Armor {Part:'Head'})-[iHead:Increases]-(a:Attribute {Name: $attribute_one}) "
+                            "Where toInteger(iHead.Amount) > 3 "
+                            "Match (aC:Armor {Part:'Chest'})-[iChest:Increases]-(a) "
+                            "Where toInteger(iChest.Amount) > 3 "
+                            "Match (aW:Armor {Part:'Waist'})-[iWaist:Increases]-(a) " 
+                            "Where toInteger(iWaist.Amount) > 3 "
+                            "Match (aL:Armor {Part:'Legs'})-[iLegs:Increases]-(a) "
+                            "Where toInteger(iLegs.Amount) > 3 "
+                            "Match (aA:Armor {Part:'Arms'})-[iArms:Increases]-(a) "
+                            "Where toInteger(iArms.Amount) > 3 "
+                            "return aH, aC, aW, aL, aA, a LIMIT 1", attribute_one = attribute_one)
+            for obj in builds:
+                print(obj['aH'])
+                print(obj['aC'])
+                print(obj['aW'])
+                print(obj['aL'])
+                print(obj['aA'])
+                return
+
+
 def ping():
     with driver.session() as session:
         with session.begin_transaction() as tx:
@@ -69,27 +95,7 @@ def add_new_armor(armor):
                     "RETURN a", id = armor['id'], name = armor['Name'], part = armor['Part'])
 
 
-# HAVING ISSUES WITH THE $AMOUNT IN THE QUERY FOR THE NEXT TWO FUNCTIONS
-
-# def get_armor_by_attribute_greater_than_amount(attribute, amt):
-#     with driver.session() as session:
-#         with session.begin_transaction() as tx:
-#             Armors = tx.run("Match (armor:Armor)-[i:Increases]-(a:Attribute {Name: $attribute})"
-#                         "Where i.Amount > $amount"
-#                         "Return armor", attribute = attribute, amount = amt)
-#             for obj in Armors:
-#                 print(obj[0].properties)
-
-# def get_armor_by_attribute_less_than_amount(attribute, amt):
-#     with driver.session() as session:
-#         with session.begin_transaction() as tx:
-#             Armors = tx.run("Match (armor:Armor)-[i:Increases]-(a:Attribute {Name: $attribute})"
-#                         "Where i.Amount < $amount"
-#                         "Return armor", attribute = attribute, amount = amt)
-#             for obj in Armors:
-#                 print(obj[0].properties)
-
-
+# generate_build_one(['Fire Atk'], [20])
 # get_skills_by_attribute("Heat Res")
 # get_skills_by_attribute_amount("Heat Res", 10)
 # get_armor_by_attribute('Mounting')
