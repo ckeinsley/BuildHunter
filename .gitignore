@@ -1,3 +1,4 @@
 WebScrapper/env
 __pycache__/
 .vscode/
+cassandra_driver\.log

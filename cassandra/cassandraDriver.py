@@ -222,7 +222,7 @@ def __insertWeaponToTable(weaponToInsert):
     class, attack""" 
     query += identifiers 
     query += """VALUES( {id}, '{name}', {affinity}, {defense}, {rarity}, {slot}, {true_attack},
-    '{weapon_family}', '{class}', {attack}""".format_map(weaponToInsert) 
+    '{weapon_family}', '{class}', {attack}""".format(**weaponToInsert) 
     query += values
 
     session.execute(query)
@@ -261,7 +261,7 @@ def __insertCreateItems(createItems):
     for item in createItems:
         session.execute("INSERT INTO " + WEAPON_CREATE_ITEMS_TABLE + 
             """(id, item_id, name, quantity) 
-            VALUES({id}, {item_id}, '{name}', {quantity})""".format_map(item))
+            VALUES({id}, {item_id}, '{name}', {quantity})""".format(**item))
 
 def __insertUpgradeItems(upgradeItems):
     if not upgradeItems:
@@ -269,7 +269,7 @@ def __insertUpgradeItems(upgradeItems):
     for item in upgradeItems:
         session.execute("INSERT INTO " + WEAPON_UPGRADE_ITEMS_TABLE + 
             """(id, item_id, name, quantity) 
-            VALUES({id}, {item_id}, '{name}', {quantity})""".format_map(item))
+            VALUES({id}, {item_id}, '{name}', {quantity})""".format(**item))
 
 def __insertUpgradesTo(upgradesTo):
     if not upgradesTo:
@@ -277,7 +277,7 @@ def __insertUpgradesTo(upgradesTo):
     for item in upgradesTo:
         session.execute("INSERT INTO " + WEAPON_UPGRADES_TO_TABLE + 
             """(id, item_id, name) 
-            VALUES({id}, {item_id}, '{name}')""".format_map(item))
+            VALUES({id}, {item_id}, '{name}')""".format(**item))
 
 # =============================== QUERIES =======================================
 

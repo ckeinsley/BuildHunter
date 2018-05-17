@@ -1,12 +1,31 @@
 import redis
+import sys
+
+def connection_decorator(function):
+    def wrapper(*args, **kwargs):
+        retVal = None
+        try:
+            retVal = function(*args, **kwargs)
+        except redis.exceptions.ConnectionError:
+            for i in range(5,9):
+                try: 
+                    r = redis.StrictRedis(host='433-0' + str(i) + '.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
+                    r.ping() #Will throw exception if connection not
+                    print('Reconnected to redis on node ' + str(i))
+                    args[0]._r = r
+                    return function(*args, **kwargs)
+                except redis.exceptions.ConnectionError:
+                    pass
+            raise(ConnectionError('Could not connect to redis.'))
+        return retVal
+    return wrapper
 
 class RedisDriver:
 
-    _r = redis.StrictRedis(host='433-05.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
-    #_r = redis.StrictRedis()
+    _r = None
 
     def __init__(self):
-        pass
+        self._r = redis.StrictRedis(host='433-07.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
 
     def ping(self):
         try:
@@ -17,28 +36,33 @@ class RedisDriver:
             return False
 
     ####----active_user and active_build properties----####
-
+    @connection_decorator
     def is_user(self, user):
-        return self._r.sismember('users', user)
+        val = self._r.sismember('users', user)
+        return val
     
+    @connection_decorator
     def build_exists_for_user(self, user, build_id):
         return self._r.sismember(user + ':builds', build_id)
 
     ####----Users----####
-
+    @connection_decorator
     def add_user(self, user):
         self._r.sadd('users', user)
-
+    
+    @connection_decorator
     def delete_user(self, user):
         self._r.delete(*self._r.keys(user + ':*'))
         self._r.srem('users', user)
 
     ####----Builds----####
     
+    @connection_decorator
     def add_build(self, user, buildId):
         #Add build to user builds
         self._r.sadd(user + ":builds", buildId)
     
+    @connection_decorator
     def delete_build(self, user, buildId, build_parts):
         #Remove from user build list
         self._r.srem(user + ":builds", buildId)
@@ -50,23 +74,28 @@ class RedisDriver:
         for part in build_parts:
             self._r.delete(buildId + ':' + part)
     
+    @connection_decorator
     def get_all_builds(self, user):
         return self._r.smembers(user + ':builds')
     
     ####----Build Components (e.g. armor pieces, weapons)----####
 
     BUILD_PARTS = {'head', 'chest', 'arms', 'waist', 'legs', 'weapon'}
-
+    
+    @connection_decorator
     def add_build_component(self, build_id, part, item_id):
         self._r.hset(build_id, part, item_id)
 
+    @connection_decorator
     def remove_build_component(self, build_id, part):
         self._r.hdel(build_id, part)
         self._r.delete(build_id + ':' + part)
     
+    @connection_decorator
     def get_build_parts(self, build_id):
         return self._r.hgetall(build_id)
 
+    @connection_decorator
     def is_part(self, id, part):
         if (part == 'weapon'):
             return self.is_object(id, 'weapon')
@@ -74,18 +103,23 @@ class RedisDriver:
     
     ####----Decorations----####
 
+    @connection_decorator
     def add_decoration(self, build_id, part, itemId):
         self._r.rpush(build_id + ':' + part, itemId)
     
+    @connection_decorator
     def remove_decoration(self, build_id, part, itemId):
         self._r.lrem(build_id + ':' + part, 1, itemId)
 
+    @connection_decorator
     def get_decorations(self, build_id, part):
         self._r.lrange(build_id + ':' + part, 0, -1)
 
+    @connection_decorator
     def remove_all_decorations(self, build_id, part):
         self._r.delete(build_id + ':' + part)
 
+    @connection_decorator
     def is_decoration(self, id):
         return self._r.sismember('decoration_ids', id)
 
@@ -93,21 +127,26 @@ class RedisDriver:
 
     ITEM_TYPES = {'armor', 'weapon', 'skill', 'item', 'decoration'}
 
+    @connection_decorator
     def get_object_name(self, id, type_):
         return self._r.hget(type_+ '_ids', id)
     
+    @connection_decorator
     def search_object_name(self, name, type_):
         return self._r.hscan_iter(type_ + '_names', '*' + name + '*')
-        
+
+    @connection_decorator    
     def get_object_type(self, id):
         for type_ in self.ITEM_TYPES:
             if self._r.hexists(type_ + '_ids', id):
                 return type_
         return None
     
+    @connection_decorator
     def get_object_id(self, name, type_):
         return self._r.hget(type_+ '_names', name)
     
+    @connection_decorator
     def is_object(self, id, type_):
         return self._r.hget(type_+ '_ids', id) is not None
 
@@ -150,6 +189,7 @@ class RedisDriver:
 
     ####----Item----####
 
+    @connection_decorator
     def add_item_data(self, item):
         if self.is_object(item.get('id'), 'item'):
             id = str(item.get('id'))
@@ -177,6 +217,7 @@ class RedisDriver:
         else:
             print('No item matching id: %s' % str(item.get('id')))
 
+    @connection_decorator
     def get_item_data(self, id):
         if self.is_object(id, 'item'):
             item_dict = {}
@@ -212,6 +253,7 @@ class RedisDriver:
 
     ####----Decorations----####
     
+    @connection_decorator
     def add_decoration_data(self, decoration):
         dec = decoration
         id = str(dec.get('id'))
@@ -241,6 +283,7 @@ class RedisDriver:
                 p += 1
             n += 1
 
+    @connection_decorator
     def get_decoration_data(self, id):
         if self.is_object(id, 'decoration'):
             dec_dict = {}
