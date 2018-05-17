@@ -55,9 +55,9 @@ def get_armor_by_attribute_dec_only(attribute):
                 print(obj[0].properties)
 
 
-def generate_build_one(attr, val):
-    attribute_one = attr[0]
-    value_1 = val[0]
+def generate_build_one(attr):
+    attribute_one = attr[0][0]
+    value_1 = attr[0][1]
     value = int(value_1 / 5)
     with driver.session() as session:
         with session.begin_transaction() as tx:
@@ -90,7 +90,7 @@ def add_new_armor(armor):
                     "RETURN a", id = armor['id'], name = armor['Name'], part = armor['Part'])
 
 
-# generate_build_one(['Fire Atk'], [20])
+generate_build_one([('Fire Atk', 20)])
 # get_skills_by_attribute("Heat Res")
 # get_skills_by_attribute_amount("Heat Res", 10)
 # get_armor_by_attribute('Mounting')
