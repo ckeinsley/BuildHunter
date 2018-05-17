@@ -68,7 +68,7 @@ class CliState:
                 new_decorations = self._db.get_decorations(self.get_build_id(), item[0].decode('utf-8'))
                 if new_decorations == None:
                     new_decorations = []
-                self._local_build[item[0].decode('utf-8') + ':decorations'] = new_decorations
+                self._local_build[item[0].decode('utf-8') + ':decorations'] = list(map(lambda x: x.decode('utf-8'), new_decorations))
 
     @active_build.deleter
     def active_build(self):
@@ -159,13 +159,12 @@ class CliState:
 
     # TODO worry about slots taken up by a decoration later
     def add_decoration(self, part, itemId):
-        self._local_build[part + ':decorations'].append(itemId)
-        print(self._local_build)
+        self._local_build[part + ':decorations'].append(str(itemId))
         prod.add_decoration(self.get_build_id(), part, itemId)
         #self._db.add_decoration(self.get_build_id, part, itemId)
     
     def remove_decoration(self, part, itemId):
-        self._local_build[part + ':decorations'].remove(bytes(str(itemId), 'utf-8'))
+        self._local_build[part + ':decorations'].remove(str(itemId))
         prod.remove_decoration(self.get_build_id(), part, itemId)
         #self._db.remove_decoration(self.get_build_id, part, itemId)
 

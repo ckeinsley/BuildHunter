@@ -158,7 +158,7 @@ def add_decoration(part, decoration_id):
 def remove_decoration(part, decoration_id):
     if (r.is_decoration(decoration_id)):
         decorations = r.get_decorations(part)
-        if str(decoration_id).encode('utf-8') in decorations:
+        if str(decoration_id) in decorations:
             r.remove_decoration(part, decoration_id)
         else:
             raise ValueError(str(decoration_id) + 'is not in the build')
@@ -167,7 +167,7 @@ def remove_decoration(part, decoration_id):
 
 @c.option('--part', '-p', prompt=True, type=c.Choice(r.BUILD_PARTS))
 @cli.command('decoration-remove-all')
-def remove_all_decorations(part, decoration_id):
+def remove_all_decorations(part):
     r.remove_all_decorations(part)
 
 ####----Advanced Features----####
