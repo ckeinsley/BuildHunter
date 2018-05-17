@@ -48,11 +48,11 @@ def connect():
         session.set_keyspace(KEYSPACE)
         session.row_factory = dict_factory
         __createHeartBeatTable()
+        __prepareStatements()
     except Exception as e:
         log.error('Unable to connect to cassandra')
         log.exception(e)
         return None
-    __prepareStatements()
 
 def __prepareStatements():
     for (name, query) in PREPARED_QUERIES.items():
