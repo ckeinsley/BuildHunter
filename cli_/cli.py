@@ -181,6 +181,7 @@ def generate_armor_sets(skill):
         value = tup[1]
         skill_list.append((id, value))
     print(skill_list) #TODO: Lookup armor set in Neo4J
+    r.get_build_by_attr_value(skill_list)
 
 def main():
     cli()

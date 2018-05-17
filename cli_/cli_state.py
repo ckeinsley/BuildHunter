@@ -125,8 +125,8 @@ class CliState:
     def get_all_builds(self):
         return self._db.get_all_builds(self.active_user)
 
-    def get_build_by_attr_value(self, attr, value):
-        return neoDriver.generate_build_one(attr, value)
+    def get_build_by_attr_value(self, attr):
+        return neoDriver.generate_build_one(attr)
 
     ####----Build Components (e.g. armor pieces, weapons)----####
 
