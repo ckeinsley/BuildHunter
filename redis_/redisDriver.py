@@ -27,6 +27,7 @@ class RedisDriver:
     def __init__(self):
         self._r = redis.StrictRedis(host='433-07.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
 
+    @connection_decorator
     def ping(self):
         try:
             response = self._r.ping()
