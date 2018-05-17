@@ -73,12 +73,7 @@ def generate_build_one(attr, val):
                             "Where toInteger(iArms.Amount) > 3 "
                             "return aH, aC, aW, aL, aA, a LIMIT 1", attribute_one = attribute_one)
             for obj in builds:
-                print(obj['aH'])
-                print(obj['aC'])
-                print(obj['aW'])
-                print(obj['aL'])
-                print(obj['aA'])
-                return
+                return obj
 
 
 def ping():
