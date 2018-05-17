@@ -8,14 +8,6 @@ from pprint import pprint
 
 r = cli_state.CliState()
 
-def connection_decorator(function):
-    def wrapper(*args, **kwargs):
-        try:
-            return function(*args, **kwargs)
-        except ConnectionError:
-            print('Service Unavailable')
-    return wrapper
-
 @shell(prompt= 'BuildHunter> ', intro='Welcome to BuildHunter!')
 def cli():
     username = c.prompt('What is your username?')

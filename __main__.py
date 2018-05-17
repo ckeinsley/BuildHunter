@@ -1,7 +1,10 @@
 from cli_ import cli
 
 def main():
-    cli.cli()
+    try: 
+        cli.cli()
+    except ConnectionError:
+        print('Service Unavailable')
 
 if __name__ == '__main__':
     main()
