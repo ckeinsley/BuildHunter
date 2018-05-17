@@ -23,9 +23,11 @@ def connection_decorator(function):
 class RedisDriver:
 
     _r = None
+    _is_master = False
 
-    def __init__(self):
-        self._r = redis.StrictRedis(host='433-07.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
+    def __init__(self, is_master):
+        self._r = redis.StrictRedis(host='433-05.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
+        self._is_master = is_master
 
     @connection_decorator
     def ping(self):
