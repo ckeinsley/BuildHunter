@@ -80,9 +80,9 @@ def generate_build_one(attr):
                                     "Where toInteger(iArms.Amount) > 2 AND toInteger(iArms.Amount) > 2 "
                                     "Return aH, aC, aL, aA, aW, a, b LIMIT 1", attribute_one = attribute_one, attribute_two = attribute_two) 
                 for obj in builds:
-                    #print("TWO")
-                    #print(obj)
-                    return obj
+                    array = [obj['aH'].properties, obj['aC'].properties, obj['aA'].properties, obj['aW'].properties, obj['aL'].properties]
+                    # print(array)
+                    return array
     except:
         with driver.session() as session:
             with session.begin_transaction() as tx:
@@ -98,8 +98,9 @@ def generate_build_one(attr):
                             "Where toInteger(iArms.Amount) > 3 "
                             "return aH, aC, aW, aL, aA, a LIMIT 1", attribute_one = attribute_one)
                 for obj in builds:
-                    #print(obj)
-                    return obj
+                    array = [obj['aH'].properties, obj['aC'].properties, obj['aA'].properties, obj['aW'].properties, obj['aL'].properties]
+                    # print(array)
+                    return array
                 
 
 
@@ -117,8 +118,9 @@ def add_new_armor(armor):
                     "RETURN a", id = armor['id'], name = armor['Name'], part = armor['Part'])
 
 
-#generate_build_one([('Fire Atk', 20),('Attack', 20)])
-# generate_build_one([('Fire Atk', 20)])
+# Fire Atk ID = 7508   Attack ID  = 7460
+# generate_build_one([('Fire Atk', 20),('Attack', 20)])
+# generate_build_one([(7508, 20)])
 # get_skills_by_attribute("Heat Res")
 # get_skills_by_attribute_amount("Heat Res", 10)
 # get_armor_by_attribute('Mounting')
