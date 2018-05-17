@@ -13,7 +13,7 @@ def admin():
 @c.option('--file-path', '-f', prompt=True, type=str)
 @admin.command('insert-armor')
 def insert_armor(file_path):
-    armor_file = open(file_path)
+    armor_file = open(file_path, 'rb')
     armor = pickle.load(armor_file, encoding='unicode')
     armor_file.close()
     prod.insert_armor(armor)
