@@ -316,7 +316,8 @@ def getBuildSkills(build):
 def __getIDList(build):
     ids = []
     for (_, id) in build.items():
-        ids.append(id)
+        if id is not None:
+            ids.append(int(id))
     return ids
 
 

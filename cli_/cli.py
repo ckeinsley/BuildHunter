@@ -72,12 +72,19 @@ def get_build_details():
                 item_type = part
             name = r.get_object_name(int(id), item_type)
             decorations = r.get_decorations(part)
-            print(part.capitalize() + ': ' + name.decode('utf-8'))
+            print(part.capitalize() + ': ' + name.decode('utf-8'), end='\t')
             if decorations != None:
                 print('Decorations:')
                 for d in decorations:
                     d_name = r.get_object_name(d, 'decoration')
                     print(d_name.decode('utf-8'))
+    print("Total Defense: \t" + str(r.get_build_total_defense()))
+    print("Resistances: ")
+    for k, v in r.get_build_resistances().items():
+        print('\t' + k.capitalize() + ': ' + str(v))
+    print("Skills: ")
+    for k, v in r.get_build_skills().items():
+        print('\t' + k.capitalize() + ': ' + str(v))
         
 ####----Parts----####
 

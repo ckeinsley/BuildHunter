@@ -29,6 +29,7 @@ class CliState:
 
     def __init__(self):
         self._db = redisDriver.RedisDriver(is_master=False)
+        cd.connect()
         self._active_user = None
         self._active_build = None
         self._local_build = EMPTY_BUILD
@@ -160,10 +161,13 @@ class CliState:
         }
     
     def get_build_resistances(self):
-        return cd.getBuildResistances(self.get_build_parts)
+        return cd.getBuildResistances(self.get_build_parts())
 
     def get_build_skills(self):
-        return cd.getBuildSkills(self.get_build_parts)
+        return cd.getBuildSkills(self.get_build_parts())
+
+    def get_build_total_defense(self):
+        return cd.getBuildDefense(self.get_build_parts())
 
     def is_part(self, id, part):
         return self._db.is_part(id, part)
