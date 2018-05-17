@@ -4,7 +4,7 @@ sys.path.insert(0,'../redis_')
 sys.path.insert(0,'../kafka_')
 
 from redis_ import redisDriver
-from kafka_.producert_test import add_build as prod_add_build
+from kafka_ import producer as prod
 
 '''
 build : {
@@ -99,14 +99,19 @@ class CliState:
         if self._db.is_user(user):
             raise ValueError('User ' + user +  ' already exists')
         else:
-            self._db.add_user(user)
+            prod.add_user(user)
+            #self._db.add_user(user)
             if setActive:
                 self.active_user = user
 
     def delete_user(self, user):
-        if (user is self.active_user):
-            del self.active_user
-        self._db.delete_user(user)
+        try:
+            if (user is self.active_user):
+                del self.active_user
+        except:
+            pass
+        prod.delete_user(user)
+        #self._db.delete_user(user)
 
     def is_user(self, user):
         return self._db.is_user(user)
@@ -115,16 +120,20 @@ class CliState:
     
     def add_build(self, build):
         build_id = self.active_user + ':' + build
-        #prod_add_build(self.active_user, build_id)
         #Add build to user builds
-        self._db.add_build(self.active_user, build_id)
+        prod.add_build(self.active_user, build_id)
+        #self._db.add_build(self.active_user, build_id)
     
     def delete_build(self, build):
         build_id = self.active_user + ':' + build
-        if build == self.active_build:
-            del self.active_build
+        try:
+            if build == self.active_build and self.active_build != None:
+                del self.active_build
+        except ValueError:
+            pass
         #Remove build
-        self._db.delete_build(self.active_user, build_id, self.BUILD_PARTS)
+        prod.delete_build(self.active_user, build_id, list(self.BUILD_PARTS))
+        #self._db.delete_build(self.active_user, build_id, self.BUILD_PARTS)
 
     def get_all_builds(self):
         return self._db.get_all_builds(self.active_user)
@@ -135,12 +144,14 @@ class CliState:
 
     # TODO worry about blademaster/gunner/all later
     def add_build_component(self, part, item_id):
-        self._local_build['part'] = item_id
-        self._db.add_build_component(self.get_build_id(), part, item_id)
+        self._local_build[part] = item_id
+        prod.add_build_component(self.get_build_id(), part, item_id)
+        # self._db.add_build_component(self.get_build_id(), part, item_id)
 
     def remove_build_component(self, part):
-        self._local_build['part'] = None
-        self._db.remove_build_component(self.get_build_id(), part)
+        self._local_build[part] = None
+        prod.remove_build_component(self.get_build_id(), part)
+        #self._db.remove_build_component(self.get_build_id(), part)
     
     # TODO shouldn't be the get build details method
     def get_build_parts(self):
@@ -162,11 +173,13 @@ class CliState:
     # TODO worry about slots taken up by a decoration later
     def add_decoration(self, part, itemId):
         self._local_build[part + ':decorations'].append(itemId)
-        self._db.add_decoration(self.get_build_id, part, itemId)
+        prod.add_decoration(self.get_build_id(), part, itemId)
+        #self._db.add_decoration(self.get_build_id, part, itemId)
     
     def remove_decoration(self, part, itemId):
         self._local_build[part + ':decorations'].remove(itemId)
-        self._db.remove_decoration(self.get_build_id, part, itemId)
+        prod.remove_decoration(self.get_build_id(), part, itemId)
+        #self._db.remove_decoration(self.get_build_id, part, itemId)
 
     def get_decorations(self, part):
         return self._local_build.get(part + ':decorations')
@@ -174,7 +187,8 @@ class CliState:
 
     def remove_all_decorations(self, part):
         self._local_build[part + ':decorations'] = []
-        self._db.remove_all_decorations(self.get_build_id, part)
+        prod.remove_all_decorations(self.get_build_id(), part)
+        #self._db.remove_all_decorations(self.get_build_id, part)
 
     def is_decoration(self, id):
         return self._db.is_decoration(id)

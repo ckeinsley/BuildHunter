@@ -19,7 +19,7 @@ def get_producer():
 
 def insert_armor(armor):
     producer = get_producer()
-    producer.send('armor-insert', json.dumps(armor).encode())
+    producer.send('insert_armor', json.dumps(armor).encode())
     producer.close()
 
 def delete_armor(id):
@@ -66,7 +66,7 @@ def add_build(user, build_id):
 def delete_build(user, build_id, build_parts):
     producer = get_producer()
     delete_build_msg = {'user' : user, 'build_id' : build_id, 'build_parts' : build_parts}
-    producer.send('delete-build', json.dumps(delete_build_msg).encode())
+    producer.send('delete_build', json.dumps(delete_build_msg).encode())
     producer.close()
 
 def add_user(user):
@@ -87,7 +87,7 @@ def add_build_component(build_id, part, item_id):
     producer.send('add_build_component', json.dumps(add_build_component_msg).encode())
     producer.close()
 
-def remove_build_component(part, build_id):
+def remove_build_component(build_id, part):
     producer = get_producer()
     remove_build_component_msg = {'part' : part, 'build_id' : build_id}
     producer.send('remove_build_component', json.dumps(remove_build_component_msg).encode())

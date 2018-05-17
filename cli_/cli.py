@@ -66,11 +66,12 @@ def get_active_build():
 def get_build_details():
     part_dict = r.get_build_parts()
     for part, id in part_dict.items():
-        item_type = 'armor'
-        if part == 'weapon':
-            item_type = part
-        name = r.get_object_name(int(id), item_type)
-        print(part.capitalize() + ': ' + name.decode('utf-8'))
+        if id != None:
+            item_type = 'armor'
+            if part == 'weapon':
+                item_type = part
+            name = r.get_object_name(int(id), item_type)
+            print(part.capitalize() + ': ' + name.decode('utf-8'))
         
 
 ####----Parts----####
@@ -128,6 +129,16 @@ def get_item_info(id):
 @cli.command('decoration-info')
 def get_decoration_data(id):
     pprint(r.get_decoration_data(id))
+
+@c.option('--part', '-p', prompt=True, type=c.Choice(r.BUILD_PARTS))
+@c.option('--decoration-id', '-i', prompt=True, type=int)
+@cli.command('decoration-add')
+def add_decoration(part, dec_id):
+    if (r.is_decoration(dec_id)):
+        r.add_decoration(part, dec_id)
+    else:
+        raise ValueError(str(dec_id) + ' is not a valid decoration')
+
 
 ####----Advanced Features----####
 
