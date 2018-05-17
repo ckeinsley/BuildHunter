@@ -6,7 +6,7 @@ from pprint import pprint
 from neo4j.v1 import GraphDatabase
 
 # Object Loader
-sys.path.insert(0,'..\WebScrapper')
+sys.path.insert(0,'../WebScrapper')
 from obj_loader import read_armor_files
 
 
