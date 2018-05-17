@@ -159,7 +159,7 @@ def remove_all_decorations(msg):
 def main():
     print('Starting Redis Consumer')
     global red
-    red = redisDriver.RedisDriver()
+    red = redisDriver.RedisDriver(is_master=True)
     repl()
 
 

@@ -24,7 +24,7 @@ EMPTY_BUILD = {
 class CliState:
 
     def __init__(self):
-        self._db = redisDriver.RedisDriver()
+        self._db = redisDriver.RedisDriver(is_master=False)
         self._active_user = None
         self._active_build = None
         self._local_build = EMPTY_BUILD

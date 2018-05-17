@@ -7,15 +7,16 @@ def connection_decorator(function):
         try:
             retVal = function(*args, **kwargs)
         except redis.exceptions.ConnectionError:
-            for i in range(5,9):
-                try: 
-                    r = redis.StrictRedis(host='433-0' + str(i) + '.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
-                    r.ping() #Will throw exception if connection not
-                    print('Reconnected to redis on node ' + str(i))
-                    args[0]._r = r
-                    return function(*args, **kwargs)
-                except redis.exceptions.ConnectionError:
-                    pass
+            if not args[0]._is_master:
+                for i in range(5,9):
+                    try: 
+                        r = redis.StrictRedis(host='433-0' + str(i) + '.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
+                        r.ping() #Will throw exception if connection not
+                        print('Reconnected to redis on node ' + str(i))
+                        args[0]._r = r
+                        return function(*args, **kwargs)
+                    except redis.exceptions.ConnectionError:
+                        pass
             raise(ConnectionError('Could not connect to redis.'))
         return retVal
     return wrapper
@@ -29,7 +30,6 @@ class RedisDriver:
         self._r = redis.StrictRedis(host='433-05.csse.rose-hulman.edu', port=6379, db=0, password='huntallthemonsters247')
         self._is_master = is_master
 
-    @connection_decorator
     def ping(self):
         try:
             response = self._r.ping()
