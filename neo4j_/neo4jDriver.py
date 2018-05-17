@@ -63,8 +63,8 @@ def generate_build_one(attr):
         value_2 = attr[1][1]
         with driver.session() as session:
             with session.begin_transaction() as tx:
-                builds = tx.run("Match (aH:Armor {Part:'Head'})-[iHead:Increases]-(a:Attribute {Name: $attribute_one}) "
-                                    "Match (aH)-[iHead2:Increases]-(b:Attribute {Name: $attribute_two}) "
+                builds = tx.run("Match (aH:Armor {Part:'Head'})-[iHead:Increases]-(a:Attribute {id: $attribute_one}) "
+                                    "Match (aH)-[iHead2:Increases]-(b:Attribute {id: $attribute_two}) "
                                     "Where toInteger(iHead2.Amount) > 2 AND toInteger(iHead.Amount) > 2 "
                                     "Match (aC:Armor {Part:'Chest'})-[iChest:Increases]-(a) "
                                     "Match (aC)-[iChest2:Increases]-(b) " 
@@ -80,13 +80,13 @@ def generate_build_one(attr):
                                     "Where toInteger(iArms.Amount) > 2 AND toInteger(iArms.Amount) > 2 "
                                     "Return aH, aC, aL, aA, aW, a, b LIMIT 1", attribute_one = attribute_one, attribute_two = attribute_two) 
                 for obj in builds:
-                    print("TWO")
-                    print(obj)
+                    #print("TWO")
+                    #print(obj)
                     return obj
     except:
         with driver.session() as session:
             with session.begin_transaction() as tx:
-                builds = tx.run("Match (aH:Armor {Part:'Head'})-[iHead:Increases]-(a:Attribute {Name: $attribute_one}) "
+                builds = tx.run("Match (aH:Armor {Part:'Head'})-[iHead:Increases]-(a:Attribute {id: $attribute_one}) "
                             "Where toInteger(iHead.Amount) > 3 "
                             "Match (aC:Armor {Part:'Chest'})-[iChest:Increases]-(a) "
                             "Where toInteger(iChest.Amount) > 3 "
@@ -98,7 +98,7 @@ def generate_build_one(attr):
                             "Where toInteger(iArms.Amount) > 3 "
                             "return aH, aC, aW, aL, aA, a LIMIT 1", attribute_one = attribute_one)
                 for obj in builds:
-                    print(obj)
+                    #print(obj)
                     return obj
                 
 
@@ -117,7 +117,7 @@ def add_new_armor(armor):
                     "RETURN a", id = armor['id'], name = armor['Name'], part = armor['Part'])
 
 
-generate_build_one([('Fire Atk', 20),('Attack', 20)])
+#generate_build_one([('Fire Atk', 20),('Attack', 20)])
 # generate_build_one([('Fire Atk', 20)])
 # get_skills_by_attribute("Heat Res")
 # get_skills_by_attribute_amount("Heat Res", 10)
