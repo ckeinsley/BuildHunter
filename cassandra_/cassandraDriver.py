@@ -13,6 +13,8 @@ log.addHandler(handler)
 from cassandra.cluster import Cluster
 from cassandra.query import SimpleStatement
 from cassandra.query import dict_factory
+import sys
+sys.path.append('./cassandra_')
 import weapon_conversion as weapon_convert
 import armor_conversion as armor_convert
 

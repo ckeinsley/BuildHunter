@@ -7,7 +7,7 @@ sys.path.insert(0,'../neo4j_')
 
 from redis_ import redisDriver
 from kafka_ import producer as prod
-from cassandra_ import cassandraDriver as c
+from cassandra_ import cassandraDriver as cd
 from neo4j_ import neo4jDriver as neoDriver
 
 EMPTY_BUILD = {
@@ -158,6 +158,12 @@ class CliState:
             'legs' : self._local_build.get('legs'),
             'weapon' : self._local_build.get('weapon')
         }
+    
+    def get_build_resistances(self):
+        return cd.getBuildResistances(self.get_build_parts)
+
+    def get_build_skills(self):
+        return cd.getBuildSkills(self.get_build_parts)
 
     def is_part(self, id, part):
         return self._db.is_part(id, part)
