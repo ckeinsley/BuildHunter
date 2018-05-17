@@ -30,13 +30,13 @@ def add_decoration():
         session.close()
 
 
-def add_armor_relations():
+def add_decoration_relations():
     with driver.session() as session:
         with session.begin_transaction() as tx:
             for decoration in allDecoration[0]:
-                for skill in decortaion['Skills']:
+                for skill in decoration['Skills']:
                     tx.run("MATCH (skill:Attribute {Name: $name})"
-                            "MATCH (armor:Armor {Name: $armorName})"
-                            "CREATE UNIQUE (armor)-[boost:Increases {Amount: $Amount}]->(skill)", name = skill['Name'], armorName = armor['Name'], Amount = skill['Value'])
+                            "MATCH (deco:Decoration {Name: $decoName})"
+                            "CREATE UNIQUE (deco)-[boost:Increases {Amount: $Amount}]->(skill)", name = skill['Name'], decoName = decoration['Name'], Amount = skill['Value'])
 add_decoration()
 add_decoration_relations()
