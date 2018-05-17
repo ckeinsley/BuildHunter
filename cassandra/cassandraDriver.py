@@ -13,7 +13,9 @@ log.addHandler(handler)
 from cassandra.cluster import Cluster
 from cassandra.query import SimpleStatement
 from cassandra.query import dict_factory
-import cassandra_weapon_conversion as convert
+import weapon_conversion as weapon_convert
+import armor_conversion as armor_convert
+
 
 IP_ADDRESSES = ['137.112.89.78', '137.112.89.77', '137.112.89.76', '137.112.89.75']
 KEYSPACE = 'buildhunter'
@@ -28,6 +30,15 @@ WEAPON_UPGRADES_TO_TABLE = 'upgradesto'
 WEAPON_UPGRADE_ITEMS_TABLE = 'upgradeitems'
 WEAPON_CREATE_ITEMS_TABLE = 'createitems'
 
+PREPARED_QUERIES = {
+    'ARMOR_ALL':'select * from armor where id=?',
+    'WEAPON_ALL': 'select * from weapon where id=?',
+    'BUILD_TOTAL_DEFENSE': 'select sum(defense_max) from armor where id in ?;',
+    'BUILD_TOTAL_RESISTANCE': 'select sum(dragon) as dragon, sum(fire) as fire, sum(ice) as ice, sum(thunder) as thunder, sum(water) as water from armor WHERE id in ?',
+    'BUILD_SKILLS': 'select name, value, skill_id from skills where id in ?'
+}
+
+
 def connect():
     global session
     try:
@@ -41,6 +52,11 @@ def connect():
         log.error('Unable to connect to cassandra')
         log.exception(e)
         return None
+    __prepareStatements()
+
+def __prepareStatements():
+    for (name, query) in PREPARED_QUERIES.items():
+        PREPARED_QUERIES[name] = session.prepare(query)
 
 def __createHeartBeatTable():
     session.execute("CREATE TABLE IF NOT EXISTS heart (stamp timestamp, id text, PRIMARY KEY(id))")
@@ -107,15 +123,15 @@ def createArmorTable():
     """ % SKILL_TABLE)
 
 def insertArmor(armor):
-    armorToInsert = convert.convertArmor(armor)
-    skills = convert.convertSkills(armor)
-    crafting = convert.convertCrafting(armor)
+    armorToInsert = armor_convert.convertArmor(armor)
+    skills = armor_convert.convertSkills(armor)
+    crafting = armor_convert.convertCrafting(armor)
 
     armorQuery = SimpleStatement("INSERT INTO " + ARMOR_TABLE + 
         "(id, part, name, price, rarity, slot, type, gender, fire, dragon, thunder, water, ice, defense_init, defense_max)"+
         "VALUES ({id}, '{part}', '{name}', '{price}', {rarity}, {slot}, '{type}', '{gender}', {fire}, {dragon}, {thunder}, {water}, {ice}, {defense_init}, {defense_max})".format(**armorToInsert)
     )
-    result = session.execute(armorQuery)
+    session.execute(armorQuery)
     
     for skill in skills:
         skillsQuery = SimpleStatement("INSERT INTO " + SKILL_TABLE + 
@@ -187,7 +203,11 @@ def createWeaponTable():
     """ % WEAPON_UPGRADES_TO_TABLE) 
 
 
-def insertWeapon(weaponToInsert, createItems, upgradeItems, upgradesTo):
+def insertWeapon(weapon):
+    weaponToInsert = weapon_convert.convertWeapon(weapon) 
+    createItems = weapon_convert.convertCreateItems(weapon)
+    upgradeItems = weapon_convert.convertUpgradeItems(weapon)
+    upgradesTo = weapon_convert.convertUpgradesTo(weapon)
     __insertWeaponToTable(weaponToInsert)
     __insertCreateItems(createItems)
     __insertUpgradeItems(upgradeItems)
@@ -202,7 +222,7 @@ def __insertWeaponToTable(weaponToInsert):
     class, attack""" 
     query += identifiers 
     query += """VALUES( {id}, '{name}', {affinity}, {defense}, {rarity}, {slot}, {true_attack},
-    '{weapon_family}', '{class}', {attack}""".format_map(weaponToInsert) 
+    '{weapon_family}', '{class}', {attack}""".format(**weaponToInsert) 
     query += values
 
     session.execute(query)
@@ -236,21 +256,66 @@ def __findOptionalFields(weaponToInsert):
     return (identifiers, values)
 
 def __insertCreateItems(createItems):
+    if not createItems:
+        return
     for item in createItems:
         session.execute("INSERT INTO " + WEAPON_CREATE_ITEMS_TABLE + 
             """(id, item_id, name, quantity) 
-            VALUES({id}, {item_id}, '{name}', {quantity})""".format_map(item))
+            VALUES({id}, {item_id}, '{name}', {quantity})""".format(**item))
 
 def __insertUpgradeItems(upgradeItems):
+    if not upgradeItems:
+        return
     for item in upgradeItems:
         session.execute("INSERT INTO " + WEAPON_UPGRADE_ITEMS_TABLE + 
             """(id, item_id, name, quantity) 
-            VALUES({id}, {item_id}, '{name}', {quantity})""".format_map(item))
+            VALUES({id}, {item_id}, '{name}', {quantity})""".format(**item))
 
 def __insertUpgradesTo(upgradesTo):
+    if not upgradesTo:
+        return
     for item in upgradesTo:
         session.execute("INSERT INTO " + WEAPON_UPGRADES_TO_TABLE + 
             """(id, item_id, name) 
-            VALUES({id}, {item_id}, '{name}')""".format_map(item))
+            VALUES({id}, {item_id}, '{name}')""".format(**item))
 
 # =============================== QUERIES =======================================
+
+#armor dump all
+#weapon dump all
+#build total defence 
+#buld total resistance
+#build attribute sums
+
+def getArmorStats(armorId):
+    result = session.execute(PREPARED_QUERIES['ARMOR_ALL'], [armorId])[0]
+    skills = []
+    for row in session.execute(PREPARED_QUERIES['BUILD_SKILLS'], [[armorId]]):
+        skills.append(row)
+    result['skills'] = skills
+    return result
+
+
+def getWeaponStats(weaponId):
+    return session.execute(PREPARED_QUERIES['WEAPON_ALL'], [weaponId])[0]
+
+def getBuildDefense(build):
+    return session.execute(PREPARED_QUERIES['BUILD_TOTAL_DEFENSE'], [__getIDList(build)])[0]['system.sum(defense_max)']
+
+def getBuildResistances(build):
+    return session.execute(PREPARED_QUERIES['BUILD_TOTAL_RESISTANCE'], [__getIDList(build)])[0]
+
+def getBuildSkills(build):
+    skills = {}
+    for row in session.execute(PREPARED_QUERIES['BUILD_SKILLS'], [__getIDList(build)]):
+        skills[row['name']] = skills.get(row['name'], 0) + row['value']
+    return skills
+            
+def __getIDList(build):
+    ids = []
+    for (_, id) in build.items():
+        ids.append(id)
+    return ids
+
+
+

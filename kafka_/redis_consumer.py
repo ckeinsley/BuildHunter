@@ -10,7 +10,7 @@ from pprint import pprint
 
 from redis_ import redisDriver
 
-topics = ["add-build", "armor-insert"]
+topics = ['add_build', 'delete_build', 'add_user', 'delete_user', 'add_build_component', 'remove_build_component', 'add_decoration', 'remove_decoration', 'remove_all_decorations']
 settings = {
     'bootstrap.servers': 'localhost:9092',
     'group.id': 'buildHunter',
@@ -35,12 +35,26 @@ def repl():
             # Found message
             elif not msg.error():
                 # Try to handle
-                if msg.topic() == u'add-build':
+                if msg.topic() == u'add_build':
                     result = add_build(msg.value())
-                elif msg.topic() == u'armor-insert':
-                    result = insert_armor(msg.value())
+                elif msg.topic() == u'delete_build':
+                    result = delete_build(msg.value())
+                elif msg.topic() == u'add_user':
+                    result = add_user(msg.value())
+                elif msg.topic() == u'delete_user':
+                    result = delete_user(msg.value())
+                elif msg.topic() == u'add_build_component':
+                    result = add_build_component(msg.value())
+                elif msg.topic() == u'remove_build_component':
+                    result = remove_build_component(msg.value())
+                elif msg.topic() == u'add_decoration':
+                    result = add_decoration(msg.value())
+                elif msg.topic() == u'remove_decoration':
+                    result = remove_decoration(msg.value())
+                elif msg.topic() == u'remove_all_decorations':
+                    result = remove_all_decorations(msg.value())
                 if result:
-                    pprint('Added Successfully ' + msg.value())
+                    pprint('Success ' + msg.value())
                     c.commit()
                 else:
                     c.unsubscribe()
@@ -65,14 +79,79 @@ def add_build(msg):
         red.add_build(args['user'], args['build_id'])
         return True
     except Exception as e:
+        print(e)
         return False
 
-def insert_armor(msg):
-    armor = json.loads(msg)
+def delete_build(msg):
+    args = json.loads(msg)
     try:
-        red.add_armor_data(armor)
+        red.delete_build(args['user'], args['build_id'], args['build_parts'])
         return True
     except Exception as e:
+        print(e)
+        return False
+
+def add_user(msg):
+    args = json.loads(msg)
+    try:
+        red.add_user(args['user'])
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def delete_user(msg):
+    args = json.loads(msg)
+    try:
+        red.delete_user(args['user'])
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def add_build_component(msg):
+    args = json.loads(msg)
+    try:
+        red.add_build_component(args['build_id'], args['part'], args['item_id'])
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def remove_build_component(msg):
+    args = json.loads(msg)
+    try:
+        red.remove_build_component(args['part'], args['build_id'])
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def add_decoration(msg):
+    args = json.loads(msg)
+    try:
+        red.add_decoration(args['build_id'], args['part'], args['item_id'])
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def remove_decoration(msg):
+    args = json.loads(msg)
+    try:
+        red.remove_decoration(args['build_id'], args['part'], args['item_id'])
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def remove_all_decorations(msg):
+    args = json.loads(msg)
+    try:
+        red.remove_all_decorations(args['build_id'], args['part'])
+        return True
+    except Exception as e:
+        print(e)
         return False
 
 

@@ -55,6 +55,12 @@ def get_armor_by_attribute_dec_only(attribute):
                 print(obj[0].properties)
 
 
+def ping():
+    with driver.session() as session:
+        with session.begin_transaction() as tx:
+            val = tx.run("Match (n) Return n Limit 1")
+        return val
+
 
 def add_new_armor(armor):
     with driver.session() as session:
