@@ -3,10 +3,12 @@ import sys
 sys.path.insert(0,'../redis_')
 sys.path.insert(0,'../kafka_')
 sys.path.insert(0,'../cassandra_')
+sys.path.insert(0,'../neo4j_')
 
 from redis_ import redisDriver
 from kafka_ import producer as prod
 from cassandra_ import cassandraDriver as c
+from neo4j_ import neo4jDriver as neoDriver
 
 EMPTY_BUILD = {
             'head' : None,
@@ -70,7 +72,7 @@ class CliState:
                 new_decorations = self._db.get_decorations(self.get_build_id(), item[0].decode('utf-8'))
                 if new_decorations == None:
                     new_decorations = []
-                self._local_build[item[0].decode('utf-8') + ':decorations'] = new_decorations
+                self._local_build[item[0].decode('utf-8') + ':decorations'] = list(map(lambda x: x.decode('utf-8'), new_decorations))
 
     @active_build.deleter
     def active_build(self):
@@ -92,12 +94,12 @@ class CliState:
                 self.active_user = user
 
     def delete_user(self, user):
+        prod.delete_user(user)
         try:
             if (user is self.active_user):
                 del self.active_user
         except:
             pass
-        prod.delete_user(user)
         #self._db.delete_user(user)
 
     def is_user(self, user):
@@ -113,17 +115,20 @@ class CliState:
     
     def delete_build(self, build):
         build_id = self.active_user + ':' + build
+        prod.delete_build(self.active_user, build_id, list(self.BUILD_PARTS))
         try:
             if build == self.active_build and self.active_build != None:
                 del self.active_build
         except ValueError:
             pass
         #Remove build
-        prod.delete_build(self.active_user, build_id, list(self.BUILD_PARTS))
         #self._db.delete_build(self.active_user, build_id, self.BUILD_PARTS)
 
     def get_all_builds(self):
         return self._db.get_all_builds(self.active_user)
+
+    def get_build_by_attr_value(self, attr, value):
+        return neoDriver.generate_build_one(attr, value)
 
     ####----Build Components (e.g. armor pieces, weapons)----####
 
@@ -131,15 +136,15 @@ class CliState:
 
     # TODO worry about blademaster/gunner/all later
     def add_build_component(self, part, item_id):
+        prod.add_build_component(self.get_build_id(), part, item_id)
         self._local_build[part] = item_id
         self._local_build[part+':decorations'] = []
-        prod.add_build_component(self.get_build_id(), part, item_id)
         # self._db.add_build_component(self.get_build_id(), part, item_id)
 
     def remove_build_component(self, part):
+        prod.remove_build_component(self.get_build_id(), part)
         self._local_build[part] = None
         self._local_build[part+':decorations'] = []
-        prod.remove_build_component(self.get_build_id(), part)
         #self._db.remove_build_component(self.get_build_id(), part)
     
     # TODO shouldn't be the get build details method
@@ -161,13 +166,13 @@ class CliState:
 
     # TODO worry about slots taken up by a decoration later
     def add_decoration(self, part, itemId):
-        self._local_build[part + ':decorations'].append(itemId)
         prod.add_decoration(self.get_build_id(), part, itemId)
+        self._local_build[part + ':decorations'].append(str(itemId))
         #self._db.add_decoration(self.get_build_id, part, itemId)
     
     def remove_decoration(self, part, itemId):
-        self._local_build[part + ':decorations'].remove(itemId)
         prod.remove_decoration(self.get_build_id(), part, itemId)
+        self._local_build[part + ':decorations'].remove(str(itemId))
         #self._db.remove_decoration(self.get_build_id, part, itemId)
 
     def get_decorations(self, part):
@@ -175,8 +180,8 @@ class CliState:
         #return self._db.get_decorations(self.get_build_id(), part)
 
     def remove_all_decorations(self, part):
-        self._local_build[part + ':decorations'] = []
         prod.remove_all_decorations(self.get_build_id(), part)
+        self._local_build[part + ':decorations'] = []
         #self._db.remove_all_decorations(self.get_build_id, part)
 
     def is_decoration(self, id):

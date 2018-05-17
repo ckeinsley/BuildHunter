@@ -12,7 +12,7 @@ import json
 import time
 from pprint import pprint
 
-topic = "armor-insert"
+topic = "insert-armor"
 settings = {
     'bootstrap.servers': 'localhost:9092',
     'group.id': 'buildHunter',
@@ -59,9 +59,6 @@ def repl():
 
     finally:
         c.close()
-
-def verifyCassandraHeartbeat():
-    return db.heartBeat()
 
 #Attempt to insert the armor. If no errors occur, we can commit
 def insertArmor(msg):

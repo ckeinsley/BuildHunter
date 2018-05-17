@@ -20,8 +20,8 @@ def add_armor():
     with driver.session() as session:
         with session.begin_transaction() as tx:
             for armor in allArmor[0]:
-                tx.run("MERGE (a: Armor {id: $id, Name: $name, Part: $part})"
-                        "RETURN a", id = armor['id'], name = armor['Name'], part = armor['Part'])
+                tx.run("MERGE (a: Armor {id: $id, Name: $name, Part: $part, Slots: $slots})"
+                        "RETURN a", id = armor['id'], name = armor['Name'], part = armor['Part'], slots = armor['Slot'])
                 
                 #for skill in attribute['Skills']:
                     #print(skill)

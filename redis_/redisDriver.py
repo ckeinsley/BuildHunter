@@ -116,7 +116,7 @@ class RedisDriver:
 
     @connection_decorator
     def get_decorations(self, build_id, part):
-        self._r.lrange(build_id + ':' + part, 0, -1)
+        return self._r.lrange(build_id + ':' + part, 0, -1)
 
     @connection_decorator
     def remove_all_decorations(self, build_id, part):

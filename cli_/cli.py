@@ -76,7 +76,8 @@ def get_build_details():
             if decorations != None:
                 print('Decorations:')
                 for d in decorations:
-                    print(d.decode('utf-8'))
+                    d_name = r.get_object_name(d, 'decoration')
+                    print(d_name.decode('utf-8'))
         
 ####----Parts----####
 
@@ -149,12 +150,17 @@ def add_decoration(part, decoration_id):
 def remove_decoration(part, decoration_id):
     if (r.is_decoration(decoration_id)):
         decorations = r.get_decorations(part)
-        if decoration_id in decorations:
+        if str(decoration_id) in decorations:
             r.remove_decoration(part, decoration_id)
         else:
             raise ValueError(str(decoration_id) + 'is not in the build')
     else:
         raise ValueError(str(decoration_id) + ' is not a valid decoration')
+
+@c.option('--part', '-p', prompt=True, type=c.Choice(r.BUILD_PARTS))
+@cli.command('decoration-remove-all')
+def remove_all_decorations(part):
+    r.remove_all_decorations(part)
 
 ####----Advanced Features----####
 
