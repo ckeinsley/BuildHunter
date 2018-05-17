@@ -79,9 +79,13 @@ def get_build_details():
             if part == 'weapon':
                 item_type = part
             name = r.get_object_name(int(id), item_type)
+            decorations = r.get_decorations(part)
             print(part.capitalize() + ': ' + name.decode('utf-8'))
+            if decorations != None:
+                print('Decorations:')
+                for d in decorations:
+                    print(d.decode('utf-8'))
         
-
 ####----Parts----####
 
 @c.option('--part', '-p', type=c.Choice(r.BUILD_PARTS), prompt=True)
@@ -123,7 +127,6 @@ def search_object_name(name, type_):
         if item_type is type_ or r.is_part(int(obj[1].decode()),type_):
             print(obj[1].decode() + ': ' + obj[0].decode('utf-8'))
 
-
 ####----Items----####
 
 @c.option('--id', '-i', prompt=True, type=int)
@@ -141,12 +144,25 @@ def get_decoration_data(id):
 @c.option('--part', '-p', prompt=True, type=c.Choice(r.BUILD_PARTS))
 @c.option('--decoration-id', '-i', prompt=True, type=int)
 @cli.command('decoration-add')
-def add_decoration(part, dec_id):
-    if (r.is_decoration(dec_id)):
-        r.add_decoration(part, dec_id)
+def add_decoration(part, decoration_id):
+    if (r.is_decoration(decoration_id)):
+        r.add_decoration(part, decoration_id)
     else:
-        raise ValueError(str(dec_id) + ' is not a valid decoration')
+        raise ValueError(str(decoration_id) + ' is not a valid decoration')
 
+
+@c.option('--part', '-p', prompt=True, type=c.Choice(r.BUILD_PARTS))
+@c.option('--decoration-id', '-i', prompt=True, type=int)
+@cli.command('decoration-remove')
+def remove_decoration(part, decoration_id):
+    if (r.is_decoration(decoration_id)):
+        decorations = r.get_decorations(part)
+        if decoration_id in decorations:
+            r.remove_decoration(part, decoration_id)
+        else:
+            raise ValueError(str(decoration_id) + 'is not in the build')
+    else:
+        raise ValueError(str(decoration_id) + ' is not a valid decoration')
 
 ####----Advanced Features----####
 

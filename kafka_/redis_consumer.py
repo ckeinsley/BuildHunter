@@ -14,7 +14,7 @@ topics = ['add_build', 'delete_build', 'add_user', 'delete_user', 'add_build_com
 settings = {
     'bootstrap.servers': 'localhost:9092',
     'group.id': 'buildHunter',
-    'client.id': 'cassandra',
+    'client.id': 'redis',
     'enable.auto.commit': False,
     'session.timeout.ms': 6000,
     'default.topic.config': {'auto.offset.reset': 'latest'}

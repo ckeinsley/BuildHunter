@@ -96,19 +96,19 @@ def remove_build_component(build_id, part):
 def add_decoration(build_id, part, item_id):
     producer = get_producer()
     add_decoration_msg = {'build_id' : build_id, 'part' : part, 'item_id' : item_id}
-    producer.send('add_decoration', json.dumps(add_decoration_msg).encodes())
+    producer.send('add_decoration', json.dumps(add_decoration_msg).encode())
     producer.close()
 
 def remove_decoration(build_id, part, item_id):
     producer = get_producer()
     remove_decoration_msg = {'build_id' : build_id, 'part' : part, 'item_id' : item_id}
-    producer.send('remove_decoration', json.dumps(remove_decoration_msg).encodes())
+    producer.send('remove_decoration', json.dumps(remove_decoration_msg).encode())
     producer.close()
 
 def remove_all_decorations(build_id, part):
     producer = get_producer()
     remove_all_decorations_msg = {'build_id' : build_id, 'part' : part}
-    producer.send('remove_all_decorations', json.dumps(remove_all_decorations_msg).encodes())
+    producer.send('remove_all_decorations', json.dumps(remove_all_decorations_msg).encode())
     producer.close()
 
 

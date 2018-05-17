@@ -121,7 +121,7 @@ class RedisDriver:
 
     @connection_decorator
     def is_decoration(self, id):
-        return self._r.sismember('decoration_ids', id)
+        return self._r.hexists('decoration_ids', id)
 
     ####----Items----####
 

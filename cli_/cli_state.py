@@ -6,23 +6,6 @@ sys.path.insert(0,'../kafka_')
 from redis_ import redisDriver
 from kafka_ import producer as prod
 
-'''
-build : {
-    'head' : id, 
-    'chest' : id,
-    'arms' : id, 
-    'waist' : id, 
-    'legs' : id, 
-    'weapon' : id,
-    'head_decorations' : id, 
-    'chest_decorations' : id,
-    'arms_decorations' : id,
-    'waist_decorations' : id,
-    'legs_decorations' : id, 
-    'weapon_decorations' : id,
-}
-'''
-
 EMPTY_BUILD = {
             'head' : None,
             'chest' : None,
@@ -83,6 +66,8 @@ class CliState:
             for item in new_parts.items():
                 self._local_build[item[0].decode('utf-8')] = item[1].decode('utf-8')
                 new_decorations = self._db.get_decorations(self.get_build_id(), item[0].decode('utf-8'))
+                if new_decorations == None:
+                    new_decorations = []
                 self._local_build[item[0].decode('utf-8') + ':decorations'] = new_decorations
 
     @active_build.deleter
@@ -145,11 +130,13 @@ class CliState:
     # TODO worry about blademaster/gunner/all later
     def add_build_component(self, part, item_id):
         self._local_build[part] = item_id
+        self._local_build[part+':decorations'] = []
         prod.add_build_component(self.get_build_id(), part, item_id)
         # self._db.add_build_component(self.get_build_id(), part, item_id)
 
     def remove_build_component(self, part):
         self._local_build[part] = None
+        self._local_build[part+':decorations'] = []
         prod.remove_build_component(self.get_build_id(), part)
         #self._db.remove_build_component(self.get_build_id(), part)
     
