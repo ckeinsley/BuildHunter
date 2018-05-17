@@ -2,10 +2,12 @@ import sys
 
 sys.path.insert(0,'../redis_')
 sys.path.insert(0,'../kafka_')
+sys.path.insert(0,'../cassandra_')
 sys.path.insert(0,'../neo4j_')
 
 from redis_ import redisDriver
 from kafka_ import producer as prod
+from cassandra_ import cassandraDriver as c
 from neo4j_ import neo4jDriver as neoDriver
 
 EMPTY_BUILD = {
