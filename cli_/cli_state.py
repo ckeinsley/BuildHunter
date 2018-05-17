@@ -160,11 +160,12 @@ class CliState:
     # TODO worry about slots taken up by a decoration later
     def add_decoration(self, part, itemId):
         self._local_build[part + ':decorations'].append(itemId)
+        print(self._local_build)
         prod.add_decoration(self.get_build_id(), part, itemId)
         #self._db.add_decoration(self.get_build_id, part, itemId)
     
     def remove_decoration(self, part, itemId):
-        self._local_build[part + ':decorations'].remove(itemId)
+        self._local_build[part + ':decorations'].remove(bytes(str(itemId), 'utf-8'))
         prod.remove_decoration(self.get_build_id(), part, itemId)
         #self._db.remove_decoration(self.get_build_id, part, itemId)
 
