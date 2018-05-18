@@ -26,7 +26,7 @@ EMPTY_BUILD = {
             'weapon:decorations' : []
         }
 
-class CliState:
+class CliState(object):
 
     def __init__(self):
         self._db = redisDriver.RedisDriver(is_master=False)
@@ -67,6 +67,7 @@ class CliState:
             self._active_build = temp
             raise ValueError('Build does not exist for the current active user')
         else:
+            print(self.get_build_id())
             new_parts = self._db.get_build_parts(self.get_build_id())
             self._local_build = EMPTY_BUILD
             for item in new_parts.items():

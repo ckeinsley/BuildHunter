@@ -72,7 +72,7 @@ def get_build_details():
                 item_type = part
             name = r.get_object_name(int(id), item_type)
             decorations = r.get_decorations(part)
-            print(part.capitalize() + ': ' + name.decode('utf-8'), '\t')
+            print(part.capitalize() + ': ' + name.decode('utf-8') + '\t')
             if decorations != None:
                 print('Decorations:')
                 for d in decorations:
