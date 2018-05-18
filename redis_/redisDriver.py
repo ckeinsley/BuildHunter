@@ -21,7 +21,7 @@ def connection_decorator(function):
         return retVal
     return wrapper
 
-class RedisDriver:
+class RedisDriver(object):
 
     _r = None
     _is_master = False
