@@ -175,13 +175,28 @@ def remove_all_decorations(part):
 @cli.command('generate-armor-sets')
 def generate_armor_sets(skill):
     skill_list = []
-    print(skill_list)
     for tup in skill:
         id = int(r.get_object_id(tup[0], 'skill'))
         value = tup[1]
         skill_list.append((id, value))
-    print(skill_list) #TODO: Lookup armor set in Neo4J
-    pprint(r.get_build_by_attr_value(skill_list))
+    buildPieces = r.get_build_by_attr_value(skill_list)
+    part_dict = {}
+    for piece in buildPieces:
+        part_dict[piece['Part'].lower()] = piece['id']
+    for part, id in part_dict.items():
+        if id != None:
+            item_type = 'armor'
+            if part == 'weapon':
+                item_type = part
+            name = r.get_object_name(int(id), item_type)
+            print(part.capitalize() + ': \t' + name.decode('utf-8'))
+    print("Total Defense: \t " + str(r.get_build_total_defense(build=part_dict)))
+    print("Resistances: ")
+    for k, v in r.get_build_resistances(build=part_dict).items():
+        print('\t' + k.capitalize() + ': ' + str(v))
+    print("Skills: ")
+    for k, v in r.get_build_skills(build=part_dict).items():
+        print('\t' + k.capitalize() + ': ' + str(v))
 
 def main():
     cli()

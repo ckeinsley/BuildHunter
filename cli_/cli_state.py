@@ -160,14 +160,20 @@ class CliState:
             'weapon' : self._local_build.get('weapon')
         }
     
-    def get_build_resistances(self):
-        return cd.getBuildResistances(self.get_build_parts())
+    def get_build_resistances(self, build=None):
+        if build is None:
+            build = self.get_build_parts()
+        return cd.getBuildResistances(build)
 
-    def get_build_skills(self):
-        return cd.getBuildSkills(self.get_build_parts())
+    def get_build_skills(self, build=None):
+        if build is None:
+            build = self.get_build_parts()
+        return cd.getBuildSkills(build)
 
-    def get_build_total_defense(self):
-        return cd.getBuildDefense(self.get_build_parts())
+    def get_build_total_defense(self, build=None):
+        if build is None:
+            build = self.get_build_parts()
+        return cd.getBuildDefense(build)
 
     def is_part(self, id, part):
         return self._db.is_part(id, part)
