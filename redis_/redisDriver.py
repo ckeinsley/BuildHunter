@@ -17,7 +17,7 @@ def connection_decorator(function):
                         return function(*args, **kwargs)
                     except redis.exceptions.ConnectionError:
                         pass
-            raise(ConnectionError('Could not connect to redis.'))
+            raise(ConnectionError('Service Unavailable'))
         return retVal
     return wrapper
 

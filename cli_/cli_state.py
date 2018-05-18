@@ -129,7 +129,11 @@ class CliState:
         return self._db.get_all_builds(self.active_user)
 
     def get_build_by_attr_value(self, attr):
-        return neoDriver.generate_build_one(attr)
+        try:
+            neoDriver.connect()
+            return neoDriver.generate_build_one(attr)
+        except:
+            raise(ConnectionError('Service Unavailable'))
 
     ####----Build Components (e.g. armor pieces, weapons)----####
 

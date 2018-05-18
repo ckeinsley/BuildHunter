@@ -1,4 +1,5 @@
 from cli_ import cli
+from redis.exceptions import ConnectionError
 
 def main():
     try: 
