@@ -1,7 +1,7 @@
 import sys
 
 # Cassandra Driver
-sys.path.insert(0,'../cassandra')
+sys.path.insert(0,'../cassandra_')
 import cassandraDriver as db
 
 
