@@ -1,4 +1,5 @@
 import sys
+from redis.exceptions import ConnectionError
 
 sys.path.insert(0,'../redis_')
 sys.path.insert(0,'../kafka_')
