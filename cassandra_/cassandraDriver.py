@@ -17,6 +17,7 @@ import sys
 sys.path.append('./cassandra_')
 import weapon_conversion as weapon_convert
 import armor_conversion as armor_convert
+from redis.exceptions import ConnectionError 
 
 
 IP_ADDRESSES = ['137.112.89.78', '137.112.89.77', '137.112.89.76', '137.112.89.75']
@@ -51,39 +52,47 @@ def connect():
         session.row_factory = dict_factory
         __createHeartBeatTable()
         __prepareStatements()
+        return True
     except Exception as e:
         log.error('Unable to connect to cassandra')
         log.exception(e)
-        return None
+        session = None
+        return False
+
+def get_session():
+    if session is None:
+        if(connect()):
+            return session 
+    raise ConnectionError('Could not connect to Cassandra')
 
 def __prepareStatements():
     for (name, query) in PREPARED_QUERIES.items():
-        PREPARED_QUERIES[name] = session.prepare(query)
+        PREPARED_QUERIES[name] = get_session().prepare(query)
 
 def __createHeartBeatTable():
-    session.execute("CREATE TABLE IF NOT EXISTS heart (stamp timestamp, id text, PRIMARY KEY(id))")
-    session.execute("INSERT INTO heart (id, stamp) VALUES ('last', toTimestamp(now()))")
+    get_session().execute("CREATE TABLE IF NOT EXISTS heart (stamp timestamp, id text, PRIMARY KEY(id))")
+    get_session().execute("INSERT INTO heart (id, stamp) VALUES ('last', toTimestamp(now()))")
 
 def heartBeat():
     try:
-        session.execute("SELECT * from heart")
+        get_session().execute("SELECT * from heart")
         return True
     except:
         return False
 
 
 def __createKeyspaceIfNotExists():
-    rows = session.execute("SELECT keyspace_name FROM system_schema.keyspaces")
+    rows = get_session().execute("SELECT keyspace_name FROM system_schema.keyspaces")
     if KEYSPACE in [row[0] for row in rows]:
         return
-    session.execute("""
+    get_session().execute("""
         CREATE KEYSPACE %s
         WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': '3' }
         """ % KEYSPACE)
 
 # ========================= CREATION ==============================================
 def createArmorTable():
-    session.execute("""
+    get_session().execute("""
         create table if not exists %s (
         id int,
         name text,
@@ -104,7 +113,7 @@ def createArmorTable():
         )  
     """ % ARMOR_TABLE)
 
-    session.execute("""
+    get_session().execute("""
         create table if not exists %s (
         id int,
         item_id int,
@@ -114,7 +123,7 @@ def createArmorTable():
         )  
     """ % ARMOR_CRAFTING_TABLE)
 
-    session.execute("""
+    get_session().execute("""
         create table if not exists %s (
         id int,
         skill_id int,
@@ -133,13 +142,13 @@ def insertArmor(armor):
         "(id, part, name, price, rarity, slot, type, gender, fire, dragon, thunder, water, ice, defense_init, defense_max)"+
         "VALUES ({id}, '{part}', '{name}', '{price}', {rarity}, {slot}, '{type}', '{gender}', {fire}, {dragon}, {thunder}, {water}, {ice}, {defense_init}, {defense_max})".format(**armorToInsert)
     )
-    session.execute(armorQuery)
+    get_session().execute(armorQuery)
     
     for skill in skills:
         skillsQuery = SimpleStatement("INSERT INTO " + SKILL_TABLE + 
             "(id, skill_id, name, value) VALUES ({id}, {skill_id}, '{name}', {value})".format(**skill)
         )
-        session.execute(skillsQuery)
+        get_session().execute(skillsQuery)
 
     for item in crafting:
         craftsQuery = SimpleStatement("INSERT INTO " + ARMOR_CRAFTING_TABLE + 
@@ -148,10 +157,10 @@ def insertArmor(armor):
             VALUES ({id}, {item_id}, '{name}', {quantity})
             """.format(**item)
         )
-        session.execute(craftsQuery)
+        get_session().execute(craftsQuery)
 
 def createWeaponTable():
-    session.execute("""
+    get_session().execute("""
         create table if not exists %s (
         id int,
         name text,
@@ -172,7 +181,7 @@ def createWeaponTable():
         )  
     """ % WEAPON_TABLE)
 
-    session.execute("""
+    get_session().execute("""
         create table if not exists %s (
         id int,
         item_id int,
@@ -183,7 +192,7 @@ def createWeaponTable():
     
     """ % WEAPON_CREATE_ITEMS_TABLE)
 
-    session.execute("""
+    get_session().execute("""
         create table if not exists %s (
         id int,
         item_id int,
@@ -194,7 +203,7 @@ def createWeaponTable():
     
     """ % WEAPON_UPGRADE_ITEMS_TABLE)
 
-    session.execute("""
+    get_session().execute("""
         create table if not exists %s (
         id int,
         item_id int,
@@ -227,7 +236,7 @@ def __insertWeaponToTable(weaponToInsert):
     '{weapon_family}', '{class}', {attack}""".format(**weaponToInsert) 
     query += values
 
-    session.execute(query)
+    get_session().execute(query)
 
 def __findOptionalFields(weaponToInsert):
     identifiers = ""
@@ -261,7 +270,7 @@ def __insertCreateItems(createItems):
     if not createItems:
         return
     for item in createItems:
-        session.execute("INSERT INTO " + WEAPON_CREATE_ITEMS_TABLE + 
+        get_session().execute("INSERT INTO " + WEAPON_CREATE_ITEMS_TABLE + 
             """(id, item_id, name, quantity) 
             VALUES({id}, {item_id}, '{name}', {quantity})""".format(**item))
 
@@ -269,7 +278,7 @@ def __insertUpgradeItems(upgradeItems):
     if not upgradeItems:
         return
     for item in upgradeItems:
-        session.execute("INSERT INTO " + WEAPON_UPGRADE_ITEMS_TABLE + 
+        get_session().execute("INSERT INTO " + WEAPON_UPGRADE_ITEMS_TABLE + 
             """(id, item_id, name, quantity) 
             VALUES({id}, {item_id}, '{name}', {quantity})""".format(**item))
 
@@ -277,7 +286,7 @@ def __insertUpgradesTo(upgradesTo):
     if not upgradesTo:
         return
     for item in upgradesTo:
-        session.execute("INSERT INTO " + WEAPON_UPGRADES_TO_TABLE + 
+        get_session().execute("INSERT INTO " + WEAPON_UPGRADES_TO_TABLE + 
             """(id, item_id, name) 
             VALUES({id}, {item_id}, '{name}')""".format(**item))
 
@@ -290,26 +299,26 @@ def __insertUpgradesTo(upgradesTo):
 #build attribute sums
 
 def getArmorStats(armorId):
-    result = session.execute(PREPARED_QUERIES['ARMOR_ALL'], [armorId])[0]
+    result = get_session().execute(PREPARED_QUERIES['ARMOR_ALL'], [armorId])[0]
     skills = []
-    for row in session.execute(PREPARED_QUERIES['BUILD_SKILLS'], [[armorId]]):
+    for row in get_session().execute(PREPARED_QUERIES['BUILD_SKILLS'], [[armorId]]):
         skills.append(row)
     result['skills'] = skills
     return result
 
 
 def getWeaponStats(weaponId):
-    return session.execute(PREPARED_QUERIES['WEAPON_ALL'], [weaponId])[0]
+    return get_session().execute(PREPARED_QUERIES['WEAPON_ALL'], [weaponId])[0]
 
 def getBuildDefense(build):
-    return session.execute(PREPARED_QUERIES['BUILD_TOTAL_DEFENSE'], [__getIDList(build)])[0]['system.sum(defense_max)']
+    return get_session().execute(PREPARED_QUERIES['BUILD_TOTAL_DEFENSE'], [__getIDList(build)])[0]['system.sum(defense_max)']
 
 def getBuildResistances(build):
-    return session.execute(PREPARED_QUERIES['BUILD_TOTAL_RESISTANCE'], [__getIDList(build)])[0]
+    return get_session().execute(PREPARED_QUERIES['BUILD_TOTAL_RESISTANCE'], [__getIDList(build)])[0]
 
 def getBuildSkills(build):
     skills = {}
-    for row in session.execute(PREPARED_QUERIES['BUILD_SKILLS'], [__getIDList(build)]):
+    for row in get_session().execute(PREPARED_QUERIES['BUILD_SKILLS'], [__getIDList(build)]):
         skills[row['name']] = skills.get(row['name'], 0) + row['value']
     return skills
             
