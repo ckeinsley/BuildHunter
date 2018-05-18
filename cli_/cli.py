@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 sys.path.insert(0, '../cli_')
 from click_shell import shell 
@@ -72,12 +73,13 @@ def get_build_details():
                 item_type = part
             name = r.get_object_name(int(id), item_type)
             decorations = r.get_decorations(part)
-            print(part.capitalize() + ': ' + name.decode('utf-8') + '\t')
+            print(part.capitalize() + ': ' + name.decode('utf-8'), end='\t')
             if decorations != None:
-                print('Decorations:')
+                print('Decorations:', end=' ')
                 for d in decorations:
                     d_name = r.get_object_name(d, 'decoration')
-                    print(d_name.decode('utf-8'))
+                    print(d_name.decode('utf-8'), end=', ')
+                print('')
     print("Total Defense: \t" + str(r.get_build_total_defense()))
     print("Resistances: ")
     for k, v in r.get_build_resistances().items():

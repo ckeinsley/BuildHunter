@@ -189,8 +189,7 @@ class CliState(object):
                 build = self.get_build_parts()
             return cd.getBuildDefense(build)
         except ConnectionError:
-            print('\tUnavailable')
-            return 0
+            return 'Unavailable'
 
     def is_part(self, id, part):
         return self._db.is_part(id, part)
