@@ -67,7 +67,6 @@ class CliState(object):
             self._active_build = temp
             raise ValueError('Build does not exist for the current active user')
         else:
-            print(self.get_build_id())
             new_parts = self._db.get_build_parts(self.get_build_id())
             self._local_build = EMPTY_BUILD
             for item in new_parts.items():
@@ -167,19 +166,31 @@ class CliState(object):
         }
     
     def get_build_resistances(self, build=None):
-        if build is None:
-            build = self.get_build_parts()
-        return cd.getBuildResistances(build)
+        try:
+            if build is None:
+                build = self.get_build_parts()
+            return cd.getBuildResistances(build)
+        except ConnectionError:
+            print('\tUnavailable')
+            return {}
 
     def get_build_skills(self, build=None):
-        if build is None:
-            build = self.get_build_parts()
-        return cd.getBuildSkills(build)
+        try:
+            if build is None:
+                build = self.get_build_parts()
+            return cd.getBuildSkills(build)
+        except ConnectionError:
+            print('\tUnavailable')
+            return {}
 
     def get_build_total_defense(self, build=None):
-        if build is None:
-            build = self.get_build_parts()
-        return cd.getBuildDefense(build)
+        try:
+            if build is None:
+                build = self.get_build_parts()
+            return cd.getBuildDefense(build)
+        except ConnectionError:
+            print('\tUnavailable')
+            return 0
 
     def is_part(self, id, part):
         return self._db.is_part(id, part)

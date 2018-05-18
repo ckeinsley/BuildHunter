@@ -5,7 +5,6 @@ from neo4j.v1 import GraphDatabase, basic_auth
 def connect():
     global neo_driver
     neo_driver = GraphDatabase.driver("bolt://433-06.csse.rose-hulman.edu:7688",auth=basic_auth("neo4j","huntallthemonsters247"))
-    global session
     session = neo_driver.session()
     return session
 
